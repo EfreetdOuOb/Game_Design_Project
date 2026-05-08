@@ -15,6 +15,24 @@ using UnityEngine.UI;
 public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerEnterHandler, IEndDragHandler
 
 {
+    [Serializable]
+    public class PointRule
+    {
+        public RectTransform point;
+        [Range(1, 9)] public int pointId;
+        public bool isMiddlePoint;
+    }
+
+    [Header("Point Rules (1~9)")]
+    public PointRule[] pointRules = new PointRule[9];
+
+    [Header("Draw Limits")]
+    public int maxPointsWithoutMiddle = 3;
+    public int extraPointsWhenTouchMiddle = 1;
+
+    private Dictionary<RectTransform, PointRule> pointRuleMap = new Dictionary<RectTransform, PointRule>();
+    private int selectedPointCount = 0;
+    private bool touchedMiddlePoint = false;
 
     public Canvas canvas;
 
@@ -43,6 +61,113 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
 
     private bool isPress = false;
+
+    private void Awake()
+
+    {
+
+        BuildPointRuleMap();
+
+    }
+
+    private void BuildPointRuleMap()
+
+    {
+
+        pointRuleMap.Clear();
+
+        if (pointRules == null)
+
+        {
+
+            return;
+
+        }
+
+        for (int i = 0; i < pointRules.Length; i++)
+
+        {
+
+            PointRule rule = pointRules[i];
+
+            if (rule == null || rule.point == null)
+
+            {
+
+                continue;
+
+            }
+
+            if (!pointRuleMap.ContainsKey(rule.point))
+
+            {
+
+                pointRuleMap.Add(rule.point, rule);
+
+            }
+
+        }
+
+    }
+
+    private bool IsMiddlePoint(RectTransform point)
+
+    {
+
+        if (point == null)
+
+        {
+
+            return false;
+
+        }
+
+        if (!pointRuleMap.TryGetValue(point, out PointRule rule))
+
+        {
+
+            return false;
+
+        }
+
+        return rule.isMiddlePoint;
+
+    }
+
+    private bool CanAddPoint(RectTransform nextPoint)
+
+    {
+
+        bool willTouchMiddle = touchedMiddlePoint || IsMiddlePoint(nextPoint);
+        int maxPoints = maxPointsWithoutMiddle + (willTouchMiddle ? extraPointsWhenTouchMiddle : 0);
+
+        return selectedPointCount + 1 <= maxPoints;
+
+    }
+
+    private bool CanPreviewFingerLine(PointerEventData eventData)
+
+    {
+        int hardMaxPoints = maxPointsWithoutMiddle + extraPointsWhenTouchMiddle;
+        return selectedPointCount < hardMaxPoints;
+
+    }
+
+    private void RegisterSelectedPoint(RectTransform point)
+
+    {
+
+        selectedPointCount++;
+
+        if (IsMiddlePoint(point))
+
+        {
+
+            touchedMiddlePoint = true;
+
+        }
+
+    }
 
 
 
@@ -170,7 +295,11 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
         {
 
+            BuildPointRuleMap();
             start = (RectTransform)eventData.pointerEnter.transform;
+            selectedPointCount = 0;
+            touchedMiddlePoint = false;
+            RegisterSelectedPoint(start);
 
             CreateJoint(start.position);
 
@@ -201,7 +330,7 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
 
 
-        if (isPress)
+        if (isPress && CanPreviewFingerLine(eventData))
 
         {
 
@@ -253,23 +382,34 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
                 {
 
+                    RectTransform nextPoint = (RectTransform)eventData.pointerEnter.transform;
+
+                    if (!CanAddPoint(nextPoint))
+
+                    {
+
+                        return;
+
+                    }
+
                     GameObject game = Instantiate(fingerLine.gameObject, start.position, Quaternion.identity, fingerLine.parent);
 
                     game.name = start.gameObject.name + "cs";
 
 
 
-                    SetLine((RectTransform)game.transform, start.position, eventData.pointerEnter.transform.position);
+                    SetLine((RectTransform)game.transform, start.position, nextPoint.position);
 
 
 
                     games.Add(game);
 
-                    CreateJoint(eventData.pointerEnter.transform.position);
+                    CreateJoint(nextPoint.position);
 
 
 
-                    start = (RectTransform)eventData.pointerEnter.transform;
+                    start = nextPoint;
+                    RegisterSelectedPoint(nextPoint);
 
                 }
 
@@ -320,6 +460,8 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         }
 
         start = null;
+        selectedPointCount = 0;
+        touchedMiddlePoint = false;
 
         fingerLine.gameObject.SetActive(false);
 

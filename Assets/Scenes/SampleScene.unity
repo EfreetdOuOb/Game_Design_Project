@@ -1287,6 +1287,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7bce5e911fdbde46baa49c19547fa70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ui_thread
+  pointRules:
+  - point: {fileID: 1849387929}
+    pointId: 9
+    isMiddlePoint: 1
+  - point: {fileID: 1071631144}
+    pointId: 0
+    isMiddlePoint: 0
+  - point: {fileID: 1582145680}
+    pointId: 2
+    isMiddlePoint: 0
+  - point: {fileID: 938743599}
+    pointId: 3
+    isMiddlePoint: 0
+  - point: {fileID: 1293255744}
+    pointId: 4
+    isMiddlePoint: 0
+  - point: {fileID: 568857443}
+    pointId: 5
+    isMiddlePoint: 0
+  - point: {fileID: 567869743}
+    pointId: 6
+    isMiddlePoint: 0
+  - point: {fileID: 1787957555}
+    pointId: 7
+    isMiddlePoint: 0
+  - point: {fileID: 1543897843}
+    pointId: 8
+    isMiddlePoint: 0
+  maxPointsWithoutMiddle: 3
+  extraPointsWhenTouchMiddle: 1
   canvas: {fileID: 732069549}
   fingerLine: {fileID: 973800068}
   jointPrefab: {fileID: 1179633876}
