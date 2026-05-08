@@ -23,4 +23,18 @@ public class GestureActionDispatcher : MonoBehaviour
             handler.OnGestureResolved(result);
         }
     }
+
+    public void DispatchTransformActivated(GestureResult previewResult)
+    {
+        for (int i = 0; i < actionHandlers.Count; i++)
+        {
+            IGestureRuntimeActionHandler handler = actionHandlers[i] as IGestureRuntimeActionHandler;
+            if (handler == null)
+            {
+                continue;
+            }
+
+            handler.OnTransformActivated(previewResult);
+        }
+    }
 }

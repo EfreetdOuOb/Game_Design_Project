@@ -62,6 +62,11 @@ public class GesturePointRegistry : MonoBehaviour
         return TryGetRule(point, out PointRule rule) ? rule.pointFunction : PointFunction.None;
     }
 
+    public IReadOnlyList<PointRule> GetAllRules()
+    {
+        return pointRules;
+    }
+
     private bool TryGetRule(RectTransform point, out PointRule rule)
     {
         if (point == null)

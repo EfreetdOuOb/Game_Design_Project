@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerEnterHandler, IEndDragHandler
+public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerEnterHandler, IEndDragHandler, IPointerUpHandler
 {
     [Header("Dependencies")]
     public GesturePointRegistry pointRegistry;
@@ -13,6 +14,15 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     public Canvas canvas;
     public RectTransform fingerLine;
     public RectTransform jointPrefab;
+
+    [Header("Debug Colors")]
+    public bool useDebugColors = true;
+    public Color idleColor = Color.white;
+    public Color attackColor = new Color(1f, 0.3f, 0.3f, 1f);
+    public Color skillColor = new Color(0.3f, 0.6f, 1f, 1f);
+    public Color transformColor = new Color(0.9f, 0.4f, 1f, 1f);
+    public Color defenseColor = new Color(0.3f, 1f, 0.5f, 1f);
+    public Color lockedColor = new Color(0.6f, 0.6f, 0.6f, 1f);
 
     public List<GameObject> games = new List<GameObject>();
     public List<GameObject> joints = new List<GameObject>();
@@ -25,6 +35,8 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     private int selectedPointCount = 0;
     private bool touchedMiddlePoint = false;
     private readonly List<int> selectedPointIds = new List<int>();
+    private readonly List<RectTransform> selectedPoints = new List<RectTransform>();
+    private bool transformTriggeredThisGesture = false;
 
     private void Awake()
     {
@@ -32,6 +44,9 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         {
             pointRegistry.Rebuild();
         }
+
+        // Show debug colors immediately at startup for prototype readability.
+        RefreshDebugColors();
     }
 
     private bool IsMiddlePoint(RectTransform point)
@@ -46,7 +61,7 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             return true;
         }
 
-        return limitPolicy.CanAddPoint(selectedPointCount, touchedMiddlePoint, IsMiddlePoint(nextPoint));
+        return limitPolicy.CanAddPoint(selectedPointCount, touchedMiddlePoint);
     }
 
     private bool CanPreviewFingerLine()
@@ -56,7 +71,7 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             return true;
         }
 
-        return limitPolicy.CanPreviewFingerLine(selectedPointCount);
+        return limitPolicy.CanPreviewFingerLine(selectedPointCount, touchedMiddlePoint);
     }
 
     private int GetPointId(RectTransform point)
@@ -80,18 +95,152 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         return pointRegistry.GetPointFunction(start);
     }
 
-    private void NotifyActionHandlers(PointFunction resolvedFunction)
+    private void DispatchTransformActivatedIfNeeded()
     {
-        if (actionDispatcher == null || resolvedFunction == PointFunction.None)
+        if (transformTriggeredThisGesture || !touchedMiddlePoint || actionDispatcher == null)
         {
             return;
         }
 
+        GestureResult previewResult = BuildGestureResult(ResolveFunctionByPath());
+        actionDispatcher.DispatchTransformActivated(previewResult);
+        transformTriggeredThisGesture = true;
+    }
+
+    private void RefreshDebugColors()
+    {
+        if (!useDebugColors || pointRegistry == null)
+        {
+            return;
+        }
+
+        IReadOnlyList<GesturePointRegistry.PointRule> rules = pointRegistry.GetAllRules();
+        if (rules == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < rules.Count; i++)
+        {
+            GesturePointRegistry.PointRule rule = rules[i];
+            if (rule == null || rule.point == null)
+            {
+                continue;
+            }
+
+            Image image = rule.point.GetComponent<Image>();
+            if (image == null)
+            {
+                continue;
+            }
+
+            image.color = idleColor;
+        }
+
+        GestureResult preview = BuildGestureResult(ResolveFunctionByPath());
+        for (int i = 0; i < selectedPoints.Count && i < preview.pointSnapshots.Count; i++)
+        {
+            RectTransform point = selectedPoints[i];
+            Image image = point != null ? point.GetComponent<Image>() : null;
+            if (image == null)
+            {
+                continue;
+            }
+
+            GesturePointSnapshot snap = preview.pointSnapshots[i];
+            if (snap.lockedBeforeTransform)
+            {
+                image.color = lockedColor;
+                continue;
+            }
+
+            switch (snap.finalFunction)
+            {
+                case PointFunction.Attack:
+                    image.color = attackColor;
+                    break;
+                case PointFunction.Skill:
+                    image.color = skillColor;
+                    break;
+                case PointFunction.Transform:
+                    image.color = transformColor;
+                    break;
+                case PointFunction.Defense:
+                    image.color = defenseColor;
+                    break;
+                default:
+                    image.color = idleColor;
+                    break;
+            }
+        }
+    }
+
+    private GestureResult BuildGestureResult(PointFunction resolvedFunction)
+    {
         GestureResult result = new GestureResult
         {
             resolvedFunction = resolvedFunction,
             pointIds = new List<int>(selectedPointIds)
         };
+
+        int transformIndex = -1;
+        for (int i = 0; i < selectedPoints.Count; i++)
+        {
+            if (IsMiddlePoint(selectedPoints[i]))
+            {
+                transformIndex = i;
+                break;
+            }
+        }
+
+        result.hasTransform = transformIndex >= 0;
+        result.transformPointIndex = transformIndex;
+
+        for (int i = 0; i < selectedPoints.Count; i++)
+        {
+            RectTransform point = selectedPoints[i];
+            int pointId = GetPointId(point);
+            PointFunction baseFunction = pointRegistry != null ? pointRegistry.GetPointFunction(point) : PointFunction.None;
+
+            bool lockedBeforeTransform = result.hasTransform && i < transformIndex;
+            bool transformedPhase = result.hasTransform && i > transformIndex;
+
+            PointFunction finalFunction = baseFunction;
+            if (!lockedBeforeTransform && transformedPhase)
+            {
+                if (baseFunction == PointFunction.Attack)
+                {
+                    finalFunction = PointFunction.Defense;
+                }
+                else if (baseFunction == PointFunction.Skill)
+                {
+                    finalFunction = PointFunction.Skill;
+                }
+            }
+
+            result.pointSnapshots.Add(new GesturePointSnapshot
+            {
+                pointId = pointId,
+                baseFunction = baseFunction,
+                finalFunction = finalFunction,
+                lockedBeforeTransform = lockedBeforeTransform
+            });
+        }
+
+        if (result.pointSnapshots.Count > 0)
+        {
+            result.resolvedFunction = result.pointSnapshots[result.pointSnapshots.Count - 1].finalFunction;
+        }
+
+        return result;
+    }
+
+    private void NotifyActionHandlers(GestureResult result)
+    {
+        if (actionDispatcher == null || result == null || result.resolvedFunction == PointFunction.None)
+        {
+            return;
+        }
 
         actionDispatcher.Dispatch(result);
     }
@@ -106,10 +255,15 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             selectedPointIds.Add(pointId);
         }
 
+        selectedPoints.Add(point);
+
         if (IsMiddlePoint(point))
         {
             touchedMiddlePoint = true;
         }
+
+        DispatchTransformActivatedIfNeeded();
+        RefreshDebugColors();
     }
 
 
@@ -175,6 +329,8 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             selectedPointCount = 0;
             touchedMiddlePoint = false;
             selectedPointIds.Clear();
+            selectedPoints.Clear();
+            transformTriggeredThisGesture = false;
             RegisterSelectedPoint(start);
             CreateJoint(start.position);
         }
@@ -231,7 +387,19 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     public void OnEndDrag(PointerEventData eventData)
     {
         PointFunction resolvedFunction = ResolveFunctionByPath();
-        NotifyActionHandlers(resolvedFunction);
+        GestureResult result = BuildGestureResult(resolvedFunction);
+        NotifyActionHandlers(result);
+        ResetGestureState();
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        // Cleanup fallback for tap-only interaction (no drag callback).
+        ResetGestureState();
+    }
+
+    private void ResetGestureState()
+    {
         while (games.Count > 0)
         {
             Destroy(games[0]);
@@ -246,6 +414,10 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         selectedPointCount = 0;
         touchedMiddlePoint = false;
         selectedPointIds.Clear();
+        selectedPoints.Clear();
+        transformTriggeredThisGesture = false;
+        isPress = false;
+        RefreshDebugColors();
         fingerLine.gameObject.SetActive(false);
     }
     private void CreateJoint(Vector3 worldPos)

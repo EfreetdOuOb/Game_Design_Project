@@ -170,12 +170,23 @@ MonoBehaviour:
   onAttack:
     m_PersistentCalls:
       m_Calls: []
+  onDefense:
+    m_PersistentCalls:
+      m_Calls: []
   onSkill:
     m_PersistentCalls:
       m_Calls: []
   onTransform:
     m_PersistentCalls:
       m_Calls: []
+  ownedSkillPool:
+  - "\u96D9\u64CA"
+  - "\u80CC\u523A"
+  - "\u6613\u50B7"
+  - "\u865B\u5F31"
+  - "\u7FA4\u9AD4"
+  - "\u9EBB\u75FA"
+  shownSkills: []
 --- !u!1 &93172329
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,16 +6,15 @@ public class GestureLimitPolicy
     public int maxPointsWithoutMiddle = 3;
     public int extraPointsWhenTouchMiddle = 1;
 
-    public bool CanAddPoint(int selectedPointCount, bool touchedMiddlePoint, bool nextIsMiddlePoint)
+    public bool CanAddPoint(int selectedPointCount, bool touchedMiddlePoint)
     {
-        bool willTouchMiddle = touchedMiddlePoint || nextIsMiddlePoint;
-        int maxPoints = maxPointsWithoutMiddle + (willTouchMiddle ? extraPointsWhenTouchMiddle : 0);
+        int maxPoints = maxPointsWithoutMiddle + (touchedMiddlePoint ? extraPointsWhenTouchMiddle : 0);
         return selectedPointCount + 1 <= maxPoints;
     }
 
-    public bool CanPreviewFingerLine(int selectedPointCount)
+    public bool CanPreviewFingerLine(int selectedPointCount, bool touchedMiddlePoint)
     {
-        int hardMaxPoints = maxPointsWithoutMiddle + extraPointsWhenTouchMiddle;
+        int hardMaxPoints = maxPointsWithoutMiddle + (touchedMiddlePoint ? extraPointsWhenTouchMiddle : 0);
         return selectedPointCount < hardMaxPoints;
     }
 }
