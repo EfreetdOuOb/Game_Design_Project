@@ -24,6 +24,9 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     public Color defenseColor = new Color(0.3f, 1f, 0.5f, 1f);
     public Color lockedColor = new Color(0.6f, 0.6f, 0.6f, 1f);
 
+    [Header("Debug Logs")]
+    public bool enableDebugLogs = false;
+
     public List<GameObject> games = new List<GameObject>();
     public List<GameObject> joints = new List<GameObject>();
 
@@ -37,6 +40,7 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     private readonly List<int> selectedPointIds = new List<int>();
     private readonly List<RectTransform> selectedPoints = new List<RectTransform>();
     private bool transformTriggeredThisGesture = false;
+    private bool hasDraggedThisGesture = false;
 
     private void Awake()
     {
@@ -235,14 +239,28 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         return result;
     }
 
+    // 修改 NotifyActionHandlers，對每個 snapshot 依序執行
     private void NotifyActionHandlers(GestureResult result)
     {
-        if (actionDispatcher == null || result == null || result.resolvedFunction == PointFunction.None)
+        if (actionDispatcher == null || result == null)
         {
             return;
         }
 
-        actionDispatcher.Dispatch(result);
+        foreach (var snap in result.pointSnapshots)
+        {
+            if (snap.lockedBeforeTransform) continue; // 鎖定的點跳過
+            if (snap.finalFunction == PointFunction.None) continue;
+
+        // 建立只針對這個點的單點 result 傳給 dispatcher
+            GestureResult singleResult = new GestureResult
+            {
+                resolvedFunction = snap.finalFunction,
+                pointIds = new List<int> { snap.pointId },
+                pointSnapshots = new List<GesturePointSnapshot> { snap }
+            };
+            actionDispatcher.Dispatch(singleResult);
+        }
     }
 
     private void RegisterSelectedPoint(RectTransform point)
@@ -264,6 +282,28 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
         DispatchTransformActivatedIfNeeded();
         RefreshDebugColors();
+    }
+
+    private void LogGestureSummary(GestureResult result)
+    {
+        if (!enableDebugLogs || result == null)
+        {
+            return;
+        }
+
+        string pathText = "";
+        for (int i = 0; i < result.pointSnapshots.Count; i++)
+        {
+            if (i > 0)
+            {
+                pathText += " -> ";
+            }
+
+            GesturePointSnapshot snap = result.pointSnapshots[i];
+            pathText += $"{snap.pointId}({snap.finalFunction})";
+        }
+
+        Debug.Log($"[手勢總結] 路徑={pathText}，有轉換={result.hasTransform}，最終功能={result.resolvedFunction}");
     }
 
 
@@ -331,6 +371,7 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             selectedPointIds.Clear();
             selectedPoints.Clear();
             transformTriggeredThisGesture = false;
+            hasDraggedThisGesture = false;
             RegisterSelectedPoint(start);
             CreateJoint(start.position);
         }
@@ -340,6 +381,7 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         if (start != null)
         {
             isPress = true;
+            hasDraggedThisGesture = true;
             touchPos = eventData.position;
         }
         if (isPress && CanPreviewFingerLine())
@@ -389,13 +431,20 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         PointFunction resolvedFunction = ResolveFunctionByPath();
         GestureResult result = BuildGestureResult(resolvedFunction);
         NotifyActionHandlers(result);
+        LogGestureSummary(result);
         ResetGestureState();
+        
+        Debug.Log("[UI] 手勢結束，呼叫 EndPlayerTurn");
+        TurnManager.Instance?.EndPlayerTurn();
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        // Cleanup fallback for tap-only interaction (no drag callback).
-        ResetGestureState();
+        // Tap-only fallback: if this gesture never dragged, EndDrag might not fire.
+        if (!hasDraggedThisGesture)
+        {
+            ResetGestureState();
+        }
     }
 
     private void ResetGestureState()
@@ -416,6 +465,7 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         selectedPointIds.Clear();
         selectedPoints.Clear();
         transformTriggeredThisGesture = false;
+        hasDraggedThisGesture = false;
         isPress = false;
         RefreshDebugColors();
         fingerLine.gameObject.SetActive(false);

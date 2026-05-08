@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using System.Collections.Generic;
 
-public class GestureActionRouter : MonoBehaviour, IGestureActionHandler, IGestureRuntimeActionHandler
+public class GestureActionRouter : MonoBehaviour, IGestureActionHandler, IGestureRuntimeActionHandler, ISkillSlotProvider
 {
     [Header("Actions")]
     public UnityEvent onAttack;
@@ -13,6 +13,7 @@ public class GestureActionRouter : MonoBehaviour, IGestureActionHandler, IGestur
     [Header("Skill Pool")]
     public List<string> ownedSkillPool = new List<string>();
     [SerializeField] private List<string> shownSkills = new List<string>();
+    public bool enableDebugLogs = false;
 
     public IReadOnlyList<string> ShownSkills => shownSkills;
 
@@ -20,6 +21,7 @@ public class GestureActionRouter : MonoBehaviour, IGestureActionHandler, IGestur
     {
         EnsureShownSkillsInitialized();
         ApplyTransformedSkills(result);
+        LogResolvedSkills(result);
 
         switch (result.resolvedFunction)
         {
@@ -88,5 +90,38 @@ public class GestureActionRouter : MonoBehaviour, IGestureActionHandler, IGestur
 
             point.resolvedSkillId = shownSkills[slotIndex];
         }
+    }
+
+    private void LogResolvedSkills(GestureResult result)
+    {
+        if (!enableDebugLogs || result == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < result.pointSnapshots.Count; i++)
+        {
+            GesturePointSnapshot point = result.pointSnapshots[i];
+            if (point.finalFunction != PointFunction.Skill)
+            {
+                continue;
+            }
+
+            string skill = string.IsNullOrEmpty(point.resolvedSkillId) ? "(not assigned)" : point.resolvedSkillId;
+            Debug.Log($"[手勢][技能] 點位={point.pointId}，最終功能={point.finalFunction}，技能={skill}");
+        }
+    }
+
+    public bool TryGetSkillIdForPoint(int pointId, out string skillId)
+    {
+        int slotIndex = pointId - 5;
+        if (slotIndex < 0 || slotIndex >= shownSkills.Count)
+        {
+            skillId = string.Empty;
+            return false;
+        }
+
+        skillId = shownSkills[slotIndex];
+        return !string.IsNullOrEmpty(skillId);
     }
 }

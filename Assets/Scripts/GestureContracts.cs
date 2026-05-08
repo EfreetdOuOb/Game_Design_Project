@@ -39,3 +39,8 @@ public interface IGestureRuntimeActionHandler
 {
     void OnTransformActivated(GestureResult previewResult);
 }
+
+public interface ISkillSlotProvider
+{
+    bool TryGetSkillIdForPoint(int pointId, out string skillId);
+}
