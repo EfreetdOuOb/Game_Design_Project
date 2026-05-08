@@ -242,25 +242,23 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     // 修改 NotifyActionHandlers，對每個 snapshot 依序執行
     private void NotifyActionHandlers(GestureResult result)
     {
-        if (actionDispatcher == null || result == null)
-        {
-            return;
-        }
+        if (actionDispatcher == null || result == null) return;
 
-        foreach (var snap in result.pointSnapshots)
-        {
-            if (snap.lockedBeforeTransform) continue; // 鎖定的點跳過
-            if (snap.finalFunction == PointFunction.None) continue;
+    foreach (var snap in result.pointSnapshots)
+    {
+        // lockedBeforeTransform 只是視覺鎖定，效果仍然要執行
+        // 只跳過 Transform 點本身和 None
+        if (snap.finalFunction == PointFunction.None) continue;
+        if (snap.finalFunction == PointFunction.Transform) continue; // Transform點只觸發形態變換，不執行戰鬥效果
 
-        // 建立只針對這個點的單點 result 傳給 dispatcher
-            GestureResult singleResult = new GestureResult
-            {
-                resolvedFunction = snap.finalFunction,
-                pointIds = new List<int> { snap.pointId },
-                pointSnapshots = new List<GesturePointSnapshot> { snap }
-            };
-            actionDispatcher.Dispatch(singleResult);
-        }
+        GestureResult singleResult = new GestureResult
+        {
+            resolvedFunction = snap.finalFunction,
+            pointIds = new List<int> { snap.pointId },
+            pointSnapshots = new List<GesturePointSnapshot> { snap }
+        };
+        actionDispatcher.Dispatch(singleResult);
+    }
     }
 
     private void RegisterSelectedPoint(RectTransform point)
@@ -433,7 +431,7 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         NotifyActionHandlers(result);
         LogGestureSummary(result);
         ResetGestureState();
-        
+
         Debug.Log("[UI] 手勢結束，呼叫 EndPlayerTurn");
         TurnManager.Instance?.EndPlayerTurn();
     }
