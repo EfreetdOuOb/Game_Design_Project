@@ -189,7 +189,7 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
         int skillDefense = skillReport != null ? skillReport.totalDefenseAdded : 0;
 
         Debug.Log(
-            "[戰鬥總結]\n" +
+            "[總結]\n" +
             $"路徑: {points}\n" +
             $"攻擊點數={attackCount}（攻擊次數={attackCount}，總傷害={totalAttackDamage}）\n" +
             $"防禦點數={defenseCount}（本回合防禦加成={totalDefenseAdded}）\n" +
