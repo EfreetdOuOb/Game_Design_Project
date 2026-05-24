@@ -43,6 +43,7 @@ public class CombatActor : MonoBehaviour
         int reduced = Mathf.Max(0, rawDamage - temporaryDefenseBonus);
         currentHp = Mathf.Max(0, currentHp - reduced);
         Debug.Log($"[戰鬥] {actorId} 受到 {reduced} 傷害（原始={rawDamage}），HP={currentHp}/{maxHp}");
+        CombatUI.Instance?.AppendBattleLog($"{actorId} 受到 {reduced} 傷害，HP {currentHp}/{maxHp}");
         return reduced;
     }
 

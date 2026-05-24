@@ -40,6 +40,7 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
         SkillExecutionReport skillReport = ExecuteSkill(result, skillCount);
 
         LogTurnSummary(result, attackCount, defenseCount, skillCount, totalAttackDamage, totalDefenseAdded, skillReport);
+        CombatUI.Instance?.AppendBattleLog($"玩家攻擊 {attackCount} 次，造成 {totalAttackDamage} 傷害");
     }
 
     private int ExecuteAttack(int attackCount)

@@ -26,5 +26,6 @@ public class DamageSkillDefinition : SkillDefinition
             context.report.totalDamageDealt += actualDamage;
         }
         Debug.Log($"[技能] {displayName}（{skillId}）造成 {finalDamage} 傷害。");
+        CombatUI.Instance?.AppendBattleLog($"{context.self.actorId} 使用 {displayName}，造成 {finalDamage} 傷害");
     }
 }

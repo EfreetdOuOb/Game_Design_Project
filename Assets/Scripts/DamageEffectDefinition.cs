@@ -25,5 +25,6 @@ public class DamageEffectDefinition : SkillEffectDefinition
             context.report.totalDamageDealt += actualDamage;
         }
         Debug.Log($"[技能效果] 傷害效果觸發，造成 {value} 傷害。");
+        CombatUI.Instance?.AppendBattleLog($"{context.self.actorId} 對 {context.target.actorId} 造成 {actualDamage} 傷害");
     }
 }
