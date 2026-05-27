@@ -377,6 +377,16 @@ private Color GetBaseColorForFunction(PointFunction func)
         GestureResult result = BuildGestureResult(resolvedFunction);
         NotifyActionHandlers(result);
         LogGestureSummary(result);
+
+        if (result.hasTransform &&
+        (hasDraggedThisGesture || result.pointSnapshots.Count > 1) &&
+        actionDispatcher != null)
+        {
+        
+        GestureResult transformResult = result;
+        transformResult.resolvedFunction = PointFunction.Transform;
+        actionDispatcher.Dispatch(transformResult);
+        }
         ResetGestureState();
 
         Debug.Log("[UI] 手勢結束，呼叫 EndPlayerTurn");

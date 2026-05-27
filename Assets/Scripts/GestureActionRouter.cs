@@ -35,6 +35,7 @@ public class GestureActionRouter : MonoBehaviour, IGestureActionHandler, IGestur
                 onSkill?.Invoke();
                 break;
             case PointFunction.Transform:
+                RerollShownSkills();
                 onTransform?.Invoke();
                 break;
         }
@@ -42,7 +43,7 @@ public class GestureActionRouter : MonoBehaviour, IGestureActionHandler, IGestur
 
     public void OnTransformActivated(GestureResult previewResult)
     {
-        RerollShownSkills();
+        
         onTransform?.Invoke();
     }
 
