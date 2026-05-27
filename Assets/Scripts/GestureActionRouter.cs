@@ -16,6 +16,7 @@ public class GestureActionRouter : MonoBehaviour, IGestureActionHandler, IGestur
     public bool enableDebugLogs = false;
 
     public IReadOnlyList<string> ShownSkills => shownSkills;
+    
     private void Start()
 {
     EnsureShownSkillsInitialized();
@@ -38,6 +39,22 @@ private void OnPlayerTurnStart()
     RerollShownSkills();
 }
 
+// 鎖定哪些槽位（index 對應 shownSkills 的位置）
+private readonly HashSet<int> lockedSlots = new HashSet<int>();
+
+// 外部呼叫：鎖定 / 解鎖某個槽位
+public void LockSlot(int slotIndex)
+{
+    if (slotIndex >= 0 && slotIndex < shownSkills.Count)
+        lockedSlots.Add(slotIndex);
+}
+
+public void UnlockSlot(int slotIndex) => lockedSlots.Remove(slotIndex);
+
+public void UnlockAllSlots() => lockedSlots.Clear();
+
+public bool IsSlotLocked(int slotIndex) => lockedSlots.Contains(slotIndex);
+
     public void OnGestureResolved(GestureResult result)
     {
         EnsureShownSkillsInitialized();
@@ -56,6 +73,7 @@ private void OnPlayerTurnStart()
                 onSkill?.Invoke();
                 break;
             case PointFunction.Transform:
+                UnlockAllSlots();      // 主動轉換時解鎖全部
                 RerollShownSkills();
                 onTransform?.Invoke();
                 break;
@@ -80,22 +98,41 @@ private void OnPlayerTurnStart()
     }
 
     private void RerollShownSkills()
+{
+    // 先把鎖定的技能記下來
+    Dictionary<int, string> preserved = new Dictionary<int, string>();
+    foreach (int lockedIdx in lockedSlots)
     {
-        shownSkills.Clear();
-        if (ownedSkillPool == null || ownedSkillPool.Count == 0)
-        {
-            return;
-        }
-
-        List<string> candidates = new List<string>(ownedSkillPool);
-        int pickCount = Mathf.Min(4, candidates.Count);
-        for (int i = 0; i < pickCount; i++)
-        {
-            int index = Random.Range(0, candidates.Count);
-            shownSkills.Add(candidates[index]);
-            candidates.RemoveAt(index);
-        }
+        if (lockedIdx < shownSkills.Count)
+            preserved[lockedIdx] = shownSkills[lockedIdx];
     }
+
+    shownSkills.Clear();
+
+    // 先填 4 個空位（null 代表待抽）
+    for (int i = 0; i < 4; i++)
+        shownSkills.Add(string.Empty);
+
+    // 把鎖定的技能放回原位
+    foreach (var kv in preserved)
+        shownSkills[kv.Key] = kv.Value;
+
+    // 候選池排除已鎖定的技能（避免重複抽到同一張）
+    List<string> candidates = new List<string>(ownedSkillPool);
+    foreach (var kv in preserved)
+        candidates.Remove(kv.Value);
+
+    // 只抽沒被鎖定的空槽
+    for (int i = 0; i < shownSkills.Count; i++)
+    {
+        if (lockedSlots.Contains(i)) continue;    // 鎖定的跳過
+        if (candidates.Count == 0) break;
+
+        int idx = Random.Range(0, candidates.Count);
+        shownSkills[i] = candidates[idx];
+        candidates.RemoveAt(idx);
+    }
+}
 
     private void ApplyTransformedSkills(GestureResult result)
     {
