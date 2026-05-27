@@ -17,9 +17,26 @@ public class GestureActionRouter : MonoBehaviour, IGestureActionHandler, IGestur
 
     public IReadOnlyList<string> ShownSkills => shownSkills;
     private void Start()
-    {
-        EnsureShownSkillsInitialized();
-    }
+{
+    EnsureShownSkillsInitialized();
+
+    // Start 時 TurnManager.Instance 一定已經在 Awake 設好了
+    if (TurnManager.Instance != null)
+        TurnManager.Instance.OnPlayerTurnStart += OnPlayerTurnStart;
+    else
+        Debug.LogWarning("[GestureActionRouter] 找不到 TurnManager，無法訂閱 OnPlayerTurnStart");
+}
+
+private void OnDestroy()  // OnDisable 改成 OnDestroy，對應 Start 的訂閱
+{
+    if (TurnManager.Instance != null)
+        TurnManager.Instance.OnPlayerTurnStart -= OnPlayerTurnStart;
+}
+
+private void OnPlayerTurnStart()
+{
+    RerollShownSkills();
+}
 
     public void OnGestureResolved(GestureResult result)
     {
