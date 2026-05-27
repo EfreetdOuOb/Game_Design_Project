@@ -378,14 +378,12 @@ private Color GetBaseColorForFunction(PointFunction func)
         NotifyActionHandlers(result);
         LogGestureSummary(result);
 
-        if (result.hasTransform &&
-        (hasDraggedThisGesture || result.pointSnapshots.Count > 1) &&
-        actionDispatcher != null)
+        if (result.hasTransform && result.transformPointIndex == 0 &&
+            hasDraggedThisGesture && actionDispatcher != null)
         {
-        
-        GestureResult transformResult = result;
-        transformResult.resolvedFunction = PointFunction.Transform;
-        actionDispatcher.Dispatch(transformResult);
+            GestureResult transformResult = result;
+            transformResult.resolvedFunction = PointFunction.Transform;
+            actionDispatcher.Dispatch(transformResult);
         }
         ResetGestureState();
 

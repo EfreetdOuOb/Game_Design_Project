@@ -16,6 +16,10 @@ public class GestureActionRouter : MonoBehaviour, IGestureActionHandler, IGestur
     public bool enableDebugLogs = false;
 
     public IReadOnlyList<string> ShownSkills => shownSkills;
+    private void Start()
+    {
+        EnsureShownSkillsInitialized();
+    }
 
     public void OnGestureResolved(GestureResult result)
     {
@@ -43,8 +47,11 @@ public class GestureActionRouter : MonoBehaviour, IGestureActionHandler, IGestur
 
     public void OnTransformActivated(GestureResult previewResult)
     {
-        
-        onTransform?.Invoke();
+        if (previewResult.transformPointIndex > 0)
+        {
+            RerollShownSkills();
+            onTransform?.Invoke();
+        }
     }
 
     private void EnsureShownSkillsInitialized()
