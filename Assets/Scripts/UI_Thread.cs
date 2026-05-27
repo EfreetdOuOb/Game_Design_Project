@@ -51,8 +51,7 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             pointRegistry.Rebuild();
         }
 
-        // Show debug colors immediately at startup for prototype readability.
-        RefreshDebugColors();
+        
     }
 
     private bool IsMiddlePoint(RectTransform point)
@@ -113,53 +112,6 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         transformTriggeredThisGesture = true;
     }
 
-    private void RefreshDebugColors()
-{
-    if (!useDebugColors || pointRegistry == null) return;
-
-    IReadOnlyList<GesturePointRegistry.PointRule> rules = pointRegistry.GetAllRules();
-    if (rules == null) return;
-
-    // 判斷目前是否已觸發 Transform
-    bool transformActive = touchedMiddlePoint;
-
-    // ① 所有點塗預設顏色（感知 Transform 狀態）
-    for (int i = 0; i < rules.Count; i++)
-    {
-        GesturePointRegistry.PointRule rule = rules[i];
-        if (rule == null || rule.point == null) continue;
-
-        Image image = rule.point.GetComponent<Image>();
-        if (image == null) continue;
-
-        PointFunction func = pointRegistry.GetPointFunction(rule.point);
-
-        // Transform 已觸發，Attack 點顯示為 Defense 色
-        if (transformActive && func == PointFunction.Attack)
-            func = PointFunction.Defense;
-
-        image.color = GetBaseColorForFunction(func);
-    }
-
-    // ② 已選中的點覆蓋（邏輯不變）
-    GestureResult preview = BuildGestureResult(ResolveFunctionByPath());
-    for (int i = 0; i < selectedPoints.Count && i < preview.pointSnapshots.Count; i++)
-    {
-        RectTransform point = selectedPoints[i];
-        Image image = point != null ? point.GetComponent<Image>() : null;
-        if (image == null) continue;
-
-        GesturePointSnapshot snap = preview.pointSnapshots[i];
-        if (snap.lockedBeforeTransform)
-        {
-            Color baseColor = GetBaseColorForFunction(snap.baseFunction);
-            image.color = Color.Lerp(baseColor, lockedColor, lockedOverlayStrength);
-            continue;
-        }
-
-        image.color = GetBaseColorForFunction(snap.finalFunction);
-    }
-}
 
 // 抽出來的輔助方法，讓邏輯只寫一次
 private Color GetBaseColorForFunction(PointFunction func)
@@ -274,7 +226,7 @@ private Color GetBaseColorForFunction(PointFunction func)
         }
 
         DispatchTransformActivatedIfNeeded();
-        RefreshDebugColors();
+        
     }
 
     private void LogGestureSummary(GestureResult result)
@@ -460,7 +412,7 @@ private Color GetBaseColorForFunction(PointFunction func)
         transformTriggeredThisGesture = false;
         hasDraggedThisGesture = false;
         isPress = false;
-        RefreshDebugColors();
+        
         fingerLine.gameObject.SetActive(false);
     }
     private void CreateJoint(Vector3 worldPos)
