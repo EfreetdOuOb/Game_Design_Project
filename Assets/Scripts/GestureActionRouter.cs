@@ -34,10 +34,11 @@ private void OnDestroy()  // OnDisable 改成 OnDestroy，對應 Start 的訂閱
         TurnManager.Instance.OnPlayerTurnStart -= OnPlayerTurnStart;
 }
 
-private void OnPlayerTurnStart()
-{
-    RerollShownSkills();
-}
+    private void OnPlayerTurnStart()
+    {
+        UnlockAllSlots();
+        RerollShownSkills();
+    }
 
 // 鎖定哪些槽位（index 對應 shownSkills 的位置）
 private readonly HashSet<int> lockedSlots = new HashSet<int>();
@@ -73,7 +74,7 @@ public bool IsSlotLocked(int slotIndex) => lockedSlots.Contains(slotIndex);
                 onSkill?.Invoke();
                 break;
             case PointFunction.Transform:
-                UnlockAllSlots();      // 主動轉換時解鎖全部
+                
                 RerollShownSkills();
                 onTransform?.Invoke();
                 break;
@@ -84,8 +85,17 @@ public bool IsSlotLocked(int slotIndex) => lockedSlots.Contains(slotIndex);
     {
         if (previewResult.transformPointIndex > 0)
         {
+            foreach (var snap in previewResult.pointSnapshots)
+            {
+                if (snap.lockedBeforeTransform && snap.baseFunction == PointFunction.Skill)
+                {
+                    int slotIndex = snap.pointId - 5;
+                    LockSlot(slotIndex);
+                }
+            }
             RerollShownSkills();
             onTransform?.Invoke();
+            UnlockAllSlots();
         }
     }
 
