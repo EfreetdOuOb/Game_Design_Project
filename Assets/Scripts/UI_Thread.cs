@@ -423,6 +423,12 @@ private Color GetBaseColorForFunction(PointFunction func)
         
         fingerLine.gameObject.SetActive(false);
     }
+
+    // 公开：获取当前正在绘制的点位列表
+    public List<int> GetSelectedPointIds()
+    {
+        return new List<int>(selectedPointIds);
+    }
     private void CreateJoint(Vector3 worldPos)
     {
         if (jointPrefab == null)

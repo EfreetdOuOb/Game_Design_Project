@@ -80,7 +80,6 @@ public bool IsSlotLocked(int slotIndex) => lockedSlots.Contains(slotIndex);
                 break;
 
         }
-
     }
 
     public void OnTransformActivated(GestureResult previewResult)
