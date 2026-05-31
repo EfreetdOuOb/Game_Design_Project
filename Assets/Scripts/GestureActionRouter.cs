@@ -78,7 +78,9 @@ public bool IsSlotLocked(int slotIndex) => lockedSlots.Contains(slotIndex);
                 RerollShownSkills();
                 onTransform?.Invoke();
                 break;
+
         }
+
     }
 
     public void OnTransformActivated(GestureResult previewResult)
