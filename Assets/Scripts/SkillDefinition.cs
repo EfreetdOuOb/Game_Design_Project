@@ -21,5 +21,7 @@ public abstract class SkillDefinition : ScriptableObject
     public string skillId;
     public string displayName;
 
+    public Sprite icon;
+
     public abstract void Execute(SkillExecutionContext context);
 }
