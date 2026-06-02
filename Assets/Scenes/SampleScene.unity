@@ -1376,7 +1376,7 @@ MonoBehaviour:
   - {fileID: 1582145681}
   - {fileID: 938743600}
   - {fileID: 1293255745}
-  attackSprite: {fileID: 364371424, guid: 75872876a773f564a9660e522ca4edd7, type: 3}
+  attackSprite: {fileID: -875591270, guid: 23571e8053dc4734ea404123c6dc79be, type: 3}
   defenseSprite: {fileID: 1523094178, guid: 930376e290d678445ad0467c7279bd2d, type: 3}
   uiThread: {fileID: 1577747617}
 --- !u!1 &732069546
