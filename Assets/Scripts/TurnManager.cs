@@ -37,7 +37,7 @@ public class TurnManager : MonoBehaviour
         OnEnemyTurnStart?.Invoke();
 
     // TODO: 之後換成真實敵人 AI，現在暫時直接結束敵人回合
-    EndEnemyTurn();
+    //EndEnemyTurn();
     }
 
     public void EndEnemyTurn()
