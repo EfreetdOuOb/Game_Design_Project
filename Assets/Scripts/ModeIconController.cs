@@ -356,7 +356,7 @@ public class ModeSwitchImageController : MonoBehaviour
                 if (!usedAttackPoints.Contains(点位))
                 {
                     usedAttackPoints.Add(点位);
-                    //Debug.Log($"[已使用点] 点位 {点位} 已被记录");
+                    Debug.Log($"[已使用点] 点位 {点位} 已被记录");
                 }
             }
         }

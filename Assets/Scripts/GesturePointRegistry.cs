@@ -47,6 +47,8 @@ public class GesturePointRegistry : MonoBehaviour
         }
     }
 
+    
+
     public bool IsMiddlePoint(RectTransform point)
     {
         return TryGetRule(point, out PointRule rule) && rule.isMiddlePoint;
