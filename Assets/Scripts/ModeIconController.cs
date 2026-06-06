@@ -348,15 +348,27 @@ public class ModeSwitchImageController : MonoBehaviour
     /// </summary>
     private void 追踪所有经过的点位(List<int> 当前点位列表)
     {
-        // 记录当前帧的所有点位
-        foreach (int 点位 in 当前点位列表)
+        // 如果当前点位列表为空（用户释放了所有点），则清除已使用的攻击点记录
+        if (当前点位列表.Count == 0)
         {
-            if (点位 >= ATTACK_POINT_START && 点位 <= ATTACK_POINT_END)
+            if (usedAttackPoints.Count > 0)
             {
-                if (!usedAttackPoints.Contains(点位))
+                Debug.Log($"[已使用点] 用户释放所有点，清除已记录的点位: {string.Join(", ", usedAttackPoints)}");
+                usedAttackPoints.Clear();
+            }
+        }
+        else
+        {
+            // 记录当前帧的所有点位
+            foreach (int 点位 in 当前点位列表)
+            {
+                if (点位 >= ATTACK_POINT_START && 点位 <= ATTACK_POINT_END)
                 {
-                    usedAttackPoints.Add(点位);
-                    Debug.Log($"[已使用点] 点位 {点位} 已被记录");
+                    if (!usedAttackPoints.Contains(点位))
+                    {
+                        usedAttackPoints.Add(点位);
+                        Debug.Log($"[已使用点] 点位 {点位} 已被记录");
+                    }
                 }
             }
         }

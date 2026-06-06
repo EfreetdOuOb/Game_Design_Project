@@ -27,7 +27,10 @@ public class CombatUI : MonoBehaviour
     public Text enemyTempDefenseText;
 
     [Header("技能 UI")]
-    public Text skillSlotsText;
+    public Text skillSlot_Left;
+    public Text skillSlot_Right;
+    public Text skillSlot_Down;
+    public Text skillSlot_Up;
 
     [Header("戰鬥記錄")]
     public Text battleLogText;
@@ -96,30 +99,36 @@ public class CombatUI : MonoBehaviour
 
     private void RefreshSkillUI()
     {
-        if (skillSlotsText == null) return;
         if (actionRouter == null)
         {
-            skillSlotsText.text = "無技能來源";
+            ClearSkillSlots();
             return;
         }
 
         var skills = actionRouter.ShownSkills;
         if (skills == null || skills.Count == 0)
         {
-            skillSlotsText.text = "";
+            ClearSkillSlots();
             return;
         }
 
-        string[] slotLabels = new[] { "左", "右", "下", "上" };
-        var lines = new List<string>();
+        // 分配技能到四个位置
+        if (skillSlot_Left != null)
+            skillSlot_Left.text = skills.Count > 0 ? skills[0] : "";
+        if (skillSlot_Right != null)
+            skillSlot_Right.text = skills.Count > 1 ? skills[1] : "";
+        if (skillSlot_Down != null)
+            skillSlot_Down.text = skills.Count > 2 ? skills[2] : "";
+        if (skillSlot_Up != null)
+            skillSlot_Up.text = skills.Count > 3 ? skills[3] : "";
+    }
 
-        for (int i = 0; i < skills.Count; i++)
-        {
-            string label = i < slotLabels.Length ? slotLabels[i] : $"槽{i + 1}";
-            lines.Add($"{label}：{skills[i]}");
-        }
-
-        skillSlotsText.text = string.Join("\n", lines);
+    private void ClearSkillSlots()
+    {
+        if (skillSlot_Left != null) skillSlot_Left.text = "";
+        if (skillSlot_Right != null) skillSlot_Right.text = "";
+        if (skillSlot_Down != null) skillSlot_Down.text = "";
+        if (skillSlot_Up != null) skillSlot_Up.text = "";
     }
 
     private void RefreshTurnUI()
