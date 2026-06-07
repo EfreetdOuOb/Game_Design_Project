@@ -8,65 +8,22 @@ public class EnemyCombatAI : MonoBehaviour
     public int defendBonus = 10;
     public float actionDelay = 0.4f;
 
-    private bool isSubscribed;
-
-    private void OnEnable()
+    public bool CanAct()
     {
-        TrySubscribe();
+        return enemyActor != null && playerActor != null && enemyActor.currentHp > 0;
     }
 
-    private void Start()
+    public IEnumerator ExecuteTurn()
     {
-        TrySubscribe();
-    }
-
-    private void OnDisable()
-    {
-        if (isSubscribed && TurnManager.Instance != null)
-        {
-            TurnManager.Instance.OnEnemyTurnStart -= OnEnemyTurnStart;
-            isSubscribed = false;
-        }
-    }
-
-    private void TrySubscribe()
-    {
-        if (isSubscribed) return;
-        if (TurnManager.Instance != null)
-        {
-            TurnManager.Instance.OnEnemyTurnStart += OnEnemyTurnStart;
-            isSubscribed = true;
-        }
-    }
-
-    private void OnEnemyTurnStart()
-    {
-        StartCoroutine(RunTurnAndEnd());
-    }
-
-    private IEnumerator RunTurnAndEnd()
-    {
-        if (enemyActor == null || playerActor == null)
-        {
-            TurnManager.Instance?.EndEnemyTurn();
+        if (!CanAct())
             yield break;
-        }
-
-        if (enemyActor.currentHp <= 0)
-        {
-            TurnManager.Instance?.EndEnemyTurn();
-            yield break;
-        }
 
         int turn = TurnManager.Instance != null ? TurnManager.Instance.TurnNumber : 1;
 
         if (turn % 2 == 1)
-            yield return StartCoroutine(ExecuteAttack());
+            yield return ExecuteAttack();
         else
-            yield return StartCoroutine(ExecuteDefend());
-
-        if (TurnManager.Instance != null && TurnManager.Instance.CurrentPhase == TurnPhase.EnemyTurn)
-            TurnManager.Instance.EndEnemyTurn();
+            yield return ExecuteDefend();
     }
 
     private IEnumerator ExecuteAttack()
