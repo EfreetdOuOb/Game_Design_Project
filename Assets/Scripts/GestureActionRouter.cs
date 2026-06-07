@@ -17,25 +17,70 @@ public class GestureActionRouter : MonoBehaviour, IGestureActionHandler, IGestur
 
     public IReadOnlyList<string> ShownSkills => shownSkills;
     
+    private bool subscribedToTurnManager;
+
+    private void OnEnable()
+    {
+        if (!Application.isPlaying)
+        {
+            return;
+        }
+
+        EnsureShownSkillsInitialized();
+    }
+
     private void Start()
-{
-    EnsureShownSkillsInitialized();
+    {
+        // Start 在所有 Awake 之後執行，此時 TurnManager.Instance 已就緒
+        SubscribeToTurnManager();
+    }
 
-    // Start 時 TurnManager.Instance 一定已經在 Awake 設好了
-    if (TurnManager.Instance != null)
+    private void OnDisable()
+    {
+        if (!Application.isPlaying)
+        {
+            return;
+        }
+
+        UnsubscribeFromTurnManager();
+    }
+
+    private void OnDestroy()
+    {
+        UnsubscribeFromTurnManager();
+    }
+
+    private void SubscribeToTurnManager()
+    {
+        if (subscribedToTurnManager)
+        {
+            return;
+        }
+
+        if (TurnManager.Instance == null)
+        {
+            Debug.LogWarning("[GestureActionRouter] 找不到 TurnManager，無法訂閱 OnPlayerTurnStart");
+            return;
+        }
+
         TurnManager.Instance.OnPlayerTurnStart += OnPlayerTurnStart;
-    else
-        Debug.LogWarning("[GestureActionRouter] 找不到 TurnManager，無法訂閱 OnPlayerTurnStart");
-}
+        subscribedToTurnManager = true;
+    }
 
-private void OnDestroy()  // OnDisable 改成 OnDestroy，對應 Start 的訂閱
-{
-    if (TurnManager.Instance != null)
+    private void UnsubscribeFromTurnManager()
+    {
+        if (!subscribedToTurnManager || TurnManager.Instance == null)
+        {
+            return;
+        }
+
         TurnManager.Instance.OnPlayerTurnStart -= OnPlayerTurnStart;
-}
+        subscribedToTurnManager = false;
+    }
 
     private void OnPlayerTurnStart()
     {
+        Debug.Log("玩家回合開始");
         UnlockAllSlots();
         RerollShownSkills();
     }
@@ -58,6 +103,11 @@ public bool IsSlotLocked(int slotIndex) => lockedSlots.Contains(slotIndex);
 
     public void OnGestureResolved(GestureResult result)
     {
+        if (Application.isPlaying)
+        {
+            SubscribeToTurnManager();
+        }
+
         EnsureShownSkillsInitialized();
         ApplyTransformedSkills(result);
         LogResolvedSkills(result);

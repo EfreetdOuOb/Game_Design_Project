@@ -9,24 +9,38 @@ public class TurnManager : MonoBehaviour
 
     public TurnPhase CurrentPhase { get; private set; } = TurnPhase.PlayerTurn;
     public int TurnNumber { get; private set; } = 1;
+    public bool IsBattleLocked { get; set; } = false;
 
-    // 其他系統訂閱這些事件
     public event Action OnPlayerTurnStart;
     public event Action OnPlayerTurnEnd;
     public event Action OnEnemyTurnStart;
     public event Action OnEnemyTurnEnd;
-    public event Action OnTurnCleanup;   // ← 防禦在這裡才清除
+    public event Action OnTurnCleanup;
 
     private void Awake()
     {
-        if (Instance != null) { Destroy(gameObject); return; }
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         Instance = this;
     }
 
-    // 玩家手勢完成後呼叫
+    public void ResetBattle()
+    {
+        CurrentPhase = TurnPhase.PlayerTurn;
+        TurnNumber = 1;
+        IsBattleLocked = false;
+        OnPlayerTurnStart?.Invoke();
+    }
+
     public void EndPlayerTurn()
     {
+        if (IsBattleLocked) return;
         if (CurrentPhase != TurnPhase.PlayerTurn) return;
+
         CurrentPhase = TurnPhase.EnemyTurn;
         OnPlayerTurnEnd?.Invoke();
         StartEnemyTurn();
@@ -35,19 +49,16 @@ public class TurnManager : MonoBehaviour
     private void StartEnemyTurn()
     {
         OnEnemyTurnStart?.Invoke();
-
-    // TODO: 之後換成真實敵人 AI，現在暫時直接結束敵人回合
-    //EndEnemyTurn();
     }
 
     public void EndEnemyTurn()
     {
         if (CurrentPhase != TurnPhase.EnemyTurn) return;
+
         CurrentPhase = TurnPhase.Cleanup;
         OnEnemyTurnEnd?.Invoke();
+        OnTurnCleanup?.Invoke();
 
-        // 清算回合
-        OnTurnCleanup?.Invoke();   // ← 防禦在這裡清除
         TurnNumber++;
         CurrentPhase = TurnPhase.PlayerTurn;
         OnPlayerTurnStart?.Invoke();

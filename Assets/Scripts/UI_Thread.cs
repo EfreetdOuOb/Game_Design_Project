@@ -373,6 +373,13 @@ private Color GetBaseColorForFunction(PointFunction func)
     }
     public void OnEndDrag(PointerEventData eventData)
     {
+        // 未點到任何節點的拖曳（例如在空白區域滑動）不應視為連線手勢
+        if (selectedPoints.Count == 0)
+        {
+            ResetGestureState();
+            return;
+        }
+
         PointFunction resolvedFunction = ResolveFunctionByPath();
         GestureResult result = BuildGestureResult(resolvedFunction);
         NotifyActionHandlers(result);

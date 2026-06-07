@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bc6f7e5eae198f438d7c76c216e6c60, type: 3}
+  m_Name: Map1Settings
+  m_EditorClassIdentifier: Assembly-CSharp::MapSettings
+  layerCount: 6
+  mapNodeWidth: 150
+  mapNodeHeight: 150
+  padding: 150
+  enemyWeight: 0.45
+  shopWeight: 0.2
+  treasureWeight: 0.15
+  restWeight: 0.1
+  eventWeight: 0.1
+  layerNodeCountSettings:
+  - layerIndex: 0
+    nodeCount: 2
+  - layerIndex: 1
+    nodeCount: 3
+  - layerIndex: 2
+    nodeCount: 2
+  - layerIndex: 3
+    nodeCount: 2
+  - layerIndex: 4
+    nodeCount: 2
+  layerFixedTypeSettings:
+  - layerIndex: 0
+    nodeTypes: 0100000001000000
+  - layerIndex: 1
+    nodeTypes: 010000000100000004000000
+  - layerIndex: 2
+    nodeTypes: 0300000003000000
+  - layerIndex: 3
+    nodeTypes: 040000000100000002000000
+  - layerIndex: 4
+    nodeTypes: 0500000005000000
+  layerNodeRuleSettings: []
+  mapNodeSpriteSettings:
+  - nodeType: 1
+    icon: {fileID: 364371424, guid: 75872876a773f564a9660e522ca4edd7, type: 3}
+  - nodeType: 2
+    icon: {fileID: -108627762, guid: 21c73331a1cd5b342a7dbd9266b695bc, type: 3}
+  - nodeType: 3
+    icon: {fileID: -1850961743, guid: c5636cd25a1f04c49bf43cb803fd6bde, type: 3}
+  - nodeType: 4
+    icon: {fileID: 1523094178, guid: 930376e290d678445ad0467c7279bd2d, type: 3}
+  - nodeType: 5
+    icon: {fileID: -276589805, guid: 9875a012a08b780409a8c4aec522ea32, type: 3}
+  - nodeType: 6
+    icon: {fileID: -1870476760, guid: 56efe1e72cd518f4ebc4320b2c0c8013, type: 3}
+  defaultNodeSprite: {fileID: 0}
