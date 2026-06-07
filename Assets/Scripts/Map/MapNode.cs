@@ -28,6 +28,35 @@ public class MapNode : MonoBehaviour
         _image.sprite = iconSprite;
         _image.enabled = iconSprite != null;
     }
+    public void SetState(bool unlocked, bool completed)
+    {
+        isUnlocked = unlocked;
+        isCompleted = completed;
+
+        if (_button != null)
+        {
+            _button.interactable = unlocked && !completed;
+        }
+
+        RefreshVisual();
+    }
+    private void RefreshVisual()
+    {
+        if (_image == null) return;
+
+        if (isCompleted)
+        {
+            _image.color = Color.gray;
+        }
+        else if (isUnlocked)
+        {
+            _image.color = Color.white;
+        }
+        else
+        {
+            _image.color = new Color(1f, 1f, 1f, 0.35f);
+        }
+    }
 }
 
 public enum MapNodeType
