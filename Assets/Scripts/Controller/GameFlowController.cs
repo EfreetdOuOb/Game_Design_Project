@@ -11,6 +11,7 @@ public class GameFlowController : MonoBehaviour
 
     [Header("Managers")]
     [SerializeField] private NodeContentManager _nodeContentManager;
+    [SerializeField] private MapController _mapController;
 
     private void Awake()
     {
@@ -21,6 +22,19 @@ public class GameFlowController : MonoBehaviour
         }
 
         Instance = this;
+
+        if (_mapController == null)
+        {
+            _mapController = FindAnyObjectByType<MapController>();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     public void StartNode(MapNodeData nodeData)
@@ -39,32 +53,9 @@ public class GameFlowController : MonoBehaviour
 
         _nodeContentManager.EnterNode(nodeData);
 
-        switch (nodeData.mapNodeType)
+        if (nodeData.mapNodeType is MapNodeType.Enemy or MapNodeType.Boss)
         {
-            case MapNodeType.Enemy:
-            case MapNodeType.Boss:
-                EnterBattle();
-                break;
-
-            case MapNodeType.Event:
-                Debug.Log($"事件流程尚未完成，contentId = {nodeData.contentId}");
-                break;
-
-            case MapNodeType.Shop:
-                Debug.Log($"商店流程尚未完成，contentId = {nodeData.contentId}");
-                break;
-
-            case MapNodeType.Rest:
-                Debug.Log($"休息流程尚未完成，contentId = {nodeData.contentId}");
-                break;
-
-            case MapNodeType.Treasure:
-                Debug.Log($"寶箱流程尚未完成，contentId = {nodeData.contentId}");
-                break;
-
-            default:
-                Debug.LogWarning($"未支援的節點類型：{nodeData.mapNodeType}");
-                break;
+            EnterBattle();
         }
     }
 
@@ -96,6 +87,7 @@ public class GameFlowController : MonoBehaviour
 
     public void ProceedAfterVictory()
     {
+        _mapController?.CompleteCurrentNode();
         ReturnToMap();
     }
 }

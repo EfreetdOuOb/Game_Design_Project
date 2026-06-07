@@ -2378,6 +2378,7 @@ MonoBehaviour:
   _battleRoot: {fileID: 0}
   _victoryRoot: {fileID: 1179550386}
   _nodeContentManager: {fileID: 2007795492}
+  _mapController: {fileID: 472646868}
 --- !u!1 &938743598
 GameObject:
   m_ObjectHideFlags: 0
