@@ -94,7 +94,7 @@ public class MapGenerator
 
         Shuffle(emptyIndexes);
 
-        if (ruleSetting != null)
+        if (ruleSetting != null && ruleSetting.requiredNodeTypes != null)
         {
             for (int i = 0; i < ruleSetting.requiredNodeTypes.Count && i < emptyIndexes.Count; i++)
             {
@@ -133,9 +133,13 @@ public class MapGenerator
 
         float total = _settings.enemyWeight + _settings.shopWeight + _settings.treasureWeight +
                       _settings.restWeight + _settings.eventWeight;
-        float roll = Random.value * total;
 
+        if (total <= 0f)
+            return pool[Random.Range(0, pool.Count)];
+
+        float roll = Random.value * total;
         float current = 0f;
+
         current += _settings.enemyWeight;
         if (roll <= current && pool.Contains(MapNodeType.Enemy)) return MapNodeType.Enemy;
 
@@ -149,6 +153,7 @@ public class MapGenerator
         if (roll <= current && pool.Contains(MapNodeType.Rest)) return MapNodeType.Rest;
 
         if (pool.Contains(MapNodeType.Event)) return MapNodeType.Event;
+
         return pool[Random.Range(0, pool.Count)];
     }
 
@@ -162,6 +167,9 @@ public class MapGenerator
             int currentCount = currentLayer.Count;
             int nextCount = nextLayer.Count;
 
+            if (currentCount <= 0 || nextCount <= 0)
+                continue;
+
             if (currentCount <= nextCount)
             {
                 List<int> nextIndexes = nextLayer.Select(n => n.nodeIndex).ToList();
@@ -169,7 +177,8 @@ public class MapGenerator
 
                 for (int j = 0; j < currentLayer.Count; j++)
                 {
-                    currentLayer[j].nextLayerConnectedNodes.AddRange(splitList[j]);
+                    if (j < splitList.Count)
+                        currentLayer[j].nextLayerConnectedNodes.AddRange(splitList[j]);
                 }
             }
             else
@@ -189,11 +198,12 @@ public class MapGenerator
                     }
                 }
 
-                List<List<int>> result = valueToIndexes.Values.ToList();
-
                 for (int j = 0; j < currentLayer.Count; j++)
                 {
-                    currentLayer[j].nextLayerConnectedNodes.AddRange(result[j]);
+                    if (valueToIndexes.TryGetValue(j, out List<int> connectedIndexes))
+                    {
+                        currentLayer[j].nextLayerConnectedNodes.AddRange(connectedIndexes);
+                    }
                 }
             }
         }
@@ -213,10 +223,13 @@ public class MapGenerator
                 mapNode.nextLayerConnectedNodes.Sort();
 
                 if (j == 0) continue;
+                if (mapNode.nextLayerConnectedNodes.Count <= 1) continue;
 
                 MapNodeData previousMapNode = currentLayer[j - 1];
+                if (previousMapNode.nextLayerConnectedNodes == null || previousMapNode.nextLayerConnectedNodes.Count == 0)
+                    continue;
 
-                if (mapNode.nextLayerConnectedNodes.Count > 1 && currentLayer.Count <= nextLayer.Count)
+                if (currentLayer.Count <= nextLayer.Count)
                 {
                     int currentMinIndex = mapNode.nextLayerConnectedNodes.Min();
                     int previousMaxIndex = previousMapNode.nextLayerConnectedNodes.Max();
@@ -231,6 +244,12 @@ public class MapGenerator
     private List<List<int>> RandomSplit(List<int> list, int groupCount)
     {
         List<List<int>> result = new();
+
+        if (list == null || list.Count == 0)
+            return result;
+
+        if (groupCount <= 0)
+            return result;
 
         if (list.Count < groupCount)
             return result;
@@ -277,18 +296,38 @@ public class MapGenerator
 
     private List<List<int>> AddRandomElementToNestedList(List<List<int>> nestedList)
     {
+        if (nestedList == null || nestedList.Count <= 1)
+            return nestedList;
+
         for (int i = 0; i < nestedList.Count; i++)
         {
             if (Random.value < 0.7f) continue;
+            if (nestedList[i] == null || nestedList[i].Count >= 3) continue;
 
-            if (nestedList[i].Count < 3)
+            if (i == 0)
             {
-                if (i == 0)
+                if (nestedList[i + 1] != null && nestedList[i + 1].Count > 0)
                     nestedList[i].Add(nestedList[i + 1].Min());
-                else if (i == nestedList.Count - 1)
+            }
+            else if (i == nestedList.Count - 1)
+            {
+                if (nestedList[i - 1] != null && nestedList[i - 1].Count > 0)
                     nestedList[i].Add(nestedList[i - 1].Max());
+            }
+            else
+            {
+                bool isForward = Random.value < 0.5f;
+
+                if (isForward)
+                {
+                    if (nestedList[i + 1] != null && nestedList[i + 1].Count > 0)
+                        nestedList[i].Add(nestedList[i + 1].Min());
+                }
                 else
-                    nestedList[i].Add(Random.value < 0.5f ? nestedList[i + 1].Min() : nestedList[i - 1].Max());
+                {
+                    if (nestedList[i - 1] != null && nestedList[i - 1].Count > 0)
+                        nestedList[i].Add(nestedList[i - 1].Max());
+                }
             }
         }
 

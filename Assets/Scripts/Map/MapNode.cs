@@ -21,6 +21,7 @@ public class MapNode : MonoBehaviour
     public void SetIcon(Sprite iconSprite)
     {
         if (_image == null) return;
+
         _image.sprite = iconSprite;
         _image.enabled = iconSprite != null;
     }

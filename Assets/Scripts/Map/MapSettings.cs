@@ -29,6 +29,39 @@ public class MapSettings : ScriptableObject
     [Header("Node Icon Settings")]
     public List<MapNodeSpriteSetting> mapNodeSpriteSettings = new();
     public Sprite defaultNodeSprite;
+
+    private void OnValidate()
+    {
+        layerCount = Mathf.Max(2, layerCount);
+        mapNodeWidth = Mathf.Max(1, mapNodeWidth);
+        mapNodeHeight = Mathf.Max(1, mapNodeHeight);
+        padding = Mathf.Max(0, padding);
+
+        if (layerNodeCountSettings != null)
+        {
+            foreach (var setting in layerNodeCountSettings)
+            {
+                setting.layerIndex = Mathf.Clamp(setting.layerIndex, 0, layerCount - 1);
+                setting.nodeCount = Mathf.Max(1, setting.nodeCount);
+            }
+        }
+
+        if (layerFixedTypeSettings != null)
+        {
+            foreach (var setting in layerFixedTypeSettings)
+            {
+                setting.layerIndex = Mathf.Clamp(setting.layerIndex, 0, layerCount - 1);
+            }
+        }
+
+        if (layerNodeRuleSettings != null)
+        {
+            foreach (var setting in layerNodeRuleSettings)
+            {
+                setting.layerIndex = Mathf.Clamp(setting.layerIndex, 0, layerCount - 1);
+            }
+        }
+    }
 }
 
 [System.Serializable]

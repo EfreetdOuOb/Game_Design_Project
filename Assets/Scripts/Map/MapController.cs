@@ -40,11 +40,20 @@ public class MapController : MonoBehaviour
 
     void OnGameStarted()
     {
+        ClearMapView();
         GenerateMapData();
         SetView();
         CreateMapView();
         SetNodeLines();
         ResetScrollPosition();
+    }
+
+    private void ClearMapView()
+    {
+        for (int i = _mapNodeParentRect.childCount - 1; i >= 0; i--)
+        {
+            Destroy(_mapNodeParentRect.GetChild(i).gameObject);
+        }
     }
 
     private void GenerateMapData()
@@ -115,6 +124,9 @@ public class MapController : MonoBehaviour
 
                 foreach (int nextIndex in currentNodeData.nextLayerConnectedNodes)
                 {
+                    if (nextIndex < 0 || nextIndex >= _mapNodeArray[i + 1].Length)
+                        continue;
+
                     MapNode nextNodeView = _mapNodeArray[i + 1][nextIndex];
                     Vector2 endPosition = nextNodeView.transform.localPosition;
 

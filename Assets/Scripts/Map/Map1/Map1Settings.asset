@@ -31,7 +31,7 @@ MonoBehaviour:
   - layerIndex: 3
     nodeCount: 2
   - layerIndex: 4
-    nodeCount: 1
+    nodeCount: 2
   layerFixedTypeSettings:
   - layerIndex: 0
     nodeTypes: 0100000001000000
@@ -42,7 +42,7 @@ MonoBehaviour:
   - layerIndex: 3
     nodeTypes: 040000000100000002000000
   - layerIndex: 4
-    nodeTypes: 05000000
+    nodeTypes: 0500000005000000
   layerNodeRuleSettings:
   - layerIndex: 0
     useRuleOnly: 0
