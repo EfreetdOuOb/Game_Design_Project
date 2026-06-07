@@ -43,11 +43,7 @@ MonoBehaviour:
     nodeTypes: 040000000100000002000000
   - layerIndex: 4
     nodeTypes: 0500000005000000
-  layerNodeRuleSettings:
-  - layerIndex: 0
-    useRuleOnly: 0
-    requiredNodeTypes: 
-    bannedNodeTypes: 
+  layerNodeRuleSettings: []
   mapNodeSpriteSettings:
   - nodeType: 1
     icon: {fileID: 364371424, guid: 75872876a773f564a9660e522ca4edd7, type: 3}
