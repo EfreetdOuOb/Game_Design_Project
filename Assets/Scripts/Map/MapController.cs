@@ -9,6 +9,7 @@ public class MapController : MonoBehaviour
     [SerializeField] private GameObject _mapNode;
     [SerializeField] private GameObject _nodeLine;
     [SerializeField] private RectTransform _mapNodeParentRect;
+    [SerializeField] private GameObject _mapPanel;
 
     private MapGraphData _mapGraphData;
     private MapNode[][] _mapNodeArray;
@@ -36,6 +37,20 @@ public class MapController : MonoBehaviour
     void UnsubscribeEvents()
     {
         EventManager.Unsubscribe(GameEvent.GameStarted, OnGameStarted);
+    }
+    public void OpenMap()
+    {
+        _mapPanel.SetActive(true);
+    }
+
+    public void CloseMap()
+    {
+        _mapPanel.SetActive(false);
+    }
+
+    public void ToggleMap()
+    {
+        _mapPanel.SetActive(!_mapPanel.activeSelf);
     }
 
     void OnGameStarted()

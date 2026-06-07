@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Map1Settings
   m_EditorClassIdentifier: Assembly-CSharp::MapSettings
   layerCount: 6
-  mapNodeWidth: 100
-  mapNodeHeight: 100
-  padding: 50
+  mapNodeWidth: 150
+  mapNodeHeight: 150
+  padding: 150
   enemyWeight: 0.45
   shopWeight: 0.2
   treasureWeight: 0.15
