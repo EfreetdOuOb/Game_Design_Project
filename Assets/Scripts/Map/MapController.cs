@@ -184,9 +184,22 @@ public class MapController : MonoBehaviour
         _progress.currentLayer = layerIndex;
         _progress.currentNodeIndex = nodeIndex;
 
-        MapNodeData selectedNode = _mapGraphData.layers[layerIndex].nodes[nodeIndex];
+        LockOtherNodesInSameLayer(layerIndex, nodeIndex);
+        RefreshNodeStates();
 
+        MapNodeData selectedNode = _mapGraphData.layers[layerIndex].nodes[nodeIndex]; 
         GameFlowController.Instance.StartNode(selectedNode.mapNodeType);
+    }
+
+    private void LockOtherNodesInSameLayer(int selectedLayer, int selectedNode)
+    {
+        for (int i = 0; i < _mapGraphData.layers[selectedLayer].nodes.Count; i++)
+        {
+            if (i == selectedNode) continue;
+
+            string key = _progress.GetKey(selectedLayer, i);
+            _progress.unlockedNodes.Remove(key);
+        }
     }
 
     public void CompleteCurrentNode()
