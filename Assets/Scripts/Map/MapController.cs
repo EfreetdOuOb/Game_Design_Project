@@ -10,7 +10,8 @@ public class MapController : MonoBehaviour
     [SerializeField] private GameObject _nodeLine;
     [SerializeField] private RectTransform _mapNodeParentRect;
     [SerializeField] private GameObject _mapPanel;
-
+    
+    private MapProgressData _progress;
     private MapGraphData _mapGraphData;
     private MapNode[][] _mapNodeArray;
 
@@ -55,12 +56,14 @@ public class MapController : MonoBehaviour
 
     void OnGameStarted()
     {
-        ClearMapView();
         GenerateMapData();
         SetView();
         CreateMapView();
         SetNodeLines();
+        InitializeProgress();
+        RefreshNodeStates();
         ResetScrollPosition();
+        OpenMap();
     }
 
     private void ClearMapView()
@@ -109,6 +112,16 @@ public class MapController : MonoBehaviour
                 mapNode.SetMapNodeType(mapNodeData);
                 mapNode.SetIcon(GetNodeSprite(mapNodeData.mapNodeType));
 
+                Button button = nodeObject.GetComponent<Button>();
+                int capturedLayer = i;
+                int capturedNode = j;
+
+                if (button != null)
+                {
+                    button.onClick.RemoveAllListeners();
+                    button.onClick.AddListener(() => OnNodeClicked(capturedLayer, capturedNode));
+                }
+
                 int roomOffsetX = offsetX + Random.Range(-_mapSettings.mapNodeWidth / 4, _mapSettings.mapNodeWidth / 4);
                 int roomOffsetY = offsetY;
 
@@ -153,6 +166,74 @@ public class MapController : MonoBehaviour
             }
         }
     }
+    private void InitializeProgress()
+    {
+        _progress = new MapProgressData();
+
+        if (_mapGraphData == null || _mapGraphData.layers.Count == 0)
+            return;
+
+        for (int i = 0; i < _mapGraphData.layers[0].nodes.Count; i++)
+        {
+            _progress.unlockedNodes.Add(_progress.GetKey(0, i));
+        }
+    }
+    private void RefreshNodeStates()
+    {
+        for (int i = 0; i < _mapNodeArray.Length; i++)
+        {
+            for (int j = 0; j < _mapNodeArray[i].Length; j++)
+            {
+                string key = _progress.GetKey(i, j);
+                bool unlocked = _progress.unlockedNodes.Contains(key);
+                bool completed = _progress.completedNodes.Contains(key);
+
+                _mapNodeArray[i][j].SetState(unlocked, completed);
+            }
+        }
+    }
+    private void OnNodeClicked(int layerIndex, int nodeIndex)
+    {
+        string key = _progress.GetKey(layerIndex, nodeIndex);
+
+        if (!_progress.unlockedNodes.Contains(key)) return;
+        if (_progress.completedNodes.Contains(key)) return;
+
+        _progress.currentLayer = layerIndex;
+        _progress.currentNodeIndex = nodeIndex;
+
+        MapNodeData selectedNode = _mapGraphData.layers[layerIndex].nodes[nodeIndex];
+
+        CloseMap();
+
+        Debug.Log($"進入節點: Layer {layerIndex}, Node {nodeIndex}, Type {selectedNode.mapNodeType}");
+
+        // 這裡之後接你的戰鬥 / 商店 / 事件流程
+    }
+    public void CompleteCurrentNode()
+    {
+        if (_progress == null) return;
+        if (_progress.currentLayer < 0 || _progress.currentNodeIndex < 0) return;
+
+        string currentKey = _progress.GetKey(_progress.currentLayer, _progress.currentNodeIndex);
+        _progress.completedNodes.Add(currentKey);
+
+        MapNodeData currentNodeData = _mapGraphData.layers[_progress.currentLayer].nodes[_progress.currentNodeIndex];
+
+        int nextLayer = _progress.currentLayer + 1;
+        if (nextLayer < _mapGraphData.layers.Count)
+        {
+            foreach (int nextIndex in currentNodeData.nextLayerConnectedNodes)
+            {
+                string nextKey = _progress.GetKey(nextLayer, nextIndex);
+                _progress.unlockedNodes.Add(nextKey);
+            }
+        }
+
+        RefreshNodeStates();
+        OpenMap();
+    }
+
 
     private void SetNodeLinePosition(GameObject nodeLine, Vector2 startPosition, Vector2 endPosition)
     {

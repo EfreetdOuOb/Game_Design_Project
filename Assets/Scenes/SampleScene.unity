@@ -1311,6 +1311,7 @@ MonoBehaviour:
   _mapNode: {fileID: 842583619577042344, guid: 20351a48904363743a3d5f0ee0540925, type: 3}
   _nodeLine: {fileID: 4054547304519205092, guid: b796c0f1e91efaa44bf83d643e61640b, type: 3}
   _mapNodeParentRect: {fileID: 1858513635}
+  _mapPanel: {fileID: 1217255051}
 --- !u!1 &498519394
 GameObject:
   m_ObjectHideFlags: 0
@@ -2936,6 +2937,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1215381189}
   m_CullTransparentMesh: 1
+--- !u!1 &1217255051 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4710747056338699003, guid: 0b49a77b17a19a541850225888c106ba, type: 3}
+  m_PrefabInstance: {fileID: 7748858317154346646}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1230026007
 GameObject:
   m_ObjectHideFlags: 0
@@ -3741,7 +3747,7 @@ GameObject:
   - component: {fileID: 1632647101}
   - component: {fileID: 1632647100}
   m_Layer: 5
-  m_Name: MapView
+  m_Name: MapViewBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3810,7 +3816,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1632647101}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 472646868}
+        m_TargetAssemblyTypeName: MapController, Assembly-CSharp
+        m_MethodName: ToggleMap
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1632647101
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5005,7 +5023,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6666706639019467473, guid: 0b49a77b17a19a541850225888c106ba, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -463.1844
+      value: -463.18436
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
