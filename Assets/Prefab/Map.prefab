@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -179,11 +179,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df497c913364ec24998bc8a6f18342fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapController
+  _mapSettings: {fileID: 11400000, guid: 6b38e37ef0f19324191195aedde67abb, type: 2}
   _mapNode: {fileID: 9100603564247534864, guid: c11d16e2992d0864ab718420e663e391, type: 3}
   _nodeLine: {fileID: 4054547304519205092, guid: b796c0f1e91efaa44bf83d643e61640b, type: 3}
-  _mapNodeWidth: 250
-  _mapNodeHeight: 250
-  _padding: 150
   _mapNodeParentRect: {fileID: 6666706639019467473}
 --- !u!1 &4801684253722165142
 GameObject:
@@ -449,7 +447,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6190606665725279494}
   m_HandleRect: {fileID: 417430114576391755}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -562,6 +560,6 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -463.18436}
+  m_AnchoredPosition: {x: 0, y: -463.1844}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0.5, y: 0}
