@@ -9,7 +9,6 @@ public class TurnManager : MonoBehaviour
 
     public TurnPhase CurrentPhase { get; private set; } = TurnPhase.PlayerTurn;
     public int TurnNumber { get; private set; } = 1;
-
     public bool IsBattleLocked { get; set; } = false;
 
     public event Action OnPlayerTurnStart;
@@ -20,7 +19,7 @@ public class TurnManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (Instance != null)
         {
             Destroy(gameObject);
             return;
@@ -31,9 +30,9 @@ public class TurnManager : MonoBehaviour
 
     public void ResetBattle()
     {
-        IsBattleLocked = false;
-        TurnNumber = 1;
         CurrentPhase = TurnPhase.PlayerTurn;
+        TurnNumber = 1;
+        IsBattleLocked = false;
         OnPlayerTurnStart?.Invoke();
     }
 
@@ -49,18 +48,15 @@ public class TurnManager : MonoBehaviour
 
     private void StartEnemyTurn()
     {
-        if (IsBattleLocked) return;
         OnEnemyTurnStart?.Invoke();
     }
 
     public void EndEnemyTurn()
     {
-        if (IsBattleLocked) return;
         if (CurrentPhase != TurnPhase.EnemyTurn) return;
 
         CurrentPhase = TurnPhase.Cleanup;
         OnEnemyTurnEnd?.Invoke();
-
         OnTurnCleanup?.Invoke();
 
         TurnNumber++;

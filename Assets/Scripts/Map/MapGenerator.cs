@@ -13,8 +13,10 @@ public class MapGenerator
 
     public MapGraphData Generate()
     {
-        MapGraphData graphData = new MapGraphData();
-        graphData.layers = new List<MapLayerData>();
+        MapGraphData graphData = new MapGraphData
+        {
+            layers = new List<MapLayerData>()
+        };
 
         for (int layerIndex = 0; layerIndex < _settings.layerCount; layerIndex++)
         {
@@ -29,7 +31,10 @@ public class MapGenerator
 
             for (int nodeIndex = 0; nodeIndex < nodeCount; nodeIndex++)
             {
-                layerData.nodes.Add(new MapNodeData(nodeTypes[nodeIndex], layerIndex, nodeIndex));
+                MapNodeType nodeType = nodeTypes[nodeIndex];
+                string contentId = GetDefaultContentId(nodeType, layerIndex, nodeIndex);
+
+                layerData.nodes.Add(new MapNodeData(nodeType, layerIndex, nodeIndex, contentId));
             }
 
             graphData.layers.Add(layerData);
@@ -64,6 +69,7 @@ public class MapGenerator
         {
             for (int i = 0; i < nodeCount; i++)
                 result[i] = MapNodeType.Enemy;
+
             return result;
         }
 
@@ -85,7 +91,7 @@ public class MapGenerator
         LayerNodeRuleSetting ruleSetting = _settings.layerNodeRuleSettings
             .FirstOrDefault(x => x.layerIndex == layerIndex);
 
-        List<int> emptyIndexes = new();
+        List<int> emptyIndexes = new List<int>();
         for (int i = 0; i < result.Length; i++)
         {
             if (result[i] == MapNodeType.None)
@@ -94,7 +100,7 @@ public class MapGenerator
 
         Shuffle(emptyIndexes);
 
-        if (ruleSetting != null && ruleSetting.requiredNodeTypes != null)
+        if (ruleSetting != null)
         {
             for (int i = 0; i < ruleSetting.requiredNodeTypes.Count && i < emptyIndexes.Count; i++)
             {
@@ -113,7 +119,7 @@ public class MapGenerator
 
     private MapNodeType GetRandomType(LayerNodeRuleSetting ruleSetting)
     {
-        List<MapNodeType> pool = new()
+        List<MapNodeType> pool = new List<MapNodeType>
         {
             MapNodeType.Enemy,
             MapNodeType.Shop,
@@ -131,30 +137,62 @@ public class MapGenerator
         if (ruleSetting != null && ruleSetting.useRuleOnly)
             return pool[Random.Range(0, pool.Count)];
 
-        float total = _settings.enemyWeight + _settings.shopWeight + _settings.treasureWeight +
-                      _settings.restWeight + _settings.eventWeight;
-
-        if (total <= 0f)
-            return pool[Random.Range(0, pool.Count)];
+        float total = _settings.enemyWeight +
+                      _settings.shopWeight +
+                      _settings.treasureWeight +
+                      _settings.restWeight +
+                      _settings.eventWeight;
 
         float roll = Random.value * total;
         float current = 0f;
 
         current += _settings.enemyWeight;
-        if (roll <= current && pool.Contains(MapNodeType.Enemy)) return MapNodeType.Enemy;
+        if (roll <= current && pool.Contains(MapNodeType.Enemy))
+            return MapNodeType.Enemy;
 
         current += _settings.shopWeight;
-        if (roll <= current && pool.Contains(MapNodeType.Shop)) return MapNodeType.Shop;
+        if (roll <= current && pool.Contains(MapNodeType.Shop))
+            return MapNodeType.Shop;
 
         current += _settings.treasureWeight;
-        if (roll <= current && pool.Contains(MapNodeType.Treasure)) return MapNodeType.Treasure;
+        if (roll <= current && pool.Contains(MapNodeType.Treasure))
+            return MapNodeType.Treasure;
 
         current += _settings.restWeight;
-        if (roll <= current && pool.Contains(MapNodeType.Rest)) return MapNodeType.Rest;
+        if (roll <= current && pool.Contains(MapNodeType.Rest))
+            return MapNodeType.Rest;
 
-        if (pool.Contains(MapNodeType.Event)) return MapNodeType.Event;
+        if (pool.Contains(MapNodeType.Event))
+            return MapNodeType.Event;
 
         return pool[Random.Range(0, pool.Count)];
+    }
+
+    private string GetDefaultContentId(MapNodeType nodeType, int layerIndex, int nodeIndex)
+    {
+        switch (nodeType)
+        {
+            case MapNodeType.Enemy:
+                return "battle_slime_01";
+
+            case MapNodeType.Boss:
+                return "battle_boss_01";
+
+            case MapNodeType.Event:
+                return "event_default_01";
+
+            case MapNodeType.Shop:
+                return "shop_default_01";
+
+            case MapNodeType.Rest:
+                return "rest_default_01";
+
+            case MapNodeType.Treasure:
+                return "treasure_default_01";
+
+            default:
+                return string.Empty;
+        }
     }
 
     private void GenerateConnections(MapGraphData graphData)
@@ -167,9 +205,6 @@ public class MapGenerator
             int currentCount = currentLayer.Count;
             int nextCount = nextLayer.Count;
 
-            if (currentCount <= 0 || nextCount <= 0)
-                continue;
-
             if (currentCount <= nextCount)
             {
                 List<int> nextIndexes = nextLayer.Select(n => n.nodeIndex).ToList();
@@ -177,8 +212,7 @@ public class MapGenerator
 
                 for (int j = 0; j < currentLayer.Count; j++)
                 {
-                    if (j < splitList.Count)
-                        currentLayer[j].nextLayerConnectedNodes.AddRange(splitList[j]);
+                    currentLayer[j].nextLayerConnectedNodes.AddRange(splitList[j]);
                 }
             }
             else
@@ -186,7 +220,7 @@ public class MapGenerator
                 List<int> currentIndexes = currentLayer.Select(n => n.nodeIndex).ToList();
                 List<List<int>> splitList = RandomSplit(currentIndexes, nextCount);
 
-                Dictionary<int, List<int>> valueToIndexes = new();
+                Dictionary<int, List<int>> valueToIndexes = new Dictionary<int, List<int>>();
                 for (int k = 0; k < splitList.Count; k++)
                 {
                     foreach (int num in splitList[k])
@@ -198,12 +232,11 @@ public class MapGenerator
                     }
                 }
 
+                List<List<int>> result = valueToIndexes.Values.ToList();
+
                 for (int j = 0; j < currentLayer.Count; j++)
                 {
-                    if (valueToIndexes.TryGetValue(j, out List<int> connectedIndexes))
-                    {
-                        currentLayer[j].nextLayerConnectedNodes.AddRange(connectedIndexes);
-                    }
+                    currentLayer[j].nextLayerConnectedNodes.AddRange(result[j]);
                 }
             }
         }
@@ -223,13 +256,10 @@ public class MapGenerator
                 mapNode.nextLayerConnectedNodes.Sort();
 
                 if (j == 0) continue;
-                if (mapNode.nextLayerConnectedNodes.Count <= 1) continue;
 
                 MapNodeData previousMapNode = currentLayer[j - 1];
-                if (previousMapNode.nextLayerConnectedNodes == null || previousMapNode.nextLayerConnectedNodes.Count == 0)
-                    continue;
 
-                if (currentLayer.Count <= nextLayer.Count)
+                if (mapNode.nextLayerConnectedNodes.Count > 1 && currentLayer.Count <= nextLayer.Count)
                 {
                     int currentMinIndex = mapNode.nextLayerConnectedNodes.Min();
                     int previousMaxIndex = previousMapNode.nextLayerConnectedNodes.Max();
@@ -243,25 +273,22 @@ public class MapGenerator
 
     private List<List<int>> RandomSplit(List<int> list, int groupCount)
     {
-        List<List<int>> result = new();
+        List<List<int>> result = new List<List<int>>();
 
-        if (list == null || list.Count == 0)
-            return result;
-
-        if (groupCount <= 0)
+        if (list == null || list.Count == 0 || groupCount <= 0)
             return result;
 
         if (list.Count < groupCount)
-            return result;
+            groupCount = list.Count;
 
-        List<int> elementCounts = new();
+        List<int> elementCounts = new List<int>();
         for (int i = 0; i < groupCount; i++)
             elementCounts.Add(1);
 
         int remainingElements = list.Count - groupCount;
 
         int specialGroupsCount = Mathf.Min(Random.Range(1, 4), groupCount);
-        List<int> specialGroups = new();
+        List<int> specialGroups = new List<int>();
         for (int i = 0; i < groupCount; i++)
             specialGroups.Add(i);
 
@@ -301,34 +328,36 @@ public class MapGenerator
 
         for (int i = 0; i < nestedList.Count; i++)
         {
-            if (Random.value < 0.7f) continue;
-            if (nestedList[i] == null || nestedList[i].Count >= 3) continue;
+            if (Random.value < 0.7f)
+                continue;
 
-            if (i == 0)
-            {
-                if (nestedList[i + 1] != null && nestedList[i + 1].Count > 0)
-                    nestedList[i].Add(nestedList[i + 1].Min());
-            }
-            else if (i == nestedList.Count - 1)
-            {
-                if (nestedList[i - 1] != null && nestedList[i - 1].Count > 0)
-                    nestedList[i].Add(nestedList[i - 1].Max());
-            }
+            if (nestedList[i] == null)
+                nestedList[i] = new List<int>();
+
+            if (nestedList[i].Count >= 3)
+                continue;
+
+            List<int> candidateSources = new List<int>();
+
+            if (i - 1 >= 0 && nestedList[i - 1] != null && nestedList[i - 1].Count > 0)
+                candidateSources.Add(i - 1);
+
+            if (i + 1 < nestedList.Count && nestedList[i + 1] != null && nestedList[i + 1].Count > 0)
+                candidateSources.Add(i + 1);
+
+            if (candidateSources.Count == 0)
+                continue;
+
+            int sourceIndex = candidateSources[Random.Range(0, candidateSources.Count)];
+            int valueToAdd;
+
+            if (sourceIndex < i)
+                valueToAdd = nestedList[sourceIndex].Max();
             else
-            {
-                bool isForward = Random.value < 0.5f;
+                valueToAdd = nestedList[sourceIndex].Min();
 
-                if (isForward)
-                {
-                    if (nestedList[i + 1] != null && nestedList[i + 1].Count > 0)
-                        nestedList[i].Add(nestedList[i + 1].Min());
-                }
-                else
-                {
-                    if (nestedList[i - 1] != null && nestedList[i - 1].Count > 0)
-                        nestedList[i].Add(nestedList[i - 1].Max());
-                }
-            }
+            if (!nestedList[i].Contains(valueToAdd))
+                nestedList[i].Add(valueToAdd);
         }
 
         return nestedList;
@@ -361,11 +390,13 @@ public class MapNodeData
     public int layerIndex;
     public int nodeIndex;
     public List<int> nextLayerConnectedNodes = new();
+    public string contentId;
 
-    public MapNodeData(MapNodeType mapNodeType, int layerIndex, int nodeIndex)
+    public MapNodeData(MapNodeType mapNodeType, int layerIndex, int nodeIndex, string contentId = "")
     {
         this.mapNodeType = mapNodeType;
         this.layerIndex = layerIndex;
         this.nodeIndex = nodeIndex;
+        this.contentId = contentId;
     }
 }

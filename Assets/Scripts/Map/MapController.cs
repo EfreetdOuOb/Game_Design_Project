@@ -188,7 +188,7 @@ public class MapController : MonoBehaviour
         RefreshNodeStates();
 
         MapNodeData selectedNode = _mapGraphData.layers[layerIndex].nodes[nodeIndex]; 
-        GameFlowController.Instance.StartNode(selectedNode.mapNodeType);
+        GameFlowController.Instance.StartNode(selectedNode);
     }
 
     private void LockOtherNodesInSameLayer(int selectedLayer, int selectedNode)

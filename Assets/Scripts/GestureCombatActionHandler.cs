@@ -20,16 +20,86 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
     private void Awake()
     {
         skillSlotProvider = skillSlotProviderBehaviour as ISkillSlotProvider;
+
+        if (self == null)
+            self = GetComponent<CombatActor>();
+    }
+
+    private void OnEnable()
+    {
+        if (TurnManager.Instance != null)
+            TurnManager.Instance.OnPlayerTurnStart += HandlePlayerTurnStart;
+    }
+
+    private void OnDisable()
+    {
+        if (TurnManager.Instance != null)
+            TurnManager.Instance.OnPlayerTurnStart -= HandlePlayerTurnStart;
+    }
+
+    private void Start()
+    {
+        AutoSelectFirstAliveEnemy();
+    }
+
+    private void HandlePlayerTurnStart()
+    {
+        if (!HasValidTarget())
+            AutoSelectFirstAliveEnemy();
+    }
+
+    public void SetTarget(CombatActor newTarget)
+    {
+        if (newTarget == null)
+            return;
+
+        if (newTarget.currentHp <= 0)
+            return;
+
+        target = newTarget;
+        Debug.Log($"[Target] 目前目標 => {target.actorId}");
+    }
+
+    public void ClearTarget()
+    {
+        target = null;
+        Debug.Log("[Target] 目前目標已清空");
+    }
+
+    public bool HasValidTarget()
+    {
+        return target != null && target.currentHp > 0;
+    }
+
+    public void AutoSelectFirstAliveEnemy()
+    {
+        EnemyCombatAI[] enemies = Object.FindObjectsByType<EnemyCombatAI>();
+
+        for (int i = 0; i < enemies.Length; i++)
+        {
+            if (enemies[i] == null)
+                continue;
+
+            if (enemies[i].enemyActor == null)
+                continue;
+
+            if (enemies[i].enemyActor.currentHp <= 0)
+                continue;
+
+            SetTarget(enemies[i].enemyActor);
+            return;
+        }
+
+        ClearTarget();
     }
 
     public void OnGestureResolved(GestureResult result)
     {
         if (result == null)
-        {
             return;
-        }
 
-        
+        if (!HasValidTarget())
+            AutoSelectFirstAliveEnemy();
 
         int attackCount = CountPoints(result, PointFunction.Attack);
         int defenseCount = CountPoints(result, PointFunction.Defense);
@@ -40,24 +110,31 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
         SkillExecutionReport skillReport = ExecuteSkill(result, skillCount);
 
         LogTurnSummary(result, attackCount, defenseCount, skillCount, totalAttackDamage, totalDefenseAdded, skillReport);
-        CombatUI.Instance?.AppendBattleLog($"玩家攻擊 {attackCount} 次，造成 {totalAttackDamage} 傷害");
+
+        if (attackCount > 0)
+        {
+            if (HasValidTarget())
+                CombatUI.Instance?.AppendBattleLog($"玩家攻擊 {attackCount} 次，造成 {totalAttackDamage} 傷害");
+            else
+                CombatUI.Instance?.AppendBattleLog("玩家有攻擊點，但目前沒有可攻擊的敵人");
+        }
     }
 
     private int ExecuteAttack(int attackCount)
     {
-        if (target == null || attackCount <= 0)
-        {
+        if (target == null || target.currentHp <= 0 || attackCount <= 0)
             return 0;
-        }
 
         int totalDamage = 0;
         for (int i = 0; i < attackCount; i++)
         {
+            if (target == null || target.currentHp <= 0)
+                break;
+
             int rawDamage = baseAttackDamage;
             if (scaleAttackWithActorPower && self != null)
-            {
                 rawDamage += self.attackPower;
-            }
+
             int actualDamage = target.ReceiveDamage(rawDamage);
             totalDamage += actualDamage;
         }
@@ -68,9 +145,7 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
     private int ExecuteDefense(int defenseCount)
     {
         if (self == null || defenseCount <= 0)
-        {
             return 0;
-        }
 
         int totalDefense = defenseCount * defenseBonusPerPoint;
         self.AddTemporaryDefense(totalDefense);
@@ -81,9 +156,7 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
     {
         SkillExecutionReport report = new SkillExecutionReport();
         if (skillCount <= 0)
-        {
             return report;
-        }
 
         string skillId = ResolveSkillId(result);
         if (string.IsNullOrEmpty(skillId))
@@ -122,19 +195,13 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
         {
             GesturePointSnapshot snap = result.pointSnapshots[i];
             if (snap.finalFunction != PointFunction.Skill)
-            {
                 continue;
-            }
 
             if (!string.IsNullOrEmpty(snap.resolvedSkillId))
-            {
                 return snap.resolvedSkillId;
-            }
 
             if (skillSlotProvider != null && skillSlotProvider.TryGetSkillIdForPoint(snap.pointId, out string fallbackSkillId))
-            {
                 return fallbackSkillId;
-            }
         }
 
         return string.Empty;
@@ -146,9 +213,7 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
         for (int i = 0; i < result.pointSnapshots.Count; i++)
         {
             if (result.pointSnapshots[i].finalFunction == function)
-            {
                 count++;
-            }
         }
 
         return count;
@@ -164,18 +229,14 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
         SkillExecutionReport skillReport)
     {
         if (!enableSummaryLog)
-        {
             return;
-        }
 
         StringBuilder points = new StringBuilder();
         for (int i = 0; i < result.pointSnapshots.Count; i++)
         {
             GesturePointSnapshot snap = result.pointSnapshots[i];
             if (i > 0)
-            {
                 points.Append(" -> ");
-            }
 
             string skill = string.IsNullOrEmpty(snap.resolvedSkillId) ? "-" : snap.resolvedSkillId;
             points.Append($"[{snap.pointId}:{snap.finalFunction}:技能{skill}]");
@@ -191,6 +252,7 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
 
         Debug.Log(
             "[總結]\n" +
+            $"目前目標: {(target != null ? target.actorId : "None")}\n" +
             $"路徑: {points}\n" +
             $"攻擊點數={attackCount}（攻擊次數={attackCount}，總傷害={totalAttackDamage}）\n" +
             $"防禦點數={defenseCount}（本回合防禦加成={totalDefenseAdded}）\n" +
