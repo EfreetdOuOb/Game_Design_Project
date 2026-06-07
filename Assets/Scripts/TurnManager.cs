@@ -9,6 +9,7 @@ public class TurnManager : MonoBehaviour
 
     public TurnPhase CurrentPhase { get; private set; } = TurnPhase.PlayerTurn;
     public int TurnNumber { get; private set; } = 1;
+    public bool IsBattleLocked { get; set; }
 
     // 其他系統訂閱這些事件
     public event Action OnPlayerTurnStart;
@@ -26,6 +27,7 @@ public class TurnManager : MonoBehaviour
     // 玩家手勢完成後呼叫
     public void EndPlayerTurn()
     {
+        if (IsBattleLocked) return;
         if (CurrentPhase != TurnPhase.PlayerTurn) return;
         CurrentPhase = TurnPhase.EnemyTurn;
         OnPlayerTurnEnd?.Invoke();
@@ -42,6 +44,7 @@ public class TurnManager : MonoBehaviour
 
     public void EndEnemyTurn()
     {
+        if (IsBattleLocked) return;
         if (CurrentPhase != TurnPhase.EnemyTurn) return;
         CurrentPhase = TurnPhase.Cleanup;
         OnEnemyTurnEnd?.Invoke();
