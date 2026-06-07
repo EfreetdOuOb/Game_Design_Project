@@ -9,6 +9,9 @@ public class MapNode : MonoBehaviour
     public Image _image;
     public MapNodeType _mapNodeType;
     public List<int> nextLayerConnectedNodes = new();
+    public Button _button;
+    public bool isUnlocked;
+    public bool isCompleted;
 
     public void SetMapNodeType(MapNodeData mapNodeData)
     {
