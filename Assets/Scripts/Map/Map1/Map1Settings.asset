@@ -46,15 +46,15 @@ MonoBehaviour:
   layerNodeRuleSettings: []
   mapNodeSpriteSettings:
   - nodeType: 1
-    icon: {fileID: 364371424, guid: 75872876a773f564a9660e522ca4edd7, type: 3}
+    icon: {fileID: -194449869, guid: 2a80e3ec196f79749b123b1df18e46da, type: 3}
   - nodeType: 2
-    icon: {fileID: -108627762, guid: 21c73331a1cd5b342a7dbd9266b695bc, type: 3}
+    icon: {fileID: -506981327, guid: a3c6093fd93f5844d86dfa4aa293ad6a, type: 3}
   - nodeType: 3
-    icon: {fileID: -1850961743, guid: c5636cd25a1f04c49bf43cb803fd6bde, type: 3}
+    icon: {fileID: -338220099, guid: 88c640395b669634fa51c85306bd4498, type: 3}
   - nodeType: 4
-    icon: {fileID: 1523094178, guid: 930376e290d678445ad0467c7279bd2d, type: 3}
+    icon: {fileID: -1634945833, guid: 34febf31ce979a24095c6299bf84ea08, type: 3}
   - nodeType: 5
-    icon: {fileID: -276589805, guid: 9875a012a08b780409a8c4aec522ea32, type: 3}
+    icon: {fileID: 402501773, guid: 7d2a1887832fb3d4a8cb2ce11e671c45, type: 3}
   - nodeType: 6
-    icon: {fileID: -1870476760, guid: 56efe1e72cd518f4ebc4320b2c0c8013, type: 3}
+    icon: {fileID: -1753607782, guid: 52c707c6f898a7c48896ae40f03b39d4, type: 3}
   defaultNodeSprite: {fileID: 0}
