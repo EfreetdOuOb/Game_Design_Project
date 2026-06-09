@@ -107,6 +107,7 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
 
         int totalAttackDamage = ExecuteAttack(attackCount);
         int totalDefenseAdded = ExecuteDefense(defenseCount);
+        ApplyAttackPoiseBreak(attackCount);
         SkillExecutionReport skillReport = ExecuteSkill(result, skillCount);
 
         LogTurnSummary(result, attackCount, defenseCount, skillCount, totalAttackDamage, totalDefenseAdded, skillReport);
@@ -140,6 +141,26 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
         }
 
         return totalDamage;
+    }
+
+    private void ApplyAttackPoiseBreak(int attackCount)
+    {
+        if (target == null || target.currentHp <= 0)
+            return;
+
+        if (attackCount < 3)
+            return;
+
+        EnemyPoise poise = target.GetComponent<EnemyPoise>();
+        if (poise == null)
+            return;
+
+        int poiseDamage = attackCount / 3;
+        if (poiseDamage <= 0)
+            return;
+
+        poise.ReducePoise(poiseDamage);
+        CombatUI.Instance?.AppendBattleLog($"{target.actorId} 因基礎攻擊連段，韌性 -{poiseDamage}");
     }
 
     private int ExecuteDefense(int defenseCount)
