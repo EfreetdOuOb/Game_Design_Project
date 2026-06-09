@@ -539,6 +539,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 19e5e26e43c5e8943b618f7b4b001ed7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1467339919272967746}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 19e5e26e43c5e8943b618f7b4b001ed7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6880483285139136693}
   m_SourcePrefab: {fileID: 100100000, guid: 19e5e26e43c5e8943b618f7b4b001ed7, type: 3}
 --- !u!4 &4672699195287295663 stripped
 Transform:
@@ -650,3 +653,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyTargetSelectable
   enemyActor: {fileID: 3998755875253723866}
   playerHandler: {fileID: 0}
+--- !u!114 &6880483285139136693
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5445717839189773333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aceb420c5a401d0458192329e6d994b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyPoise
+  maxPoise: 3
+  currentPoise: 3
+  stunTurnsOnBreak: 1
