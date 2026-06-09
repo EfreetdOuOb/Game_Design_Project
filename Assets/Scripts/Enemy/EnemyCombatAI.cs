@@ -8,11 +8,35 @@ public class EnemyCombatAI : MonoBehaviour
     public int defendBonus = 10;
     public float actionDelay = 0.4f;
 
+    private Animator animator;
+
     private EnemyPoise enemyPoise;
+    private int lastHp;
+    private bool isInitialized = false;
 
     private void Awake()
     {
+        animator = GetComponent<Animator>();
         enemyPoise = GetComponent<EnemyPoise>();
+    }
+
+    private void Start()
+    {
+        if (enemyActor != null)
+            lastHp = enemyActor.currentHp;
+        isInitialized = true;
+    }
+
+    private void Update()
+    {
+        if (!isInitialized || enemyActor == null)
+            return;
+
+        if (enemyActor.currentHp < lastHp)
+        {
+            StartCoroutine(hit());
+            lastHp = enemyActor.currentHp;
+        }
     }
 
     public bool CanAct()
@@ -38,6 +62,10 @@ public class EnemyCombatAI : MonoBehaviour
 
     private IEnumerator ExecuteAttack()
     {
+        animator.SetTrigger("Attack");
+        yield return new WaitForSeconds(0.5f);
+        animator.SetTrigger("None");
+
         int damage = enemyActor.attackPower;
         int actual = playerActor.ReceiveDamage(damage);
 
@@ -56,5 +84,12 @@ public class EnemyCombatAI : MonoBehaviour
         enemyActor.AddTemporaryDefense(defendBonus);
         CombatUI.Instance?.AppendBattleLog($"{enemyActor.actorId} 防守，獲得 +{defendBonus} 暫時防禦");
         yield return new WaitForSeconds(actionDelay);
+    }
+
+    private IEnumerator hit()
+    {
+        animator.SetTrigger("Hit");
+        yield return new WaitForSeconds(0.5f);
+        animator.SetTrigger("None");
     }
 }
