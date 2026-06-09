@@ -15,7 +15,11 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
     public bool enableSummaryLog = true;
     public bool scaleAttackWithActorPower = false;
 
+    [Header("Poise")]
+    [SerializeField] private int attackPointsPerPoiseDamage = 3;
+
     private ISkillSlotProvider skillSlotProvider;
+    private int currentTurnAttackPointCount = 0;
 
     private void Awake()
     {
@@ -44,6 +48,9 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
 
     private void HandlePlayerTurnStart()
     {
+        currentTurnAttackPointCount = 0;
+        Debug.Log("[韌性判定] 玩家新回合開始，攻擊點累積已清空");
+
         if (!HasValidTarget())
             AutoSelectFirstAliveEnemy();
     }
@@ -105,9 +112,11 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
         int defenseCount = CountPoints(result, PointFunction.Defense);
         int skillCount = CountPoints(result, PointFunction.Skill);
 
+        Debug.Log($"[攻擊判定] 本次結算 Attack={attackCount}, Defense={defenseCount}, Skill={skillCount}");
+
         int totalAttackDamage = ExecuteAttack(attackCount);
         int totalDefenseAdded = ExecuteDefense(defenseCount);
-        ApplyAttackPoiseBreak(attackCount);
+        AccumulateAttackPointsAndApplyPoise(attackCount);
         SkillExecutionReport skillReport = ExecuteSkill(result, skillCount);
 
         LogTurnSummary(result, attackCount, defenseCount, skillCount, totalAttackDamage, totalDefenseAdded, skillReport);
@@ -143,24 +152,53 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
         return totalDamage;
     }
 
-    private void ApplyAttackPoiseBreak(int attackCount)
+    private void AccumulateAttackPointsAndApplyPoise(int attackCount)
     {
-        if (target == null || target.currentHp <= 0)
+        if (attackCount <= 0)
             return;
 
-        if (attackCount < 3)
+        if (target == null)
+        {
+            Debug.Log("[韌性判定] target 是 null，無法累積韌性扣除");
             return;
+        }
+
+        if (target.currentHp <= 0)
+        {
+            Debug.Log($"[韌性判定] {target.actorId} 已死亡，不進行韌性累積");
+            return;
+        }
 
         EnemyPoise poise = target.GetComponent<EnemyPoise>();
         if (poise == null)
-            return;
+            poise = target.GetComponentInParent<EnemyPoise>();
 
-        int poiseDamage = attackCount / 3;
-        if (poiseDamage <= 0)
+        if (poise == null)
+        {
+            Debug.LogWarning($"[韌性判定] 在 {target.actorId} 身上找不到 EnemyPoise");
             return;
+        }
+
+        currentTurnAttackPointCount += attackCount;
+        Debug.Log($"[韌性判定] 本回合累積攻擊點 = {currentTurnAttackPointCount}");
+
+        if (attackPointsPerPoiseDamage <= 0)
+            attackPointsPerPoiseDamage = 3;
+
+        int poiseDamage = currentTurnAttackPointCount / attackPointsPerPoiseDamage;
+
+        if (poiseDamage <= 0)
+        {
+            Debug.Log($"[韌性判定] 尚未達到 {attackPointsPerPoiseDamage} 點攻擊，不扣韌性");
+            return;
+        }
+
+        currentTurnAttackPointCount %= attackPointsPerPoiseDamage;
+
+        Debug.Log($"[韌性判定] 達成扣韌性條件，扣除 {poiseDamage} 點韌性，剩餘累積攻擊點 = {currentTurnAttackPointCount}");
 
         poise.ReducePoise(poiseDamage);
-        CombatUI.Instance?.AppendBattleLog($"{target.actorId} 因基礎攻擊連段，韌性 -{poiseDamage}");
+        CombatUI.Instance?.AppendBattleLog($"{target.actorId} 因連續攻擊，韌性 -{poiseDamage}");
     }
 
     private int ExecuteDefense(int defenseCount)
@@ -277,6 +315,7 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
             $"路徑: {points}\n" +
             $"攻擊點數={attackCount}（攻擊次數={attackCount}，總傷害={totalAttackDamage}）\n" +
             $"防禦點數={defenseCount}（本回合防禦加成={totalDefenseAdded}）\n" +
-            $"技能點數={skillCount}（技能傷害={skillDamage}，技能治療={skillHeal}，技能防禦={skillDefense}，Debuff={debuffText}）");
+            $"技能點數={skillCount}（技能傷害={skillDamage}，技能治療={skillHeal}，技能防禦={skillDefense}，Debuff={debuffText}）\n" +
+            $"本回合剩餘攻擊點累積={currentTurnAttackPointCount}");
     }
 }
