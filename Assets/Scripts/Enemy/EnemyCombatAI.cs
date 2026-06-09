@@ -7,28 +7,12 @@ public class EnemyCombatAI : MonoBehaviour
     public CombatActor playerActor;
     public int defendBonus = 10;
     public float actionDelay = 0.4f;
-    private int previousHp;
-    private Animator ani;
-    private bool isAnimating = false;
 
-    private void Start()
+    private EnemyPoise enemyPoise;
+
+    private void Awake()
     {
-        ani = GetComponent<Animator>();
-        if (enemyActor != null)
-            previousHp = enemyActor.currentHp;
-    }
-
-    private void Update()
-    {
-        if (enemyActor == null || ani == null)
-            return;
-
-        if (enemyActor.currentHp < previousHp)
-        {
-            ani.SetTrigger("Hit");
-            previousHp = enemyActor.currentHp;
-            ani.SetTrigger("None");
-        }
+        enemyPoise = GetComponent<EnemyPoise>();
     }
 
     public bool CanAct()
@@ -41,6 +25,9 @@ public class EnemyCombatAI : MonoBehaviour
         if (!CanAct())
             yield break;
 
+        if (enemyPoise != null && enemyPoise.TryConsumeStunTurn())
+            yield break;
+
         int turn = TurnManager.Instance != null ? TurnManager.Instance.TurnNumber : 1;
 
         if (turn % 2 == 1)
@@ -51,22 +38,17 @@ public class EnemyCombatAI : MonoBehaviour
 
     private IEnumerator ExecuteAttack()
     {
-        if (ani != null && !isAnimating)
-        {
-            isAnimating = true;
-            ani.SetTrigger("Attack");
-            yield return new WaitForSeconds(actionDelay);
-            isAnimating = false;
-            ani.SetTrigger("None");
-        }
-        else
-        {
-            yield return new WaitForSeconds(actionDelay);
-        }
-        
         int damage = enemyActor.attackPower;
         int actual = playerActor.ReceiveDamage(damage);
+
+        if (actual == 0 && enemyPoise != null)
+        {
+            enemyPoise.ReducePoise(1);
+            CombatUI.Instance?.AppendBattleLog($"{enemyActor.actorId} 的攻擊被完全防禦，韌性 -1");
+        }
+
         CombatUI.Instance?.AppendBattleLog($"{enemyActor.actorId} 攻擊玩家，造成 {actual} 傷害");
+        yield return new WaitForSeconds(actionDelay);
     }
 
     private IEnumerator ExecuteDefend()
