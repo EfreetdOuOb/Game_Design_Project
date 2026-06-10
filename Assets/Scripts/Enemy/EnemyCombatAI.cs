@@ -8,6 +8,8 @@ public class EnemyCombatAI : MonoBehaviour
     public int defendBonus = 10;
     public float actionDelay = 0.4f;
 
+    public float animationDelay = 0.3f;
+
     private Animator animator;
 
     private EnemyPoise enemyPoise;
@@ -88,6 +90,7 @@ public class EnemyCombatAI : MonoBehaviour
 
     private IEnumerator hit()
     {
+        yield return new WaitForSeconds(animationDelay);
         animator.SetBool("Hit", true);
         yield return new WaitForSeconds(0.3f);
         animator.SetBool("Hit", false);

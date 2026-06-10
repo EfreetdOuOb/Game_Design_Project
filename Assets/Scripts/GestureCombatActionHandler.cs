@@ -1,6 +1,5 @@
 using System.Text;
 using UnityEngine;
-
 public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
 {
     [Header("Dependencies")]
@@ -8,6 +7,7 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
     public CombatActor target;
     public SkillLibrary skillLibrary;
     public MonoBehaviour skillSlotProviderBehaviour;
+    public PlayerAnimator playerAnimator;
 
     [Header("Tuning")]
     public int baseAttackDamage = 15;
@@ -24,7 +24,6 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
     private void Awake()
     {
         skillSlotProvider = skillSlotProviderBehaviour as ISkillSlotProvider;
-
         if (self == null)
             self = GetComponent<CombatActor>();
     }
@@ -135,6 +134,10 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
         if (target == null || target.currentHp <= 0 || attackCount <= 0)
             return 0;
 
+        // 觸發玩家動畫
+        if (playerAnimator != null)
+            playerAnimator.OnPlayerAttack();
+
         int totalDamage = 0;
         for (int i = 0; i < attackCount; i++)
         {
@@ -151,6 +154,7 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
 
         return totalDamage;
     }
+
 
     private void AccumulateAttackPointsAndApplyPoise(int attackCount)
     {
