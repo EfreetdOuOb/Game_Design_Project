@@ -5196,9 +5196,6 @@ MonoBehaviour:
   _playerActor: {fileID: 377310422}
   _playerGestureHandler: {fileID: 1738395219}
   _mapController: {fileID: 472646868}
-  _eventPanelRoot: {fileID: 347312018}
-  _eventDescriptionText: {fileID: 0}
-  _defaultEventText: "\u4F60\u906D\u9047\u4E86\u4E00\u500B\u4E8B\u4EF6"
   _playerFollowCamera: {fileID: 858928957}
   _treasureCamera: {fileID: 1830763721}
   _activeCameraPriority: 20
@@ -5207,6 +5204,7 @@ MonoBehaviour:
   _treasureChestAnimator: {fileID: 0}
   _treasureRewardPanelUI: {fileID: 1206328586}
   _defaultTreasureRewardText: "\u4F60\u7372\u5F97\u4E86 50 \u91D1\u5E63"
+  _magicTownPanel: {fileID: 1230026007}
 --- !u!1 &2120177151
 GameObject:
   m_ObjectHideFlags: 0
