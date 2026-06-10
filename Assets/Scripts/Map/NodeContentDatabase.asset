@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NodeContentDatabase
   battleEncounters:
   - {fileID: 11400000, guid: 25c02bbf6e01a724eb3e9dd21d0c9c42, type: 2}
+  - {fileID: 11400000, guid: 7aa8530add674fb45a30c21d252c1341, type: 2}

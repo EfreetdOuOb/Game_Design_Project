@@ -15,7 +15,7 @@ MonoBehaviour:
   layerCount: 5
   mapNodeWidth: 150
   mapNodeHeight: 150
-  padding: 150
+  padding: 200
   enemyWeight: 0.45
   shopWeight: 0.2
   treasureWeight: 0.15
