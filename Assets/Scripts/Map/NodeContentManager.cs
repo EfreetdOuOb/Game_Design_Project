@@ -1,23 +1,34 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Cinemachine;
 
 public class NodeContentManager : MonoBehaviour
 {
-    [Header("References")]
+    [Header("Battle References")]
     [SerializeField] private NodeContentDatabase _database;
     [SerializeField] private Transform _enemySpawnRoot;
     [SerializeField] private List<Transform> _enemySpawnPoints = new();
     [SerializeField] private BattleController _battleController;
     [SerializeField] private CombatActor _playerActor;
     [SerializeField] private GestureCombatActionHandler _playerGestureHandler;
+
+    [Header("Shared References")]
     [SerializeField] private MapController _mapController;
 
-    [Header("Event Encounter")]
-    [SerializeField] private GameObject _eventPanel;
+    [Header("Treasure Encounter")]
+    [SerializeField] private CinemachineCamera _playerFollowCamera;
+    [SerializeField] private CinemachineCamera _treasureCamera;
+    [SerializeField] private int _activeCameraPriority = 20;
+    [SerializeField] private int _inactiveCameraPriority = 10;
+    [SerializeField] private TreasureChestSelectable _treasureChestSelectable;
+    [SerializeField] private Animator _treasureChestAnimator;
+    [SerializeField] private TreasureRewardPanelUI _treasureRewardPanelUI;
+    [SerializeField] private string _defaultTreasureRewardText = "你獲得了 50 金幣";
 
     private readonly List<GameObject> _spawnedObjects = new();
-    private MapNodeData _currentNodeData;
-    private bool _eventEncounterActive;
+
+    private bool _treasureEncounterActive;
+    private bool _treasureOpened;
 
     public void EnterNode(MapNodeData nodeData)
     {
@@ -26,9 +37,6 @@ public class NodeContentManager : MonoBehaviour
             Debug.LogWarning("EnterNode 失敗：nodeData 是 null");
             return;
         }
-
-        _currentNodeData = nodeData;
-        _eventEncounterActive = false;
 
         ClearCurrentContent();
 
@@ -40,7 +48,7 @@ public class NodeContentManager : MonoBehaviour
                 break;
 
             case MapNodeType.Event:
-                EnterEventNode(nodeData.contentId);
+                Debug.Log($"事件節點尚未實作，contentId = {nodeData.contentId}");
                 break;
 
             case MapNodeType.Shop:
@@ -52,7 +60,7 @@ public class NodeContentManager : MonoBehaviour
                 break;
 
             case MapNodeType.Treasure:
-                Debug.Log($"寶箱節點尚未實作，contentId = {nodeData.contentId}");
+                EnterTreasureNode(nodeData.contentId);
                 break;
 
             default:
@@ -126,70 +134,106 @@ public class NodeContentManager : MonoBehaviour
         _battleController.StartBattleWithEnemies(spawnedEnemies);
     }
 
-    private void EnterEventNode(string contentId)
+    private void EnterTreasureNode(string contentId)
     {
-        if (_eventPanel == null)
-        {
-            Debug.LogWarning($"事件節點無法開啟：_eventPanel 未指定，contentId = {contentId}");
-            return;
-        }
-
-        _eventEncounterActive = true;
-
         if (_mapController != null)
         {
             _mapController.CloseMap();
         }
 
-        _eventPanel.SetActive(true);
-        Debug.Log($"事件節點開啟：contentId = {contentId}");
+        _treasureEncounterActive = true;
+        _treasureOpened = false;
+
+        if (_treasureRewardPanelUI != null)
+        {
+            _treasureRewardPanelUI.gameObject.SetActive(false);
+        }
+
+        if (_treasureChestSelectable != null)
+        {
+            _treasureChestSelectable.Setup(this);
+            _treasureChestSelectable.SetInteractable(true);
+        }
+        else
+        {
+            Debug.LogWarning("TreasureChestSelectable 未指定");
+        }
+
+        SetTreasureCameraActive(true);
+
+        Debug.Log($"寶箱節點開啟：contentId = {contentId}");
     }
 
-    public void CloseEventEncounter()
+    public void OpenTreasureChest()
     {
-        if (!_eventEncounterActive)
-        {
-            Debug.LogWarning("CloseEventEncounter 被呼叫，但目前沒有進行中的事件遭遇");
+        if (!_treasureEncounterActive || _treasureOpened)
             return;
+
+        _treasureOpened = true;
+
+        if (_treasureChestSelectable != null)
+        {
+            _treasureChestSelectable.SetInteractable(false);
         }
 
-        _eventEncounterActive = false;
-
-        if (_eventPanel != null)
+        if (_treasureChestAnimator != null)
         {
-            _eventPanel.SetActive(false);
+            _treasureChestAnimator.SetTrigger("Open");
         }
 
-        if (_mapController != null)
+        if (_treasureRewardPanelUI != null)
         {
-            _mapController.CompleteCurrentNode();
+            _treasureRewardPanelUI.ShowReward(_defaultTreasureRewardText);
         }
         else
         {
-            Debug.LogWarning("NodeContentManager 缺少 MapController，無法完成事件節點");
+            Debug.LogWarning("TreasureRewardPanelUI 未指定");
+        }
+    }
+
+    public void CloseTreasureReward()
+    {
+        if (!_treasureEncounterActive)
+            return;
+
+        if (_treasureRewardPanelUI != null)
+        {
+            _treasureRewardPanelUI.gameObject.SetActive(false);
         }
 
-        if (GameFlowController.Instance != null)
+        SetTreasureCameraActive(false);
+
+        _treasureEncounterActive = false;
+        _treasureOpened = false;
+
+        _mapController?.CompleteCurrentNode();
+        GameFlowController.Instance?.ReturnToMap();
+    }
+
+    private void SetTreasureCameraActive(bool active)
+    {
+        if (_playerFollowCamera != null)
         {
-            GameFlowController.Instance.ReturnToMap();
-        }
-        else
-        {
-            Debug.LogWarning("找不到 GameFlowController.Instance，無法返回地圖");
+            _playerFollowCamera.Priority = active ? _inactiveCameraPriority : _activeCameraPriority;
         }
 
-        _currentNodeData = null;
-        Debug.Log("事件節點已完成，返回地圖");
+        if (_treasureCamera != null)
+        {
+            _treasureCamera.Priority = active ? _activeCameraPriority : _inactiveCameraPriority;
+        }
     }
 
     public void ClearCurrentContent()
     {
-        if (_eventPanel != null)
+        if (_treasureRewardPanelUI != null)
         {
-            _eventPanel.SetActive(false);
+            _treasureRewardPanelUI.gameObject.SetActive(false);
         }
 
-        _eventEncounterActive = false;
+        SetTreasureCameraActive(false);
+
+        _treasureEncounterActive = false;
+        _treasureOpened = false;
 
         for (int i = 0; i < _spawnedObjects.Count; i++)
         {
