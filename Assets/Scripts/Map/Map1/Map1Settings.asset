@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bc6f7e5eae198f438d7c76c216e6c60, type: 3}
   m_Name: Map1Settings
   m_EditorClassIdentifier: Assembly-CSharp::MapSettings
-  layerCount: 5
+  layerCount: 4
   mapNodeWidth: 150
-  mapNodeHeight: 150
+  mapNodeHeight: 200
   padding: 200
   enemyWeight: 0.45
   shopWeight: 0.2
@@ -28,17 +28,13 @@ MonoBehaviour:
     nodeCount: 3
   - layerIndex: 2
     nodeCount: 2
-  - layerIndex: 3
-    nodeCount: 2
   layerFixedTypeSettings:
   - layerIndex: 0
     nodeTypes: 0100000001000000
   - layerIndex: 1
-    nodeTypes: 010000000100000004000000
+    nodeTypes: 040000000100000004000000
   - layerIndex: 2
     nodeTypes: 0300000003000000
-  - layerIndex: 3
-    nodeTypes: 040000000100000002000000
   layerNodeRuleSettings: []
   mapNodeSpriteSettings:
   - nodeType: 1

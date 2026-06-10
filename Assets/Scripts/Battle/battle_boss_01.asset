@@ -15,4 +15,4 @@ MonoBehaviour:
   contentId: battle_boss_01
   nodeType: 1
   enemyPrefabs:
-  - {fileID: 574847649120406160, guid: 0ff86698d2069e8469504e1957c6b470, type: 3}
+  - {fileID: 8161953461809116963, guid: 13a92828d57d96e4baeefc6ce7da840c, type: 3}
