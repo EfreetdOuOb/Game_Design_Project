@@ -690,7 +690,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0018102527, y: 0.9997186, z: 0.012185991, w: 0.020276107}
+  m_LocalRotation: {x: -0.00024756335, y: 0.99972016, z: 0.012217642, w: 0.020257108}
   m_LocalPosition: {x: 841.5402, y: 306.6803, z: -552.38763}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1302,7 +1302,7 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 26c2eae17e539cf4ca14384204c20619, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 858928955}
+      addedObject: {fileID: 899343232}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 26c2eae17e539cf4ca14384204c20619, type: 3}
       insertIndex: -1
@@ -2399,7 +2399,7 @@ GameObject:
   - component: {fileID: 858928957}
   - component: {fileID: 858928956}
   m_Layer: 0
-  m_Name: Camera
+  m_Name: CinemachineCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2413,12 +2413,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 858928954}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.012317015, y: 0.10605767, z: -0.00025781823, w: 0.9942837}
-  m_LocalPosition: {x: 0.72362614, y: 1.498291, z: -1.5943494}
+  m_LocalRotation: {x: -0.00024756335, y: 0.99972016, z: 0.012217642, w: 0.020257108}
+  m_LocalPosition: {x: 841.5402, y: 306.6803, z: -552.38763}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1076613596}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -79.898, y: 81.991, z: 97.707}
 --- !u!114 &858928956
 MonoBehaviour:
@@ -2458,7 +2458,7 @@ MonoBehaviour:
   m_StreamingVersion: 20241001
   m_LegacyPriority: 0
   Target:
-    TrackingTarget: {fileID: 0}
+    TrackingTarget: {fileID: 899343232}
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
@@ -2560,6 +2560,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 876702670}
   m_CullTransparentMesh: 1
+--- !u!1 &899343231
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 899343232}
+  m_Layer: 0
+  m_Name: CamPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &899343232
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 899343231}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.012317015, y: 0.10605767, z: -0.00025781823, w: 0.9942837}
+  m_LocalPosition: {x: 0.72362614, y: 1.498291, z: -1.5943494}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1076613596}
+  m_LocalEulerAnglesHint: {x: -79.898, y: 81.991, z: 97.707}
 --- !u!1 &935809857
 GameObject:
   m_ObjectHideFlags: 0
@@ -5655,6 +5686,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 330585546}
+  - {fileID: 858928955}
   - {fileID: 410087041}
   - {fileID: 267178568}
   - {fileID: 832575519}
