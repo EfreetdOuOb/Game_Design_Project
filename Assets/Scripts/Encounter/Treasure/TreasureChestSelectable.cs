@@ -2,15 +2,25 @@ using UnityEngine;
 
 public class TreasureChestSelectable : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private NodeContentManager _owner;
+    private bool _canInteract;
+
+    public void Setup(NodeContentManager owner)
     {
-        
+        _owner = owner;
+        _canInteract = owner != null;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SetInteractable(bool canInteract)
     {
-        
+        _canInteract = canInteract;
+    }
+
+    private void OnMouseDown()
+    {
+        if (!_canInteract || _owner == null)
+            return;
+
+        _owner.OpenTreasureChest();
     }
 }

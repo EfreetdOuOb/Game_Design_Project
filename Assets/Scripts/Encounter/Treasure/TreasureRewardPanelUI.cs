@@ -1,16 +1,26 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TreasureRewardPanelUI : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [SerializeField] private NodeContentManager _nodeContentManager;
+    [SerializeField] private Text _rewardText;
+
+    public void ShowReward(string rewardText)
     {
-        
+        if (_rewardText != null)
+        {
+            _rewardText.text = rewardText;
+        }
+
+        gameObject.SetActive(true);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OnClickClose()
     {
-        
+        if (_nodeContentManager != null)
+        {
+            _nodeContentManager.CloseTreasureReward();
+        }
     }
 }
