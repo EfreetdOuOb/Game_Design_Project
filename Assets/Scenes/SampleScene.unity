@@ -2211,7 +2211,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 756877626}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1206328586}
+        m_TargetAssemblyTypeName: TreasureRewardPanelUI, Assembly-CSharp
+        m_MethodName: OnClickClose
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &756877626
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3347,6 +3359,7 @@ GameObject:
   - component: {fileID: 1206328583}
   - component: {fileID: 1206328585}
   - component: {fileID: 1206328584}
+  - component: {fileID: 1206328586}
   m_Layer: 5
   m_Name: TreasureEncounterPanel
   m_TagString: Untagged
@@ -3412,6 +3425,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1206328582}
   m_CullTransparentMesh: 1
+--- !u!114 &1206328586
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1206328582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0eb8c8fc833a0240a0dff7520ef6e80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TreasureRewardPanelUI
+  _nodeContentManager: {fileID: 2007795492}
+  _rewardText: {fileID: 0}
 --- !u!1 &1217255051 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4710747056338699003, guid: 0b49a77b17a19a541850225888c106ba, type: 3}
@@ -5169,7 +5196,14 @@ MonoBehaviour:
   _playerActor: {fileID: 377310422}
   _playerGestureHandler: {fileID: 1738395219}
   _mapController: {fileID: 472646868}
-  _eventPanel: {fileID: 347312018}
+  _playerFollowCamera: {fileID: 858928957}
+  _treasureCamera: {fileID: 1830763721}
+  _activeCameraPriority: 20
+  _inactiveCameraPriority: 10
+  _treasureChestSelectable: {fileID: 7277902418591680368}
+  _treasureChestAnimator: {fileID: 0}
+  _treasureRewardPanelUI: {fileID: 1206328586}
+  _defaultTreasureRewardText: "\u4F60\u7372\u5F97\u4E86 50 \u91D1\u5E63"
 --- !u!1 &2120177151
 GameObject:
   m_ObjectHideFlags: 0
@@ -5591,13 +5625,33 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6004130323964247013, guid: 9e7acac984ccc0649becea120979b3e2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7277902418591680368}
   m_SourcePrefab: {fileID: 100100000, guid: 9e7acac984ccc0649becea120979b3e2, type: 3}
 --- !u!4 &7277902418591680366 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1008954449757789819, guid: 9e7acac984ccc0649becea120979b3e2, type: 3}
   m_PrefabInstance: {fileID: 7277902418591680365}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7277902418591680367 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6004130323964247013, guid: 9e7acac984ccc0649becea120979b3e2, type: 3}
+  m_PrefabInstance: {fileID: 7277902418591680365}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7277902418591680368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7277902418591680367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed2f2efd08878bb4689ca861a19d4a16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TreasureChestSelectable
 --- !u!1001 &7748858317154346646
 PrefabInstance:
   m_ObjectHideFlags: 0
