@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Unity.Cinemachine;
+using TMPro;
 
 public class NodeContentManager : MonoBehaviour
 {
@@ -15,6 +17,11 @@ public class NodeContentManager : MonoBehaviour
     [Header("Shared References")]
     [SerializeField] private MapController _mapController;
 
+    [Header("Event Encounter")]
+    [SerializeField] private GameObject _eventPanelRoot;
+    [SerializeField] private TMP_Text _eventDescriptionText;
+    [SerializeField] private string _defaultEventText = "你遭遇了一個事件";
+
     [Header("Treasure Encounter")]
     [SerializeField] private CinemachineCamera _playerFollowCamera;
     [SerializeField] private CinemachineCamera _treasureCamera;
@@ -27,6 +34,8 @@ public class NodeContentManager : MonoBehaviour
 
     private readonly List<GameObject> _spawnedObjects = new();
 
+    private MapNodeData _currentNodeData;
+    private bool _eventEncounterActive;
     private bool _treasureEncounterActive;
     private bool _treasureOpened;
 
@@ -39,6 +48,7 @@ public class NodeContentManager : MonoBehaviour
         }
 
         ClearCurrentContent();
+        _currentNodeData = nodeData;
 
         switch (nodeData.mapNodeType)
         {
@@ -48,7 +58,7 @@ public class NodeContentManager : MonoBehaviour
                 break;
 
             case MapNodeType.Event:
-                Debug.Log($"事件節點尚未實作，contentId = {nodeData.contentId}");
+                EnterEventNode(nodeData.contentId);
                 break;
 
             case MapNodeType.Shop:
@@ -134,6 +144,61 @@ public class NodeContentManager : MonoBehaviour
         _battleController.StartBattleWithEnemies(spawnedEnemies);
     }
 
+    private void EnterEventNode(string contentId)
+    {
+        if (_mapController != null)
+        {
+            _mapController.CloseMap();
+        }
+
+        _eventEncounterActive = true;
+
+        if (_eventPanelRoot != null)
+        {
+            _eventPanelRoot.SetActive(true);
+        }
+
+        if (_eventDescriptionText != null)
+        {
+            _eventDescriptionText.text = ResolveCurrentEvent();
+        }
+
+        Debug.Log($"事件節點開啟：contentId = {contentId}");
+    }
+
+    public string ResolveCurrentEvent()
+    {
+        if (!_eventEncounterActive)
+            return string.Empty;
+
+        if (_currentNodeData == null)
+            return string.Empty;
+
+        if (_currentNodeData.mapNodeType != MapNodeType.Event)
+            return string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(_currentNodeData.contentId))
+            return _currentNodeData.contentId;
+
+        return _defaultEventText;
+    }
+
+    public void CloseEventPanel()
+    {
+        if (!_eventEncounterActive)
+            return;
+
+        if (_eventPanelRoot != null)
+        {
+            _eventPanelRoot.SetActive(false);
+        }
+
+        _eventEncounterActive = false;
+
+        _mapController?.CompleteCurrentNode();
+        GameFlowController.Instance?.ReturnToMap();
+    }
+
     private void EnterTreasureNode(string contentId)
     {
         if (_mapController != null)
@@ -162,6 +227,20 @@ public class NodeContentManager : MonoBehaviour
         SetTreasureCameraActive(true);
 
         Debug.Log($"寶箱節點開啟：contentId = {contentId}");
+    }
+
+    public string ResolveCurrentTreasure()
+    {
+        if (!_treasureEncounterActive)
+            return string.Empty;
+
+        if (_currentNodeData == null)
+            return string.Empty;
+
+        if (_currentNodeData.mapNodeType != MapNodeType.Treasure)
+            return string.Empty;
+
+        return _currentNodeData.contentId;
     }
 
     public void OpenTreasureChest()
@@ -225,6 +304,11 @@ public class NodeContentManager : MonoBehaviour
 
     public void ClearCurrentContent()
     {
+        if (_eventPanelRoot != null)
+        {
+            _eventPanelRoot.SetActive(false);
+        }
+
         if (_treasureRewardPanelUI != null)
         {
             _treasureRewardPanelUI.gameObject.SetActive(false);
@@ -232,6 +316,7 @@ public class NodeContentManager : MonoBehaviour
 
         SetTreasureCameraActive(false);
 
+        _eventEncounterActive = false;
         _treasureEncounterActive = false;
         _treasureOpened = false;
 

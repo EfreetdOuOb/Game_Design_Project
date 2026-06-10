@@ -90,4 +90,10 @@ public class GameFlowController : MonoBehaviour
         _mapController?.CompleteCurrentNode();
         ReturnToMap();
     }
+
+    public void CompleteCurrentNodeAndReturnToMap()
+    {
+        _mapController?.CompleteCurrentNode();
+        ReturnToMap();
+    }
 }

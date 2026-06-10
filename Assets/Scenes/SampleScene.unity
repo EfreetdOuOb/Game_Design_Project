@@ -3880,7 +3880,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2007795492}
         m_TargetAssemblyTypeName: NodeContentManager, Assembly-CSharp
-        m_MethodName: CloseEventEncounter
+        m_MethodName: CloseEventPanel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5196,6 +5196,9 @@ MonoBehaviour:
   _playerActor: {fileID: 377310422}
   _playerGestureHandler: {fileID: 1738395219}
   _mapController: {fileID: 472646868}
+  _eventPanelRoot: {fileID: 347312018}
+  _eventDescriptionText: {fileID: 0}
+  _defaultEventText: "\u4F60\u906D\u9047\u4E86\u4E00\u500B\u4E8B\u4EF6"
   _playerFollowCamera: {fileID: 858928957}
   _treasureCamera: {fileID: 1830763721}
   _activeCameraPriority: 20
