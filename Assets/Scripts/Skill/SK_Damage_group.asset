@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DamageSkillDefinition
   skillId: "\u7FA4\u9AD4"
   displayName: "\u7FA4\u9AD4"
-  icon: {fileID: -1161054706, guid: ee9b9d1e56f14034ca2a01b323c0c1d3, type: 3}
+  icon: {fileID: -2054838891, guid: ff1b47fd20d03cf4f8641e9c72c93480, type: 3}
   damage: 9
   scaleWithCasterAttackPower: 0
