@@ -1522,10 +1522,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 26c2eae17e539cf4ca14384204c20619, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1076613598}
+      addedObject: {fileID: 1076613597}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 26c2eae17e539cf4ca14384204c20619, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1076613597}
+      addedObject: {fileID: 1076613598}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 26c2eae17e539cf4ca14384204c20619, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1076613600}
@@ -2847,7 +2847,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GestureActionDispatcher
   actionHandlers:
   - {fileID: 362660907}
-  - {fileID: 1076613598}
+  - {fileID: 1076613597}
 --- !u!1 &816413287
 GameObject:
   m_ObjectHideFlags: 0
