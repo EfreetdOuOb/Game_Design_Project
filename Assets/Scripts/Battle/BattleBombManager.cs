@@ -120,6 +120,13 @@ public class BattleBombManager : MonoBehaviour
         }
     }
 
+    public void ClearAllBombs()
+    {
+        int clearedCount = activeBombs.Count;
+        activeBombs.Clear();
+        Debug.Log($"[炸彈] 戰鬥重置，清空 {clearedCount} 顆炸彈記錄");
+    }
+
     private void ResolveTurn()
     {
         Debug.Log($"[炸彈] ResolveTurn 被呼叫，目前場上炸彈數={activeBombs.Count}");

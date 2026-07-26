@@ -6,7 +6,6 @@ using UnityEngine;
 public class BattleController : MonoBehaviour
 {
     [SerializeField] private TurnManager _turnManager;
-    [SerializeField] private BattleBombManager _bombManager;
 
     private readonly List<EnemyDead> _enemies = new();
     private CombatActor _playerActor;
@@ -39,6 +38,8 @@ public class BattleController : MonoBehaviour
             _enemies.Add(enemy);
             enemy.SetBattleController(this);
         }
+
+        BattleBombManager.Instance?.ClearAllBombs();
 
         _turnManager?.ResetBattle();
     }
@@ -75,6 +76,8 @@ public class BattleController : MonoBehaviour
         _battleEnded = true;
         _isRunningEnemyTurn = false;
         StopAllCoroutines();
+
+        BattleBombManager.Instance?.ClearAllBombs();
 
         if (_turnManager != null)
         {
@@ -127,6 +130,9 @@ public class BattleController : MonoBehaviour
 
         _battleEnded = true;
         _isRunningEnemyTurn = false;
+
+        BattleBombManager.Instance?.ClearAllBombs();
+
         _turnManager.IsBattleLocked = true;
 
         GameFlowController.Instance.EnterVictory();

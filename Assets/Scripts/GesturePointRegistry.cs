@@ -10,7 +10,7 @@ public class GesturePointRegistry : MonoBehaviour
     public class PointRule
     {
         public RectTransform point;
-        [Range(1, 9)] public int pointId;
+        [Range(1, 9)] public int pointId=1;
         public bool isMiddlePoint;
         public PointFunction pointFunction = PointFunction.None;
     }
