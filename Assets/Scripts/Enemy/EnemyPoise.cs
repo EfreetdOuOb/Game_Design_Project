@@ -17,6 +17,8 @@ public class EnemyPoise : MonoBehaviour
     public bool IsBroken => currentPoise <= 0;
     public bool IsStunned => pendingStunTurns > 0;
 
+    public event System.Action OnPoiseBroken; // 韌性剛好歸零那一刻觸發一次
+
     private void Awake()
     {
         actor = GetComponent<CombatActor>();
@@ -62,6 +64,8 @@ public class EnemyPoise : MonoBehaviour
 
             Debug.Log($"[韌性] {ActorName} 韌性歸零，進入暈眩 {pendingStunTurns} 回合");
             CombatUI.Instance?.AppendBattleLog($"{ActorName} 韌性歸零，陷入暈眩");
+
+            OnPoiseBroken?.Invoke();
         }
     }
 

@@ -817,6 +817,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6a87056fc6931e844ae95b8c0b737890, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7845719733045699432}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6a87056fc6931e844ae95b8c0b737890, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2370483898590383291}
   m_SourcePrefab: {fileID: 100100000, guid: 6a87056fc6931e844ae95b8c0b737890, type: 3}
 --- !u!1 &1202065666963630300 stripped
 GameObject:
@@ -839,6 +842,10 @@ MonoBehaviour:
   playerActor: {fileID: 0}
   defendBonus: 10
   actionDelay: 0.4
+  animationDelay: 0.3
+  canPlaceBomb: 1
+  bombPlacementChance: 1
+  bombInitialTurns: 2
 --- !u!114 &1734471424122317504
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -964,6 +971,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2370483898590383291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1202065666963630300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9912902deee34b4c875f8e43e8f5687, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BombPoiseBridge
 --- !u!4 &2010093031947973222 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6a87056fc6931e844ae95b8c0b737890, type: 3}

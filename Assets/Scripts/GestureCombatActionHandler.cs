@@ -1,5 +1,6 @@
 using System.Text;
 using UnityEngine;
+
 public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
 {
     [Header("Dependencies")]
@@ -17,6 +18,8 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
 
     [Header("Poise")]
     [SerializeField] private int attackPointsPerPoiseDamage = 3;
+
+    
 
     private ISkillSlotProvider skillSlotProvider;
     private int currentTurnAttackPointCount = 0;
@@ -79,7 +82,7 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
 
     public void AutoSelectFirstAliveEnemy()
     {
-        EnemyCombatAI[] enemies = Object.FindObjectsByType<EnemyCombatAI>();
+        EnemyCombatAI[] enemies = Object.FindObjectsByType<EnemyCombatAI>(FindObjectsInactive.Exclude);
 
         for (int i = 0; i < enemies.Length; i++)
         {
@@ -103,6 +106,14 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
     {
         if (result == null)
             return;
+
+        if (BattleBombManager.Instance != null)
+        {
+            for (int i = 0; i < result.pointSnapshots.Count; i++)
+            {
+                BattleBombManager.Instance.NotifyPointTouched(result.pointSnapshots[i].pointId);
+            }
+        }
 
         if (!HasValidTarget())
             AutoSelectFirstAliveEnemy();
@@ -134,7 +145,6 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
         if (target == null || target.currentHp <= 0 || attackCount <= 0)
             return 0;
 
-        // 觸發玩家動畫
         if (playerAnimator != null)
             playerAnimator.OnPlayerAttack();
 
@@ -154,7 +164,6 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
 
         return totalDamage;
     }
-
 
     private void AccumulateAttackPointsAndApplyPoise(int attackCount)
     {

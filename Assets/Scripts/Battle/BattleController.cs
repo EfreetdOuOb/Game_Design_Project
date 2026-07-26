@@ -6,6 +6,7 @@ using UnityEngine;
 public class BattleController : MonoBehaviour
 {
     [SerializeField] private TurnManager _turnManager;
+    [SerializeField] private BattleBombManager _bombManager;
 
     private readonly List<EnemyDead> _enemies = new();
     private CombatActor _playerActor;

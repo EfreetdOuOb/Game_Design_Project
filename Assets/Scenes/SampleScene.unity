@@ -1734,8 +1734,57 @@ Transform:
   - {fileID: 1386121413}
   - {fileID: 2007795491}
   - {fileID: 1767380872}
+  - {fileID: 501749757}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &501749756
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 501749757}
+  - component: {fileID: 501749758}
+  m_Layer: 0
+  m_Name: BattleBombManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &501749757
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 501749756}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 498519395}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &501749758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 501749756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 947877d9702cb4a4fbe9c05818997e5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BattleBombManager
+  maxActiveBombs: 3
+  damageOnTimerDetonate: 15
+  damagePerBombOnPoiseBreak: 20
+  playerActor: {fileID: 1076613598}
 --- !u!1 &520664339
 GameObject:
   m_ObjectHideFlags: 0
@@ -2011,7 +2060,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff4d5040dbe4d4c47a896593f5e72316, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleUIDisplay
-  playerActor: {fileID: 377310422}
+  playerActor: {fileID: 1076613598}
   enemyActor: {fileID: 0}
   actionRouter: {fileID: 362660907}
   playerHpText: {fileID: 876702672}
@@ -2798,7 +2847,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GestureActionDispatcher
   actionHandlers:
   - {fileID: 362660907}
-  - {fileID: 1738395219}
+  - {fileID: 1076613598}
 --- !u!1 &816413287
 GameObject:
   m_ObjectHideFlags: 0
@@ -2831,7 +2880,6 @@ Transform:
   - {fileID: 93172330}
   - {fileID: 816130351}
   - {fileID: 362660908}
-  - {fileID: 1738395218}
   - {fileID: 520664340}
   - {fileID: 472646867}
   m_Father: {fileID: 0}
@@ -4331,7 +4379,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff6d24bcf08a94049b0d9f83a60e3abe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealthBarUI
-  enemyActor: {fileID: 377310422}
+  enemyActor: {fileID: 1076613598}
   hpSlider: {fileID: 1787313716}
   hpText: {fileID: 0}
   poiseSlider: {fileID: 0}
@@ -4463,6 +4511,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleController
   _turnManager: {fileID: 472452699}
+  _bombManager: {fileID: 501749758}
 --- !u!4 &1467606503 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5cccc05d543be2741a49efa6e60c3537, type: 3}
@@ -5331,64 +5380,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2120177152}
   m_LocalEulerAnglesHint: {x: 0, y: -50, z: 0}
---- !u!1 &1738395217
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1738395218}
-  - component: {fileID: 1738395219}
-  m_Layer: 5
-  m_Name: CombatActionHandler
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1738395218
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1738395217}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 816413288}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1738395219
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1738395217}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14414516228558c4abd67ef94674fff4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GestureCombatActionHandler
-  self: {fileID: 377310422}
-  target: {fileID: 0}
-  skillLibrary: {fileID: 520664341}
-  skillSlotProviderBehaviour: {fileID: 362660907}
-  playerAnimator: {fileID: 1076613600}
-  baseAttackDamage: 5
-  defenseBonusPerPoint: 5
-  enableSummaryLog: 1
-  scaleAttackWithActorPower: 0
-  attackPointsPerPoiseDamage: 3
 --- !u!1 &1767380871
 GameObject:
   m_ObjectHideFlags: 0
@@ -6198,8 +6189,8 @@ MonoBehaviour:
   _enemySpawnPoints:
   - {fileID: 1736986727}
   _battleController: {fileID: 1386121414}
-  _playerActor: {fileID: 377310422}
-  _playerGestureHandler: {fileID: 1738395219}
+  _playerActor: {fileID: 1076613598}
+  _playerGestureHandler: {fileID: 1076613597}
   _mapController: {fileID: 472646868}
   _eventPanelRoot: {fileID: 347312018}
   _playerFollowCamera: {fileID: 858928957}

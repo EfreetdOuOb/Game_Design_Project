@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class GesturePointRegistry : MonoBehaviour
 {
+    public static GesturePointRegistry Instance { get; private set; }
+
     [Serializable]
     public class PointRule
     {
@@ -20,7 +22,14 @@ public class GesturePointRegistry : MonoBehaviour
 
     private void Awake()
     {
+        Instance = this;
         Rebuild();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 
     public void Rebuild()
@@ -46,8 +55,6 @@ public class GesturePointRegistry : MonoBehaviour
             }
         }
     }
-
-    
 
     public bool IsMiddlePoint(RectTransform point)
     {
