@@ -8,6 +8,8 @@ public class EnemyCombatAI : MonoBehaviour
     public int defendBonus = 10;
     public float actionDelay = 0.4f;
 
+    public float animationDelay = 0.3f;
+
     private Animator animator;
 
     private EnemyPoise enemyPoise;
@@ -62,9 +64,9 @@ public class EnemyCombatAI : MonoBehaviour
 
     private IEnumerator ExecuteAttack()
     {
-        animator.SetTrigger("Attack");
-        yield return new WaitForSeconds(0.5f);
-        animator.SetTrigger("None");
+        animator.SetBool("Attack", true);
+        yield return new WaitForSeconds(0.3f);
+        animator.SetBool("Attack", false);
 
         int damage = enemyActor.attackPower;
         int actual = playerActor.ReceiveDamage(damage);
@@ -88,8 +90,9 @@ public class EnemyCombatAI : MonoBehaviour
 
     private IEnumerator hit()
     {
-        animator.SetTrigger("Hit");
-        yield return new WaitForSeconds(0.5f);
-        animator.SetTrigger("None");
+        yield return new WaitForSeconds(animationDelay);
+        animator.SetBool("Hit", true);
+        yield return new WaitForSeconds(0.3f);
+        animator.SetBool("Hit", false);
     }
 }
