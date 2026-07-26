@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -21,9 +22,14 @@ public class CombatActor : MonoBehaviour
     public int temporaryDefenseBonus = 0;
     [SerializeField] private List<DebuffState> debuffs = new List<DebuffState>();
 
+    public event Action OnDeath;
+
+    public bool IsDead { get; private set; }
+
     private void Awake()
     {
         currentHp = Mathf.Clamp(currentHp <= 0 ? maxHp : currentHp, 0, maxHp);
+        IsDead = currentHp <= 0;
     }
     private void Start()  
 {
@@ -40,11 +46,42 @@ public class CombatActor : MonoBehaviour
 
     public int ReceiveDamage(int rawDamage)
     {
+        if (IsDead)
+        {
+            return 0;
+        }
+
         int reduced = Mathf.Max(0, rawDamage - temporaryDefenseBonus);
         currentHp = Mathf.Max(0, currentHp - reduced);
         Debug.Log($"[戰鬥] {actorId} 受到 {reduced} 傷害（原始={rawDamage}），HP={currentHp}/{maxHp}");
         CombatUI.Instance?.AppendBattleLog($"{actorId} 受到 {reduced} 傷害，HP {currentHp}/{maxHp}");
+
+        if (currentHp <= 0)
+        {
+            MarkDead();
+        }
+
         return reduced;
+    }
+
+    public void ResetToDefaultStats()
+    {
+        IsDead = false;
+        currentHp = maxHp;
+        temporaryDefenseBonus = 0;
+        debuffs.Clear();
+    }
+
+    private void MarkDead()
+    {
+        if (IsDead)
+        {
+            return;
+        }
+
+        IsDead = true;
+        currentHp = 0;
+        OnDeath?.Invoke();
     }
 
     public int Heal(int amount)

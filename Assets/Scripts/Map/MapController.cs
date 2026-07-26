@@ -22,6 +22,7 @@ public class MapController : MonoBehaviour
 
     public void InitializeMap()
     {
+        ClearMapView();
         GenerateMapData();
         SetView();
         CreateMapView();
@@ -30,6 +31,28 @@ public class MapController : MonoBehaviour
         RefreshNodeStates();
         ResetScrollPosition();
         OpenMap();
+    }
+
+    public void ResetRun()
+    {
+        InitializeMap();
+    }
+
+    private void ClearMapView()
+    {
+        if (_mapNodeParentRect == null)
+        {
+            return;
+        }
+
+        for (int i = _mapNodeParentRect.childCount - 1; i >= 0; i--)
+        {
+            Destroy(_mapNodeParentRect.GetChild(i).gameObject);
+        }
+
+        _mapNodeArray = null;
+        _mapGraphData = null;
+        _progress = null;
     }
 
     private void GenerateMapData()

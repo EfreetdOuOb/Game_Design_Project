@@ -160,4 +160,10 @@ public class CombatUI : MonoBehaviour
 
         RefreshBattleLog();
     }
+
+    public void ClearBattleLog()
+    {
+        battleLog.Clear();
+        RefreshBattleLog();
+    }
 }

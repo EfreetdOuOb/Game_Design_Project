@@ -8,6 +8,7 @@ public class BattleController : MonoBehaviour
     [SerializeField] private TurnManager _turnManager;
 
     private readonly List<EnemyDead> _enemies = new();
+    private CombatActor _playerActor;
     private bool _battleEnded = false;
     private bool _isRunningEnemyTurn = false;
 
@@ -19,15 +20,17 @@ public class BattleController : MonoBehaviour
 
     private void OnDisable()
     {
+        UnbindPlayer();
         if (_turnManager != null)
             _turnManager.OnEnemyTurnStart -= HandleEnemyTurnStart;
     }
 
-    public void StartBattleWithEnemies(List<EnemyDead> enemies)
+    public void StartBattleWithEnemies(List<EnemyDead> enemies, CombatActor playerActor)
     {
         _battleEnded = false;
         _isRunningEnemyTurn = false;
         _enemies.Clear();
+        BindPlayer(playerActor);
 
         foreach (EnemyDead enemy in enemies)
         {
@@ -39,15 +42,53 @@ public class BattleController : MonoBehaviour
         _turnManager?.ResetBattle();
     }
 
+    private void BindPlayer(CombatActor playerActor)
+    {
+        UnbindPlayer();
+        _playerActor = playerActor;
+        if (_playerActor != null)
+        {
+            _playerActor.OnDeath += HandlePlayerDeath;
+        }
+    }
+
+    private void UnbindPlayer()
+    {
+        if (_playerActor != null)
+        {
+            _playerActor.OnDeath -= HandlePlayerDeath;
+            _playerActor = null;
+        }
+    }
+
     public void NotifyEnemyDeath(EnemyDead deadEnemy)
     {
         if (_battleEnded) return;
         CheckBattleResult();
     }
 
+    private void HandlePlayerDeath()
+    {
+        if (_battleEnded) return;
+
+        _battleEnded = true;
+        _isRunningEnemyTurn = false;
+        StopAllCoroutines();
+
+        if (_turnManager != null)
+        {
+            _turnManager.IsBattleLocked = true;
+        }
+
+        CombatUI.Instance?.AppendBattleLog("玩家陣亡");
+        GameFlowController.Instance?.EnterDefeat();
+    }
+
     private void HandleEnemyTurnStart()
     {
         if (_battleEnded || _isRunningEnemyTurn) return;
+        if (_playerActor != null && _playerActor.IsDead) return;
+
         StartCoroutine(RunEnemyTurnSequence());
     }
 

@@ -8,6 +8,7 @@ public class GameFlowController : MonoBehaviour
     [SerializeField] private GameObject _mapRoot;
     [SerializeField] private GameObject _battleRoot;
     [SerializeField] private GameObject _victoryRoot;
+    [SerializeField] private GameObject _defeatRoot;
 
     [Header("Managers")]
     [SerializeField] private NodeContentManager _nodeContentManager;
@@ -61,16 +62,18 @@ public class GameFlowController : MonoBehaviour
 
     public void EnterBattle()
     {
-        if (_mapRoot != null) _mapRoot.SetActive(false);
-        if (_battleRoot != null) _battleRoot.SetActive(true);
-        if (_victoryRoot != null) _victoryRoot.SetActive(false);
+        SetActiveRoots(map: false, battle: true, victory: false, defeat: false);
     }
 
     public void EnterVictory()
     {
-        if (_mapRoot != null) _mapRoot.SetActive(false);
-        if (_battleRoot != null) _battleRoot.SetActive(false);
-        if (_victoryRoot != null) _victoryRoot.SetActive(true);
+        SetActiveRoots(map: false, battle: false, victory: true, defeat: false);
+    }
+
+    public void EnterDefeat()
+    {
+        _nodeContentManager?.ClearCurrentContent();
+        SetActiveRoots(map: false, battle: false, victory: false, defeat: true);
     }
 
     public void ReturnToMap()
@@ -80,9 +83,7 @@ public class GameFlowController : MonoBehaviour
             _nodeContentManager.ClearCurrentContent();
         }
 
-        if (_mapRoot != null) _mapRoot.SetActive(true);
-        if (_battleRoot != null) _battleRoot.SetActive(false);
-        if (_victoryRoot != null) _victoryRoot.SetActive(false);
+        SetActiveRoots(map: true, battle: false, victory: false, defeat: false);
     }
 
     public void ProceedAfterVictory()
@@ -95,5 +96,26 @@ public class GameFlowController : MonoBehaviour
     {
         _mapController?.CompleteCurrentNode();
         ReturnToMap();
+    }
+
+    public void RestartRun()
+    {
+        if (TurnManager.Instance != null)
+        {
+            TurnManager.Instance.IsBattleLocked = false;
+        }
+
+        _nodeContentManager?.ResetPlayerForNewRun();
+        _mapController?.ResetRun();
+        CombatUI.Instance?.ClearBattleLog();
+        ReturnToMap();
+    }
+
+    private void SetActiveRoots(bool map, bool battle, bool victory, bool defeat)
+    {
+        if (_mapRoot != null) _mapRoot.SetActive(map);
+        if (_battleRoot != null) _battleRoot.SetActive(battle);
+        if (_victoryRoot != null) _victoryRoot.SetActive(victory);
+        if (_defeatRoot != null) _defeatRoot.SetActive(defeat);
     }
 }

@@ -138,7 +138,14 @@ public class NodeContentManager : MonoBehaviour
             }
         }
 
-        _battleController.StartBattleWithEnemies(spawnedEnemies);
+        _battleController.StartBattleWithEnemies(spawnedEnemies, _playerActor);
+    }
+
+    public void ResetPlayerForNewRun()
+    {
+        ClearCurrentContent();
+        _currentNodeData = null;
+        _playerActor?.ResetToDefaultStats();
     }
 
     private void EnterEventNode(string contentId)

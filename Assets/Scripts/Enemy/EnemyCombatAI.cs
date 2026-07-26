@@ -43,7 +43,10 @@ public class EnemyCombatAI : MonoBehaviour
 
     public bool CanAct()
     {
-        return enemyActor != null && playerActor != null && enemyActor.currentHp > 0;
+        return enemyActor != null
+            && playerActor != null
+            && !playerActor.IsDead
+            && enemyActor.currentHp > 0;
     }
 
     public IEnumerator ExecuteTurn()
