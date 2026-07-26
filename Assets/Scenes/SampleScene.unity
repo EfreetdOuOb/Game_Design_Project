@@ -1734,6 +1734,7 @@ MonoBehaviour:
   maxActiveBombs: 3
   damageOnTimerDetonate: 15
   damagePerBombOnPoiseBreak: 20
+  delayAmountOnTouch: 2
   playerActor: {fileID: 1076613598}
 --- !u!1 &520664339
 GameObject:

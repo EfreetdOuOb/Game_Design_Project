@@ -22,6 +22,10 @@ public class BattleBombManager : MonoBehaviour
     [SerializeField] private int damageOnTimerDetonate = 15;
     [SerializeField] private int damagePerBombOnPoiseBreak = 20;
 
+    [Header("延緩設定")]
+    [Tooltip("玩家碰到炸彈時，額外增加的回合數（在本回合正常倒數之前套用）")]
+    [SerializeField] private int delayAmountOnTouch = 2;
+
     [SerializeField] private CombatActor playerActor;
 
     private readonly Dictionary<int, BombState> activeBombs = new Dictionary<int, BombState>();
@@ -137,15 +141,15 @@ public class BattleBombManager : MonoBehaviour
         {
             if (bomb.touchedThisTurn)
             {
-                bomb.remainingTurns++;
+                // 第一步：先套用延緩加成
+                bomb.remainingTurns += delayAmountOnTouch;
                 bomb.touchedThisTurn = false;
-                Debug.Log($"[炸彈] pointId={bomb.pointId} 被延緩，剩餘回合={bomb.remainingTurns}");
+                Debug.Log($"[炸彈] pointId={bomb.pointId} 被延緩 +{delayAmountOnTouch}，暫時剩餘回合={bomb.remainingTurns}");
             }
-            else
-            {
-                bomb.remainingTurns--;
-                Debug.Log($"[炸彈] pointId={bomb.pointId} 倒數，剩餘回合={bomb.remainingTurns}");
-            }
+
+            // 第二步：最後才扣本回合的正常倒數（無論本回合是否被摸過都要扣）
+            bomb.remainingTurns--;
+            Debug.Log($"[炸彈] pointId={bomb.pointId} 倒數，最終剩餘回合={bomb.remainingTurns}");
 
             if (bomb.remainingTurns <= 0)
             {
