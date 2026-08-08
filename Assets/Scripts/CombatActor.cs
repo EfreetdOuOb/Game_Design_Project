@@ -66,6 +66,7 @@ public class CombatActor : MonoBehaviour
 
     public void ResetToDefaultStats()
     {
+        gameObject.SetActive(true);
         IsDead = false;
         currentHp = maxHp;
         temporaryDefenseBonus = 0;
