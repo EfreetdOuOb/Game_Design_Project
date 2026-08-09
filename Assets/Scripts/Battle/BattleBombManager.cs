@@ -33,6 +33,9 @@ public class BattleBombManager : MonoBehaviour
 
     public event Action<int> OnBombDetonatedByTimer;
     public event Action<int, int> OnBombsConsumedForDamage;
+    public event Action<int, int> OnBombRegistered;   // pointId, remainingTurns
+    public event Action<int, int> OnBombTurnsChanged; // pointId, remainingTurns
+    public event Action OnAllBombsCleared;
 
     private void Awake()
     {
@@ -112,6 +115,7 @@ public class BattleBombManager : MonoBehaviour
         };
 
         Debug.Log($"[炸彈] 註冊炸彈 pointId={pointId}，倒數={initialTurns}（目前 {activeBombs.Count}/{maxActiveBombs}）");
+        OnBombRegistered?.Invoke(pointId, activeBombs[pointId].remainingTurns);
         return true;
     }
 
@@ -129,6 +133,9 @@ public class BattleBombManager : MonoBehaviour
         int clearedCount = activeBombs.Count;
         activeBombs.Clear();
         Debug.Log($"[炸彈] 戰鬥重置，清空 {clearedCount} 顆炸彈記錄");
+
+        if (clearedCount > 0)
+            OnAllBombsCleared?.Invoke();
     }
 
     private void ResolveTurn()
@@ -154,6 +161,10 @@ public class BattleBombManager : MonoBehaviour
             if (bomb.remainingTurns <= 0)
             {
                 detonatedThisResolve.Add(bomb);
+            }
+            else
+            {
+                OnBombTurnsChanged?.Invoke(bomb.pointId, bomb.remainingTurns);
             }
         }
 
@@ -203,4 +214,17 @@ public class BattleBombManager : MonoBehaviour
 
     public bool HasBombAt(int pointId) => activeBombs.ContainsKey(pointId);
     public int ActiveBombCount => activeBombs.Count;
+    public IReadOnlyCollection<int> ActiveBombPointIds => activeBombs.Keys;
+
+    public bool TryGetRemainingTurns(int pointId, out int remainingTurns)
+    {
+        if (activeBombs.TryGetValue(pointId, out BombState bomb))
+        {
+            remainingTurns = bomb.remainingTurns;
+            return true;
+        }
+
+        remainingTurns = 0;
+        return false;
+    }
 }

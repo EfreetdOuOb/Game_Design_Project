@@ -76,6 +76,25 @@ public class GesturePointRegistry : MonoBehaviour
         return pointRules;
     }
 
+    public RectTransform GetPointTransformById(int pointId)
+    {
+        if (pointRules == null)
+        {
+            return null;
+        }
+
+        for (int i = 0; i < pointRules.Length; i++)
+        {
+            PointRule rule = pointRules[i];
+            if (rule != null && rule.pointId == pointId)
+            {
+                return rule.point;
+            }
+        }
+
+        return null;
+    }
+
     private bool TryGetRule(RectTransform point, out PointRule rule)
     {
         if (point == null)

@@ -79,6 +79,15 @@ public class MapGenerator
             return result;
         }
 
+        // 王關前一層的節點必定是休息點，讓玩家在王關前一定能回血、冥想升級技能
+        if (layerIndex == _settings.layerCount - 2 && layerIndex > 0)
+        {
+            for (int i = 0; i < nodeCount; i++)
+                result[i] = MapNodeType.Rest;
+
+            return result;
+        }
+
         LayerFixedTypeSetting fixedSetting = _settings.layerFixedTypeSettings
             .FirstOrDefault(x => x.layerIndex == layerIndex);
 

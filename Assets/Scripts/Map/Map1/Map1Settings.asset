@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bc6f7e5eae198f438d7c76c216e6c60, type: 3}
   m_Name: Map1Settings
   m_EditorClassIdentifier: Assembly-CSharp::MapSettings
-  layerCount: 4
+  layerCount: 5
   mapNodeWidth: 150
   mapNodeHeight: 200
   padding: 200

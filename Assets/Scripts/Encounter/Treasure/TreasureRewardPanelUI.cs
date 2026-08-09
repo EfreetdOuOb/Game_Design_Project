@@ -16,11 +16,16 @@ public class TreasureRewardPanelUI : MonoBehaviour
         gameObject.SetActive(true);
     }
 
-    public void OnClickClose()
+    public void OnClickNextStep()
     {
         if (_nodeContentManager != null)
         {
             _nodeContentManager.CloseTreasureReward();
         }
+    }
+
+    public void OnClickViewMap()
+    {
+        _nodeContentManager?.OnClickViewMap();
     }
 }

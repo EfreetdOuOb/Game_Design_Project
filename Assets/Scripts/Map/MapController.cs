@@ -266,6 +266,30 @@ public class MapController : MonoBehaviour
             _mapPanel.SetActive(!_mapPanel.activeSelf);
     }
 
+    // 節點面板呼叫「觀看當前地圖」時，暫時關閉節點按鈕互動，
+    // 避免玩家在偷看地圖時誤觸目前節點（例如再次打開已開過的寶箱面板）。
+    public void SetNodeInteractionEnabled(bool enabled)
+    {
+        if (_mapNodeArray == null)
+            return;
+
+        if (enabled)
+        {
+            RefreshNodeStates();
+            return;
+        }
+
+        for (int i = 0; i < _mapNodeArray.Length; i++)
+        {
+            for (int j = 0; j < _mapNodeArray[i].Length; j++)
+            {
+                MapNode node = _mapNodeArray[i][j];
+                if (node != null && node._button != null)
+                    node._button.interactable = false;
+            }
+        }
+    }
+
     private void ResetScrollPosition()
     {
         ScrollRect scrollRect = _mapNodeParentRect.GetComponentInParent<ScrollRect>();
