@@ -14,6 +14,8 @@ public class NodeContentManager : MonoBehaviour
 
     [Header("Shared References")]
     [SerializeField] private MapController _mapController;
+    [Tooltip("常駐的地圖切換按鈕（會跟各節點面板自己的「觀看當前地圖」按鈕重複），節點面板開啟時自動隱藏")]
+    [SerializeField] private GameObject _mapToggleButtonRoot;
 
     [Header("Event Encounter")]
     [SerializeField] private GameObject _eventPanelRoot;
@@ -169,6 +171,7 @@ public class NodeContentManager : MonoBehaviour
         }
 
         _eventEncounterActive = true;
+        SetMapToggleButtonVisible(false);
 
         if (_eventPanelRoot != null)
         {
@@ -281,6 +284,7 @@ public class NodeContentManager : MonoBehaviour
         if (_treasureRewardPanelUI != null)
         {
             _treasureRewardPanelUI.ShowReward(_defaultTreasureRewardText);
+            SetMapToggleButtonVisible(false);
         }
         else
         {
@@ -312,6 +316,16 @@ public class NodeContentManager : MonoBehaviour
         GameFlowController.Instance?.ReturnToMap();
     }
 
+    // 節點面板自己就有「觀看當前地圖」按鈕了，常駐按鈕留著會變成畫面上兩顆功能重複的按鈕，
+    // 而且面板開著時常駐按鈕本來就點不到（被面板蓋住），所以節點面板開啟時直接隱藏它。
+    private void SetMapToggleButtonVisible(bool visible)
+    {
+        if (_mapToggleButtonRoot != null)
+        {
+            _mapToggleButtonRoot.SetActive(visible);
+        }
+    }
+
     private void SetTreasureCameraActive(bool active)
     {
         if (_playerFollowCamera != null)
@@ -333,6 +347,7 @@ public class NodeContentManager : MonoBehaviour
         }
 
         _restEncounterActive = true;
+        SetMapToggleButtonVisible(false);
 
         if (_restPanelUI != null)
         {
@@ -382,6 +397,7 @@ public class NodeContentManager : MonoBehaviour
         }
 
         _shopEncounterActive = true;
+        SetMapToggleButtonVisible(false);
 
         if (_shopPanelUI != null)
         {
@@ -442,6 +458,27 @@ public class NodeContentManager : MonoBehaviour
         _isPeekingMap = false;
     }
 
+    // 給場景裡既有的常駐「地圖切換」按鈕用，取代直接呼叫 MapController.ToggleMap()。
+    // 直接呼叫 ToggleMap 在有節點面板開著時會跟偷看地圖流程互相打架
+    // （例如偷看地圖時誤按到它，地圖跟面板會一起消失變成空白畫面），
+    // 所以統一導向這裡判斷目前狀態，該走偷看流程就走偷看流程，其餘情況才維持原本的單純開關行為。
+    public void OnClickToggleMap()
+    {
+        if (_isPeekingMap)
+        {
+            OnClickCloseMapPeek();
+            return;
+        }
+
+        if (GetActiveNodePanelRoot() != null)
+        {
+            OnClickViewMap();
+            return;
+        }
+
+        _mapController?.ToggleMap();
+    }
+
     private GameObject GetActiveNodePanelRoot()
     {
         if (_eventEncounterActive && _eventPanelRoot != null)
@@ -487,6 +524,7 @@ public class NodeContentManager : MonoBehaviour
         }
 
         SetTreasureCameraActive(false);
+        SetMapToggleButtonVisible(true);
 
         if (_isPeekingMap && _mapController != null)
         {
