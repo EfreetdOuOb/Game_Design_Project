@@ -32,7 +32,7 @@ MonoBehaviour:
   - layerIndex: 0
     nodeTypes: 0100000001000000
   - layerIndex: 1
-    nodeTypes: 040000000100000004000000
+    nodeTypes: 040000000100000002000000
   - layerIndex: 2
     nodeTypes: 0300000003000000
   layerNodeRuleSettings: []
