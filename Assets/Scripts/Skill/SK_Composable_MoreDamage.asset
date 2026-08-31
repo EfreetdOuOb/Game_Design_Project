@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9663d85561eb254e8eb38326cf6fead, type: 3}
+  m_Name: SK_Composable_MoreDamage
+  m_EditorClassIdentifier: Assembly-CSharp::ComposableSkillDefinition
+  skillId: "\u6613\u50B7"
+  displayName: "\u6613\u50B7"
+  icon: {fileID: -655898374, guid: 9e160641aee7b8f48a0a2c718c7c0347, type: 3}
+  effects:
+  - {fileID: 11400000, guid: a7a711db0b2eaf947a1b7e89f5740e6a, type: 2}

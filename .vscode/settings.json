@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "向量的終點.sln"
+    "dotnet.defaultSolution": "Game_Design_Project.slnx"
 }

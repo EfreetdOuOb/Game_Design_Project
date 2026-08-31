@@ -22,6 +22,8 @@ public class CombatActor : MonoBehaviour
     public int temporaryDefenseBonus = 0;
     [SerializeField] private List<DebuffState> debuffs = new List<DebuffState>();
 
+    public IReadOnlyList<DebuffState> ActiveDebuffs => debuffs;
+
     public event Action OnDeath;
 
     public bool IsDead { get; private set; }
@@ -51,9 +53,11 @@ public class CombatActor : MonoBehaviour
             return 0;
         }
 
-        int reduced = Mathf.Max(0, rawDamage - temporaryDefenseBonus);
+        float damageMultiplier = GetDamageMultiplierFromDebuffs();
+        int adjustedDamage = Mathf.RoundToInt(rawDamage * damageMultiplier);
+        int reduced = Mathf.Max(0, adjustedDamage - temporaryDefenseBonus);
         currentHp = Mathf.Max(0, currentHp - reduced);
-        Debug.Log($"[戰鬥] {actorId} 受到 {reduced} 傷害（原始={rawDamage}），HP={currentHp}/{maxHp}");
+        Debug.Log($"[戰鬥] {actorId} 受到 {reduced} 傷害（原始={rawDamage}，倍率={damageMultiplier:F2}），HP={currentHp}/{maxHp}");
         CombatUI.Instance?.AppendBattleLog($"{actorId} 受到 {reduced} 傷害，HP {currentHp}/{maxHp}");
 
         if (currentHp <= 0)
@@ -141,6 +145,67 @@ public class CombatActor : MonoBehaviour
 
         Debug.Log($"[戰鬥] {actorId} 被施加 Debuff：{debuffId}，層數={state.stacks}，剩餘回合={state.remainingTurns}");
     }
+
+    public bool HasDebuff(string debuffId)
+    {
+        if (string.IsNullOrEmpty(debuffId) || debuffs == null)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < debuffs.Count; i++)
+        {
+            if (debuffs[i] != null && debuffs[i].debuffId == debuffId)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public int GetDebuffStacks(string debuffId)
+    {
+        if (string.IsNullOrEmpty(debuffId) || debuffs == null)
+        {
+            return 0;
+        }
+
+        for (int i = 0; i < debuffs.Count; i++)
+        {
+            if (debuffs[i] != null && debuffs[i].debuffId == debuffId)
+            {
+                return debuffs[i].stacks;
+            }
+        }
+
+        return 0;
+    }
+
+    public float GetDamageMultiplierFromDebuffs()
+    {
+        if (debuffs == null || debuffs.Count == 0)
+        {
+            return 1f;
+        }
+
+        float multiplier = 1f;
+        for (int i = 0; i < debuffs.Count; i++)
+        {
+            if (debuffs[i] == null)
+            {
+                continue;
+            }
+
+            if (debuffs[i].debuffId == "Vulnerable")
+            {
+                multiplier *= 1f + (0.2f * debuffs[i].stacks);
+            }
+        }
+
+        return multiplier;
+    }
+
     private void TickDebuffs()
     {
         for (int i = debuffs.Count - 1; i >= 0; i--)
