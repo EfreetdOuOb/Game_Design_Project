@@ -24,32 +24,11 @@ public class EnemyCombatAI : MonoBehaviour
     private Animator animator;
 
     private EnemyPoise enemyPoise;
-    private int lastHp;
-    private bool isInitialized = false;
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
         enemyPoise = GetComponent<EnemyPoise>();
-    }
-
-    private void Start()
-    {
-        if (enemyActor != null)
-            lastHp = enemyActor.currentHp;
-        isInitialized = true;
-    }
-
-    private void Update()
-    {
-        if (!isInitialized || enemyActor == null)
-            return;
-
-        if (enemyActor.currentHp < lastHp)
-        {
-            StartCoroutine(hit());
-            lastHp = enemyActor.currentHp;
-        }
     }
 
     public bool CanAct()
@@ -164,11 +143,4 @@ public class EnemyCombatAI : MonoBehaviour
     }
 }
 
-    private IEnumerator hit()
-    {
-        yield return new WaitForSeconds(animationDelay);
-        animator.SetBool("Hit", true);
-        yield return new WaitForSeconds(0.3f);
-        animator.SetBool("Hit", false);
-    }
 }

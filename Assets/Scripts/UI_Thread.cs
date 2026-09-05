@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -8,6 +9,7 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     [Header("Dependencies")]
     public GesturePointRegistry pointRegistry;
     public GestureActionDispatcher actionDispatcher;
+    public PlayerActionAnimationSequence actionAnimationSequence;
     public GestureLimitPolicy limitPolicy = new GestureLimitPolicy();
 
     [Header("View")]
@@ -43,9 +45,13 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     private readonly List<RectTransform> selectedPoints = new List<RectTransform>();
     private bool transformTriggeredThisGesture = false;
     private bool hasDraggedThisGesture = false;
+    private bool isPlayingActionAnimations = false;
 
     private void Awake()
     {
+        if (actionAnimationSequence == null)
+            actionAnimationSequence = FindAnyObjectByType<PlayerActionAnimationSequence>();
+
         if (pointRegistry != null)
         {
             pointRegistry.Rebuild();
@@ -303,6 +309,9 @@ private Color GetBaseColorForFunction(PointFunction func)
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        if (isPlayingActionAnimations)
+            return;
+
         if(eventData.pointerEnter != null && eventData.pointerEnter.GetComponent<sta>() != null)
         {
             if (pointRegistry != null)
@@ -382,7 +391,6 @@ private Color GetBaseColorForFunction(PointFunction func)
 
         PointFunction resolvedFunction = ResolveFunctionByPath();
         GestureResult result = BuildGestureResult(resolvedFunction);
-        NotifyActionHandlers(result);
         LogGestureSummary(result);
 
         if (result.hasTransform && result.transformPointIndex == 0 &&
@@ -394,7 +402,20 @@ private Color GetBaseColorForFunction(PointFunction func)
         }
         ResetGestureState();
 
-        Debug.Log("[UI] 手勢結束，呼叫 EndPlayerTurn");
+        StartCoroutine(PlayActionAnimationsAndEndTurn(result));
+    }
+
+    private IEnumerator PlayActionAnimationsAndEndTurn(GestureResult result)
+    {
+        isPlayingActionAnimations = true;
+
+        if (actionAnimationSequence != null)
+            yield return actionAnimationSequence.Play(result, actionDispatcher);
+        else
+            NotifyActionHandlers(result);
+
+        isPlayingActionAnimations = false;
+        Debug.Log("[UI] 動作動畫結束，呼叫 EndPlayerTurn");
         TurnManager.Instance?.EndPlayerTurn();
     }
 
