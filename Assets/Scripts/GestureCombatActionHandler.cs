@@ -80,6 +80,27 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
         return target != null && target.currentHp > 0;
     }
 
+    public CombatActor CurrentTarget => target;
+
+    public string ResolveSkillIdForAnimation(GesturePointSnapshot snapshot)
+    {
+        if (snapshot == null || snapshot.finalFunction != PointFunction.Skill)
+            return string.Empty;
+
+        if (!string.IsNullOrEmpty(snapshot.resolvedSkillId))
+            return snapshot.resolvedSkillId;
+
+        if (skillSlotProvider != null && skillSlotProvider.TryGetSkillIdForPoint(snapshot.pointId, out string skillId))
+            return skillId;
+
+        return string.Empty;
+    }
+
+    public void ResolveSinglePoint(GestureResult result)
+    {
+        OnGestureResolved(result);
+    }
+
     public void AutoSelectFirstAliveEnemy()
     {
         EnemyCombatAI[] enemies = Object.FindObjectsByType<EnemyCombatAI>(FindObjectsInactive.Exclude);
@@ -144,9 +165,6 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
     {
         if (target == null || target.currentHp <= 0 || attackCount <= 0)
             return 0;
-
-        if (playerAnimator != null)
-            playerAnimator.OnPlayerAttack();
 
         int totalDamage = 0;
         for (int i = 0; i < attackCount; i++)

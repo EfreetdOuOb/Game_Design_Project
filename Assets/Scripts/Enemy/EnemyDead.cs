@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class EnemyDead : MonoBehaviour
@@ -34,23 +35,28 @@ public class EnemyDead : MonoBehaviour
 
     private void HandleDeath()
     {
+        StartCoroutine(PlayDeathAnimationAndWait());
+    }
+
+    public IEnumerator PlayDeathAnimationAndWait()
+    {
+        if (isDead)
+            yield break;
+
         isDead = true;
 
         EnemyCombatAI ai = GetComponent<EnemyCombatAI>();
         if (ai != null)
             ai.enabled = false;
 
-        battleController?.NotifyEnemyDeath(this);
-
         if (animator != null && animator.isActiveAndEnabled)
         {
             animator.SetTrigger("Dead");
-            Destroy(gameObject, deathAnimationDuration);
+            yield return new WaitForSeconds(deathAnimationDuration);
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+
+        battleController?.NotifyEnemyDeath(this);
+        Destroy(gameObject);
     }
 
     public void SetDeathAnimationDuration(float duration)

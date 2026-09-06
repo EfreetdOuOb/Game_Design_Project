@@ -1709,6 +1709,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 26c2eae17e539cf4ca14384204c20619, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1076613601}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 26c2eae17e539cf4ca14384204c20619, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1076613602}
   m_SourcePrefab: {fileID: 100100000, guid: 26c2eae17e539cf4ca14384204c20619, type: 3}
 --- !u!1 &446602102
 GameObject:
@@ -5137,9 +5140,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimator
   animator: {fileID: 1076613599}
+  skillAnimations:
+  - skillId: "\u80CC\u523A"
+    animationStateName: try
+  - skillId: "\u6613\u50B7"
+    animationStateName: try
+  - skillId: "\u96D9\u64CA"
+    animationStateName: try
+  - skillId: "\u7FA4\u9AD4"
+    animationStateName: try
+  - skillId: "\u9EBB\u75FA"
+    animationStateName: try
+  - skillId: "\u865B\u5F31"
+    animationStateName: try
+  - skillId: "\u6CBB\u7652"
+    animationStateName: try
+  - skillId: "\u5927\u88DC"
+    animationStateName: try
+  attackAnimationStateName: "rig|\u653B\u64CA"
+  idleAnimationStateName: rig|idle
   combatActionHandler: {fileID: 1076613597}
-  attackAnimationDuration: 0.3
-  animationDelay: 0.4
+  attackAnimationDuration: 0.5
+  animationDelay: 1
+  skillAnimationDuration: 1
+  useLegacyAttackAnimation: 1
 --- !u!114 &1076613601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5152,6 +5176,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7417e7f36bedf9e4eb3b3d090fd84103, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerDeath
+--- !u!114 &1076613602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1076613595}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ce43137c33bef84fa36f91b498fbc96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerActionAnimationSequence
+  playerAnimator: {fileID: 1076613600}
 --- !u!1 &1085224216
 GameObject:
   m_ObjectHideFlags: 0
@@ -6863,6 +6900,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ui_thread
   pointRegistry: {fileID: 93172331}
   actionDispatcher: {fileID: 816130352}
+  actionAnimationSequence: {fileID: 0}
   limitPolicy:
     maxPointsWithoutMiddle: 3
     extraPointsWhenTouchMiddle: 1

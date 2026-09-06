@@ -25,6 +25,7 @@ public class CombatActor : MonoBehaviour
     public IReadOnlyList<DebuffState> ActiveDebuffs => debuffs;
 
     public event Action OnDeath;
+    public event Action<int> OnDamaged;
 
     public bool IsDead { get; private set; }
 
@@ -59,6 +60,8 @@ public class CombatActor : MonoBehaviour
         currentHp = Mathf.Max(0, currentHp - reduced);
         Debug.Log($"[戰鬥] {actorId} 受到 {reduced} 傷害（原始={rawDamage}，倍率={damageMultiplier:F2}），HP={currentHp}/{maxHp}");
         CombatUI.Instance?.AppendBattleLog($"{actorId} 受到 {reduced} 傷害，HP {currentHp}/{maxHp}");
+        if (reduced > 0)
+            OnDamaged?.Invoke(reduced);
 
         if (currentHp <= 0)
         {
