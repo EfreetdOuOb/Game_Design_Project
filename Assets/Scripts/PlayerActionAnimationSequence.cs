@@ -13,8 +13,6 @@ public class PlayerActionAnimationSequence : MonoBehaviour
         if (playerAnimator == null)
             playerAnimator = GetComponentInChildren<PlayerAnimator>();
 
-        if (playerAnimator != null)
-            playerAnimator.useLegacyAttackAnimation = false;
     }
 
     public bool IsPlaying { get; private set; }
@@ -55,15 +53,10 @@ public class PlayerActionAnimationSequence : MonoBehaviour
 
             actionDispatcher?.Dispatch(singleResult);
 
-            if (snapshot.finalFunction == PointFunction.Attack)
+            if (snapshot.finalFunction == PointFunction.Attack && IsCurrentTargetDead())
             {
-                yield return PlayTargetHitAnimationAndWait();
-
-                if (IsCurrentTargetDead())
-                {
-                    yield return PlayTargetDeathAnimationAndWait();
-                    break;
-                }
+                yield return PlayTargetDeathAnimationAndWait();
+                break;
             }
             else if (snapshot.finalFunction == PointFunction.Skill && IsCurrentTargetDead())
             {
@@ -74,23 +67,6 @@ public class PlayerActionAnimationSequence : MonoBehaviour
         }
 
         IsPlaying = false;
-    }
-
-    private IEnumerator PlayTargetHitAnimationAndWait()
-    {
-        GestureCombatActionHandler combat = playerAnimator.combatActionHandler;
-        if (combat == null || combat.CurrentTarget == null)
-            yield break;
-
-        EnemyHitAnimator hitAnimator = combat.CurrentTarget.GetComponent<EnemyHitAnimator>();
-        if (hitAnimator == null)
-            hitAnimator = combat.CurrentTarget.GetComponentInParent<EnemyHitAnimator>();
-
-        if (hitAnimator == null)
-            hitAnimator = combat.CurrentTarget.gameObject.AddComponent<EnemyHitAnimator>();
-
-        if (hitAnimator != null)
-            yield return hitAnimator.PlayHitAnimationAndWait();
     }
 
     private bool IsCurrentTargetDead()

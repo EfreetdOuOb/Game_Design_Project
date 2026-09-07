@@ -8,8 +8,9 @@ public class EnemyCombatAI : MonoBehaviour
     public CombatActor playerActor;
     public int defendBonus = 10;
     public float actionDelay = 0.4f;
-
-    public float animationDelay = 0.3f;
+    public string attackAnimationStateName = "Armature|攻擊";
+    public string hitAnimationStateName = "Armature|受擊";
+    public float attackAnimationDuration = 0.3f;
 
     [Header("炸彈放置設定")]
     [Tooltip("是否啟用此敵人的炸彈放置行為")]
@@ -29,6 +30,13 @@ public class EnemyCombatAI : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         enemyPoise = GetComponent<EnemyPoise>();
+
+        EnemyHitAnimator hitAnimator = GetComponent<EnemyHitAnimator>();
+        if (hitAnimator == null)
+        {
+            hitAnimator = gameObject.AddComponent<EnemyHitAnimator>();
+            hitAnimator.hitAnimationStateName = hitAnimationStateName;
+        }
     }
 
     public bool CanAct()
@@ -59,9 +67,10 @@ public class EnemyCombatAI : MonoBehaviour
 
     private IEnumerator ExecuteAttack()
     {
-        animator.SetBool("Attack", true);
-        yield return new WaitForSeconds(0.3f);
-        animator.SetBool("Attack", false);
+        if (animator != null && animator.isActiveAndEnabled && !string.IsNullOrEmpty(attackAnimationStateName))
+            animator.Play(attackAnimationStateName, 0, 0f);
+
+        yield return new WaitForSeconds(attackAnimationDuration);
 
         int damage = enemyActor.attackPower;
         int actual = playerActor.ReceiveDamage(damage);

@@ -17,12 +17,15 @@ public class PlayerAnimator : MonoBehaviour
     public List<SkillAnimationBinding> skillAnimations = new List<SkillAnimationBinding>();
     [Header("Basic Animations")]
     public string attackAnimationStateName = "rig|攻擊";
+    public string hitAnimationStateName = "Hit";
     public string idleAnimationStateName = "rig|idle";
     public GestureCombatActionHandler combatActionHandler;
     public float attackAnimationDuration = 0.3f;
+    public float hitAnimationDuration = 0.3f;
     public float animationDelay = 0.4f;
     public float skillAnimationDuration = 0.4f;
-    public bool useLegacyAttackAnimation = true;
+
+    private CombatActor combatActor;
 
     private void Awake()
     {
@@ -39,6 +42,9 @@ public class PlayerAnimator : MonoBehaviour
             animator = GetComponentInParent<Animator>();
         
         combatActionHandler = GetComponent<GestureCombatActionHandler>();
+        combatActor = GetComponent<CombatActor>();
+        if (combatActor == null)
+            combatActor = GetComponentInParent<CombatActor>();
 
         if (animator == null)
             Debug.LogError("[PlayerAnimator] 找不到 Animator 組件，請在 Inspector 中手動設置或確保 Animator 在同一/子/父物件");
@@ -53,19 +59,21 @@ public class PlayerAnimator : MonoBehaviour
             // OnGestureResolved 會在攻擊時被調用
             Debug.Log("[PlayerAnimator] 已訂閱 GestureCombatActionHandler");
         }
+
+        if (combatActor != null)
+            combatActor.OnDamaged += HandleDamaged;
     }
 
     private void OnDisable()
     {
+        if (combatActor != null)
+            combatActor.OnDamaged -= HandleDamaged;
     }
 
     // 由 GestureCombatActionHandler 的 ExecuteAttack 直接調用
     public void OnPlayerAttack()
     {
-        if (!useLegacyAttackAnimation)
-            return;
-
-        StartCoroutine(PlayAttackAnimation());
+        StartCoroutine(PlayAttackAnimationAndWait());
     }
 
     public IEnumerator PlayAttackAnimationAndWait()
@@ -82,11 +90,18 @@ public class PlayerAnimator : MonoBehaviour
             if (state.IsName(attackAnimationStateName) && state.length > 0f)
             {
                 yield return new WaitForSeconds(state.length);
-                yield break;
             }
+            else
+            {
+                yield return new WaitForSeconds(attackAnimationDuration);
+            }
+
+            PlayIdleAnimation();
+            yield break;
         }
 
-        yield return PlayAttackAnimation();
+        yield return new WaitForSeconds(attackAnimationDuration);
+        PlayIdleAnimation();
     }
 
     public IEnumerator PlayActionAnimationAndWait(GesturePointSnapshot snapshot)
@@ -146,13 +161,32 @@ public class PlayerAnimator : MonoBehaviour
         animator.Play(idleAnimationStateName, 0, 0f);
     }
 
-    private IEnumerator PlayAttackAnimation()
+    private void HandleDamaged(int damage)
     {
-        if (animator != null && animator.isActiveAndEnabled)
-        {
-            animator.SetBool("Attack", true);
-            yield return new WaitForSeconds(attackAnimationDuration);
-            animator.SetBool("Attack", false);
-        }
+        StartCoroutine(PlayHitAnimationAndWait());
     }
+
+    private IEnumerator PlayHitAnimationAndWait()
+    {
+        if (animator == null || !animator.isActiveAndEnabled)
+            yield break;
+
+        if (!string.IsNullOrEmpty(hitAnimationStateName))
+        {
+            animator.Play(hitAnimationStateName, 0, 0f);
+            yield return null;
+
+            AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+            if (state.IsName(hitAnimationStateName) && state.length > 0f)
+            {
+                yield return new WaitForSeconds(state.length);
+                PlayIdleAnimation();
+                yield break;
+            }
+        }
+
+        yield return new WaitForSeconds(hitAnimationDuration);
+        PlayIdleAnimation();
+    }
+
 }

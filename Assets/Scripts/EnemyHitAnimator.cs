@@ -5,10 +5,10 @@ public class EnemyHitAnimator : MonoBehaviour
 {
     [SerializeField] private Animator animator;
     [Header("Hit Animation")]
-    public string hitParameterName = "Hit";
-    public bool playStateDirectly = false;
-    public string hitAnimationStateName = "";
+    public string hitAnimationStateName = "Armature|受擊";
     public float hitAnimationDuration = 0.3f;
+
+    private CombatActor combatActor;
 
     private void Awake()
     {
@@ -20,6 +20,27 @@ public class EnemyHitAnimator : MonoBehaviour
 
         if (animator == null)
             animator = GetComponentInParent<Animator>();
+
+        combatActor = GetComponent<CombatActor>();
+        if (combatActor == null)
+            combatActor = GetComponentInParent<CombatActor>();
+    }
+
+    private void OnEnable()
+    {
+        if (combatActor != null)
+            combatActor.OnDamaged += HandleDamaged;
+    }
+
+    private void OnDisable()
+    {
+        if (combatActor != null)
+            combatActor.OnDamaged -= HandleDamaged;
+    }
+
+    private void HandleDamaged(int damage)
+    {
+        StartCoroutine(PlayHitAnimationAndWait());
     }
 
     public IEnumerator PlayHitAnimationAndWait()
@@ -27,7 +48,7 @@ public class EnemyHitAnimator : MonoBehaviour
         if (animator == null || !animator.isActiveAndEnabled)
             yield break;
 
-        if (playStateDirectly && !string.IsNullOrEmpty(hitAnimationStateName))
+        if (!string.IsNullOrEmpty(hitAnimationStateName))
         {
             animator.Play(hitAnimationStateName, 0, 0f);
             yield return null;
@@ -38,37 +59,6 @@ public class EnemyHitAnimator : MonoBehaviour
                 yield return new WaitForSeconds(state.length);
                 yield break;
             }
-        }
-
-        if (!string.IsNullOrEmpty(hitParameterName))
-        {
-            int previousStateHash = animator.GetCurrentAnimatorStateInfo(0).fullPathHash;
-            animator.SetBool(hitParameterName, false);
-            animator.SetBool(hitParameterName, true);
-
-            float waitForStateTime = 0f;
-            AnimatorStateInfo hitState = default;
-            bool foundHitState = false;
-            while (waitForStateTime < 2f)
-            {
-                yield return null;
-                waitForStateTime += Time.deltaTime;
-                hitState = animator.GetCurrentAnimatorStateInfo(0);
-
-                if (hitState.fullPathHash != previousStateHash && !animator.IsInTransition(0))
-                {
-                    foundHitState = true;
-                    break;
-                }
-            }
-
-            if (foundHitState && hitState.length > 0f)
-                yield return new WaitForSeconds(hitState.length);
-            else
-                yield return new WaitForSeconds(hitAnimationDuration);
-
-            animator.SetBool(hitParameterName, false);
-            yield break;
         }
 
         yield return new WaitForSeconds(hitAnimationDuration);
