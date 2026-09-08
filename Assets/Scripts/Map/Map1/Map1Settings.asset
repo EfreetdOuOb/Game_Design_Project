@@ -40,13 +40,13 @@ MonoBehaviour:
   - nodeType: 1
     icon: {fileID: -194449869, guid: 2a80e3ec196f79749b123b1df18e46da, type: 3}
   - nodeType: 2
-    icon: {fileID: -506981327, guid: a3c6093fd93f5844d86dfa4aa293ad6a, type: 3}
+    icon: {fileID: -1064082468, guid: 237f5a79bd8d50f4f9e1f0d9a77e8814, type: 3}
   - nodeType: 3
     icon: {fileID: -338220099, guid: 88c640395b669634fa51c85306bd4498, type: 3}
   - nodeType: 4
     icon: {fileID: -1634945833, guid: 34febf31ce979a24095c6299bf84ea08, type: 3}
   - nodeType: 5
-    icon: {fileID: 402501773, guid: 7d2a1887832fb3d4a8cb2ce11e671c45, type: 3}
+    icon: {fileID: 219455427, guid: df8df3c948dfdfe49ba5ea6d37a19bd1, type: 3}
   - nodeType: 6
     icon: {fileID: -1753607782, guid: 52c707c6f898a7c48896ae40f03b39d4, type: 3}
   defaultNodeSprite: {fileID: 0}
