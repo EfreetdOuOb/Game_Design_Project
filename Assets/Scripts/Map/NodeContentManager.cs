@@ -202,7 +202,19 @@ public class NodeContentManager : MonoBehaviour
             Debug.LogWarning("Event Panel Root 未指定");
         }
 
+        GrantNodeGoldReward(contentId);
+
         Debug.Log($"事件節點開啟：contentId = {contentId}");
+    }
+
+    // Event / Treasure 共用：依 contentId 查表發放固定金幣獎勵，查不到或獎勵是 0 就什麼都不做
+    private void GrantNodeGoldReward(string contentId)
+    {
+        NodeRewardDefinition reward = _database != null ? _database.GetNodeReward(contentId) : null;
+        if (reward != null && reward.goldReward > 0)
+        {
+            PlayerCurrency.Instance?.AddGold(reward.goldReward);
+        }
     }
 
     public string ResolveCurrentEvent()
@@ -290,6 +302,8 @@ public class NodeContentManager : MonoBehaviour
             return;
 
         _treasureOpened = true;
+
+        GrantNodeGoldReward(_currentNodeData?.contentId);
 
         if (_treasureChestSelectable != null)
         {

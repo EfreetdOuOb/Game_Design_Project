@@ -178,12 +178,16 @@ public class BattleBombManager : MonoBehaviour
     {
         activeBombs.Remove(bomb.pointId);
 
-        Debug.Log($"[炸彈] pointId={bomb.pointId} 倒數結束，引爆！");
-        CombatUI.Instance?.AppendBattleLog($"炸彈引爆，造成 {damageOnTimerDetonate} 傷害");
+        int finalDamage = RelicManager.Instance != null
+            ? RelicManager.Instance.ApplyBombDamageModifiers(damageOnTimerDetonate)
+            : damageOnTimerDetonate;
+
+        Debug.Log($"[炸彈] pointId={bomb.pointId} 倒數結束，引爆！（基礎傷害={damageOnTimerDetonate}，遺物加成後={finalDamage}）");
+        CombatUI.Instance?.AppendBattleLog($"炸彈引爆，造成 {finalDamage} 傷害");
 
         if (playerActor != null)
         {
-            playerActor.ReceiveDamage(damageOnTimerDetonate);
+            playerActor.ReceiveDamage(finalDamage);
         }
 
         OnBombDetonatedByTimer?.Invoke(bomb.pointId);

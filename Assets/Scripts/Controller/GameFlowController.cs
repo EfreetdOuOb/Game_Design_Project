@@ -124,6 +124,8 @@ public class GameFlowController : MonoBehaviour
         _nodeContentManager?.ResetPlayerForNewRun();
         _mapController?.ResetRun();
         CombatUI.Instance?.ClearBattleLog();
+        PlayerCurrency.Instance?.ResetForNewRun();
+        RelicManager.Instance?.ResetForNewRun();
         ReturnToMap();
     }
 

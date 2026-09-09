@@ -27,6 +27,8 @@ public class BattleController : MonoBehaviour
 
     public void StartBattleWithEnemies(List<EnemyDead> enemies, CombatActor playerActor)
     {
+        RelicManager.Instance?.NotifyBattleStart();
+
         _battleEnded = false;
         _isRunningEnemyTurn = false;
         _enemies.Clear();

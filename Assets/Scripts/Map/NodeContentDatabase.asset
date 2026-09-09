@@ -15,3 +15,5 @@ MonoBehaviour:
   battleEncounters:
   - {fileID: 11400000, guid: 25c02bbf6e01a724eb3e9dd21d0c9c42, type: 2}
   - {fileID: 11400000, guid: 7aa8530add674fb45a30c21d252c1341, type: 2}
+  nodeRewards:
+  - {fileID: 11400000, guid: 6f940511b1958004b82ad5194420cfbc, type: 2}

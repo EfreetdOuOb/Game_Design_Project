@@ -5,6 +5,10 @@ public class EnemyDead : MonoBehaviour
 {
     public CombatActor enemyActor;
 
+    [Header("金幣掉落")]
+    [SerializeField] private int minGoldReward = 3;
+    [SerializeField] private int maxGoldReward = 8;
+
     private Animator animator;
     private bool isDead = false;
     private float deathAnimationDuration = 2f;
@@ -55,8 +59,19 @@ public class EnemyDead : MonoBehaviour
             yield return new WaitForSeconds(deathAnimationDuration);
         }
 
+        GrantGoldDrop();
+
         battleController?.NotifyEnemyDeath(this);
         Destroy(gameObject);
+    }
+
+    private void GrantGoldDrop()
+    {
+        int minReward = Mathf.Min(minGoldReward, maxGoldReward);
+        int maxReward = Mathf.Max(minGoldReward, maxGoldReward);
+        int goldDropped = Random.Range(minReward, maxReward + 1);
+
+        PlayerCurrency.Instance?.AddGold(goldDropped);
     }
 
     public void SetDeathAnimationDuration(float duration)
