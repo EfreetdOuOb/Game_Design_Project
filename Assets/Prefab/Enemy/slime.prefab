@@ -957,7 +957,7 @@ MonoBehaviour:
   debuffSlotPrefab: {fileID: 5477580273698351961, guid: 7add07ebf0ccbf249bf02a2308eee8f1, type: 3}
   debuffSprites:
   - debuffId: Vulnerable
-    sprite: {fileID: -655898374, guid: 9e160641aee7b8f48a0a2c718c7c0347, type: 3}
+    sprite: {fileID: -1708121119, guid: 6049020b2cab69f4e816d272cdf7a150, type: 3}
   maxDebuffSlots: 6
   smoothSpeed: 100
 --- !u!114 &8936605949120555439
@@ -973,6 +973,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDead
   enemyActor: {fileID: 754455680687667523}
+  minGoldReward: 3
+  maxGoldReward: 8
 --- !u!114 &754455680687667523
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: d9acd9cd3257b05419924d72cccaa49e
+guid: 519cd927efd87234587ae8d80eac851e
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 200
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -97,13 +97,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "\u5546\u54C1 \u6848\u9375_0"
+      name: "\u9B54\u6CD5\u9663 \u683C\u5B50_0"
       rect:
         serializedVersion: 2
-        x: 5277
-        y: 2629
-        width: 681
-        height: 134
+        x: 716
+        y: 789
+        width: 1137
+        height: 1137
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -112,8 +112,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f38967538c4d52c44a46dada45bc0807
-      internalID: -1633002613
+      spriteID: 3d94a22976f6eee4286201d65d222e28
+      internalID: -1451486785
       vertices: []
       indices: 
       edges: []
@@ -134,7 +134,12 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      "\u5546\u54C1 \u6848\u9375_0": -1633002613
+      "\u9B54\u6CD5\u9663 \u683C\u5B50_0": -1451486785
+      "\u9B54\u6CD5\u9663 \u683C\u5B50_1": -1789347167
+      "\u9B54\u6CD5\u9663 \u683C\u5B50_2": 1525251279
+      "\u9B54\u6CD5\u9663 \u683C\u5B50_3": 1013520172
+      "\u9B54\u6CD5\u9663 \u683C\u5B50_4": -929381676
+      "\u9B54\u6CD5\u9663 \u683C\u5B50_5": -1618740496
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

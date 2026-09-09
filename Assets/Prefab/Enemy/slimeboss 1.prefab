@@ -115,7 +115,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1302891006543960513}
   m_LocalRotation: {x: -0.00830857, y: -0.9964385, z: -0.0006997049, w: -0.08390988}
-  m_LocalPosition: {x: 0, y: 0, z: 0.011}
+  m_LocalPosition: {x: 0, y: 0, z: 0.012}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -128,7 +128,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 170.373, z: 0.955}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.012, y: 1.947}
+  m_AnchoredPosition: {x: -0.008, y: 2.178}
   m_SizeDelta: {x: 3, y: 3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &1881347188751185247
@@ -849,6 +849,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: slimeboss 1
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 9f2eb93c7e836fd4eb9ecce5cda0fa43, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: 9f2eb93c7e836fd4eb9ecce5cda0fa43, type: 3}
       propertyPath: m_Controller
       value: 
@@ -919,7 +923,9 @@ MonoBehaviour:
   playerActor: {fileID: 0}
   defendBonus: 10
   actionDelay: 0.4
-  animationDelay: 0.3
+  attackAnimationStateName: "Armature_002|\u653B\u64CA"
+  hitAnimationStateName: "Armature_002|\u53D7\u64CA_001"
+  attackAnimationDuration: 0.3
   canPlaceBomb: 1
   bombPlacementChance: 0.5
   bombInitialTurns: 3
@@ -936,6 +942,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDead
   enemyActor: {fileID: 6070616346704711866}
+  minGoldReward: 3
+  maxGoldReward: 8
 --- !u!114 &8176050822501173182
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -957,7 +965,9 @@ MonoBehaviour:
   protectIntent: {fileID: 8133875613622166405}
   debuffContainer: {fileID: 6068889642090444359}
   debuffSlotPrefab: {fileID: 5477580273698351961, guid: 7add07ebf0ccbf249bf02a2308eee8f1, type: 3}
-  debuffSprites: []
+  debuffSprites:
+  - debuffId: "\u7570\u50B7"
+    sprite: {fileID: -1708121119, guid: 6049020b2cab69f4e816d272cdf7a150, type: 3}
   maxDebuffSlots: 6
   smoothSpeed: 100
 --- !u!114 &8830516170414013152

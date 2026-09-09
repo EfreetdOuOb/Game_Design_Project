@@ -20,3 +20,6 @@ MonoBehaviour:
   eventDefinitions:
   - {fileID: 11400000, guid: 1cfa2f32447b3f04d889dfe1e221828c, type: 2}
   - {fileID: 11400000, guid: e23786f425f2ab341aaf9d62a7f670e7, type: 2}
+  - {fileID: 11400000, guid: cb26f8c165997f849a432c1c6d1ef6c2, type: 2}
+  - {fileID: 11400000, guid: 9384c55fadc01d3419f66a14da2e747d, type: 2}
+  - {fileID: 11400000, guid: 89cef36bbc1839c48a71edc8e444aa36, type: 2}
