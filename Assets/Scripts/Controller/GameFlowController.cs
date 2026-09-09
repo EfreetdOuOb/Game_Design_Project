@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameFlowController : MonoBehaviour
@@ -9,10 +10,13 @@ public class GameFlowController : MonoBehaviour
     [SerializeField] private GameObject _battleRoot;
     [SerializeField] private GameObject _victoryRoot;
     [SerializeField] private GameObject _defeatRoot;
+    [Tooltip("Boss 專屬的勝利流程根物件（過場文本 + 回標題提示）")]
+    [SerializeField] private GameObject _bossVictoryRoot;
 
     [Header("Managers")]
     [SerializeField] private NodeContentManager _nodeContentManager;
     [SerializeField] private MapController _mapController;
+    [SerializeField] private BossVictoryFlowController _bossVictoryFlowController;
 
     private void Awake()
     {
@@ -67,7 +71,19 @@ public class GameFlowController : MonoBehaviour
 
     public void EnterVictory()
     {
+        if (_nodeContentManager != null && _nodeContentManager.TryGetCurrentBossVictoryLines(out List<DialogueLine> bossVictoryLines))
+        {
+            EnterBossVictory(bossVictoryLines);
+            return;
+        }
+
         SetActiveRoots(map: false, battle: false, victory: true, defeat: false);
+    }
+
+    private void EnterBossVictory(List<DialogueLine> lines)
+    {
+        SetActiveRoots(map: false, battle: false, victory: false, defeat: false, bossVictory: true);
+        _bossVictoryFlowController?.Play(lines);
     }
 
     public void EnterDefeat()
@@ -111,11 +127,12 @@ public class GameFlowController : MonoBehaviour
         ReturnToMap();
     }
 
-    private void SetActiveRoots(bool map, bool battle, bool victory, bool defeat)
+    private void SetActiveRoots(bool map, bool battle, bool victory, bool defeat, bool bossVictory = false)
     {
         if (_mapRoot != null) _mapRoot.SetActive(map);
         if (_battleRoot != null) _battleRoot.SetActive(battle);
         if (_victoryRoot != null) _victoryRoot.SetActive(victory);
         if (_defeatRoot != null) _defeatRoot.SetActive(defeat);
+        if (_bossVictoryRoot != null) _bossVictoryRoot.SetActive(bossVictory);
     }
 }

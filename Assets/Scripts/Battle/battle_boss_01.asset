@@ -16,3 +16,10 @@ MonoBehaviour:
   nodeType: 1
   enemyPrefabs:
   - {fileID: 8161953461809116963, guid: 13a92828d57d96e4baeefc6ce7da840c, type: 3}
+  victoryDialogueLines:
+  - speaker: "\u8AAA\u8A71\u8005"
+    text: "\u9019\u662F"
+  - speaker: "\u8AAA\u8A71\u8005"
+    text: "\u64CA\u6557BOSS"
+  - speaker: "\u8AAA\u8A71\u8005"
+    text: "\u7684\u6587\u672C"

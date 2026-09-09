@@ -156,6 +156,26 @@ public class NodeContentManager : MonoBehaviour
         _battleController.StartBattleWithEnemies(spawnedEnemies, _playerActor);
     }
 
+    // 給 GameFlowController 判斷本次勝利是否為 Boss 戰、以及要播放的擊敗文本。
+    // 直接複用 EnterBattleNode 已經在用的 NodeContentDatabase 查詢方式，不另外建資料庫。
+    public bool TryGetCurrentBossVictoryLines(out List<DialogueLine> lines)
+    {
+        lines = null;
+
+        if (_currentNodeData == null || _currentNodeData.mapNodeType != MapNodeType.Boss)
+            return false;
+
+        BattleEncounterDefinition encounter = _database != null
+            ? _database.GetBattleEncounter(_currentNodeData.contentId)
+            : null;
+
+        if (encounter == null || encounter.victoryDialogueLines == null || encounter.victoryDialogueLines.Count == 0)
+            return false;
+
+        lines = encounter.victoryDialogueLines;
+        return true;
+    }
+
     public void ResetPlayerForNewRun()
     {
         ClearCurrentContent();
