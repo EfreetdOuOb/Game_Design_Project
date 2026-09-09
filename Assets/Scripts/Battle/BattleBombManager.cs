@@ -32,7 +32,7 @@ public class BattleBombManager : MonoBehaviour
     private bool subscribedToTurnManager;
 
     public event Action<int> OnBombDetonatedByTimer;
-    public event Action<int, int> OnBombsConsumedForDamage;
+    public event Action<int, int, CombatActor> OnBombsConsumedForDamage; // bombCount, totalDamage, targetEnemy
     public event Action<int, int> OnBombRegistered;   // pointId, remainingTurns
     public event Action<int, int> OnBombTurnsChanged; // pointId, remainingTurns
     public event Action OnAllBombsCleared;
@@ -209,7 +209,7 @@ public class BattleBombManager : MonoBehaviour
             CombatUI.Instance?.AppendBattleLog($"{targetEnemy.actorId} 暈眩，{bombCount} 顆未爆炸彈反打造成 {actualDamage} 傷害");
         }
 
-        OnBombsConsumedForDamage?.Invoke(bombCount, totalDamage);
+        OnBombsConsumedForDamage?.Invoke(bombCount, totalDamage, targetEnemy);
     }
 
     public bool HasBombAt(int pointId) => activeBombs.ContainsKey(pointId);

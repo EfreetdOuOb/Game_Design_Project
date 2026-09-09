@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using DG.Tweening;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,6 +28,25 @@ public class BombView : MonoBehaviour
     [SerializeField] private float pulseScale = 1.15f;
     [SerializeField] private float pulseDuration = 0.5f;
     [SerializeField] private float dangerPulseDuration = 0.25f;
+
+    [Header("爆炸效果 - 位置")]
+    [Tooltip("炸彈飛向敵人、原地爆炸時使用的共用頂層 UI 圖層，需要能覆蓋整個戰鬥畫面（不能是法陣點位底下的子物件），否則會被裁切")]
+    [SerializeField] private RectTransform explosionOverlayLayer;
+    [Tooltip("把敵人的世界座標換算成 UI 座標時使用的相機，留空則用 Camera.main")]
+    [SerializeField] private Camera worldToUiCamera;
+
+    [Header("爆炸效果 - 動畫")]
+    [SerializeField] private float explosionShakeDuration = 0.2f;
+    [SerializeField] private float explosionShakeStrength = 20f;
+    [SerializeField] private int explosionShakeVibrato = 30;
+    [Tooltip("爆炸瞬間圖示膨脹到的倍率")]
+    [SerializeField] private float explosionBurstScale = 2.5f;
+    [SerializeField] private float explosionBurstDuration = 0.35f;
+    [Tooltip("消耗炸彈反打敵人時，圖示飛向敵人所花的時間")]
+    [SerializeField] private float flyToEnemyDuration = 0.3f;
+
+    [Header("爆炸效果 - 相機震動（選填）")]
+    [SerializeField] private CinemachineImpulseSource explosionImpulseSource;
 
     private class IndicatorInstance
     {
@@ -123,9 +143,17 @@ public class BombView : MonoBehaviour
         RemoveIndicator(pointId);
     }
 
-    private void HandleAllBombsConsumed(int bombCount, int totalDamage)
+    private void HandleAllBombsConsumed(int bombCount, int totalDamage, CombatActor targetEnemy)
     {
-        ClearAllIndicators(instant: false);
+        List<int> pointIds = new List<int>(indicators.Keys);
+        foreach (int pointId in pointIds)
+        {
+            if (!indicators.TryGetValue(pointId, out IndicatorInstance instance))
+                continue;
+
+            indicators.Remove(pointId);
+            PlayFlyToEnemyThenExplode(instance, targetEnemy);
+        }
     }
 
     private void HandleAllBombsCleared()
@@ -276,7 +304,125 @@ public class BombView : MonoBehaviour
             return;
 
         indicators.Remove(pointId);
-        PlayPopOutAndDestroy(instance);
+        PlayExplodeInPlaceAndDestroy(instance);
+    }
+
+    // 玩家這邊被引爆：原地震動後膨脹炸開
+    private void PlayExplodeInPlaceAndDestroy(IndicatorInstance instance)
+    {
+        if (instance.root == null)
+            return;
+
+        PrepareForExplosion(instance);
+
+        RectTransform root = instance.root;
+        Sequence sequence = DOTween.Sequence();
+        sequence.Append(root.DOShakeAnchorPos(explosionShakeDuration, explosionShakeStrength, explosionShakeVibrato));
+        sequence.AppendCallback(() => explosionImpulseSource?.GenerateImpulse());
+        sequence.Append(root.DOScale(explosionBurstScale, explosionBurstDuration).SetEase(Ease.OutQuad));
+
+        if (instance.icon != null)
+            sequence.Join(instance.icon.DOFade(0f, explosionBurstDuration));
+
+        sequence.OnComplete(() =>
+        {
+            if (root != null)
+                Destroy(root.gameObject);
+        });
+    }
+
+    // 敵人這邊被消耗反打：圖示先飛到敵人身上，才震動+膨脹炸開；找不到敵人位置就退回原地爆炸
+    private void PlayFlyToEnemyThenExplode(IndicatorInstance instance, CombatActor targetEnemy)
+    {
+        if (instance.root == null)
+            return;
+
+        if (explosionOverlayLayer == null)
+        {
+            Debug.LogWarning("[炸彈爆炸] 未指定 Explosion Overlay Layer，無法飛向敵人，退回原地爆炸");
+            PlayExplodeInPlaceAndDestroy(instance);
+            return;
+        }
+
+        Vector2? destination = ResolveEnemyAnchoredPosition(targetEnemy);
+        if (destination == null)
+        {
+            Debug.LogWarning("[炸彈爆炸] 找不到敵人的畫面位置（targetEnemy 可能是 null，或找不到可用的相機），退回原地爆炸");
+            PlayExplodeInPlaceAndDestroy(instance);
+            return;
+        }
+
+        PrepareForExplosion(instance);
+
+        RectTransform root = instance.root;
+        // 換到共用頂層圖層才能飛出法陣範圍；worldPositionStays 確保換父物件當下畫面位置不會跳動
+        root.SetParent(explosionOverlayLayer, worldPositionStays: true);
+
+        Sequence sequence = DOTween.Sequence();
+        sequence.Append(root.DOAnchorPos(destination.Value, flyToEnemyDuration).SetEase(Ease.InQuad));
+        sequence.Append(root.DOShakeAnchorPos(explosionShakeDuration, explosionShakeStrength, explosionShakeVibrato));
+        sequence.AppendCallback(() => explosionImpulseSource?.GenerateImpulse());
+        sequence.Append(root.DOScale(explosionBurstScale, explosionBurstDuration).SetEase(Ease.OutQuad));
+
+        if (instance.icon != null)
+            sequence.Join(instance.icon.DOFade(0f, explosionBurstDuration));
+
+        sequence.OnComplete(() =>
+        {
+            if (root != null)
+                Destroy(root.gameObject);
+        });
+    }
+
+    // 兩種爆炸共用的前置作業：停掉原本的呼吸動畫、爆炸階段不需要再顯示倒數數字
+    private void PrepareForExplosion(IndicatorInstance instance)
+    {
+        instance.pulseTween?.Kill();
+        instance.root.DOKill();
+
+        if (instance.countdownText != null)
+            instance.countdownText.gameObject.SetActive(false);
+    }
+
+    // 把敵人的世界座標換算成 explosionOverlayLayer 底下的 anchoredPosition
+    private Vector2? ResolveEnemyAnchoredPosition(CombatActor targetEnemy)
+    {
+        if (targetEnemy == null)
+        {
+            Debug.LogWarning("[炸彈爆炸] targetEnemy 是 null，無法計算飛行目標位置");
+            return null;
+        }
+
+        if (explosionOverlayLayer == null)
+            return null;
+
+        Camera sceneCamera = worldToUiCamera != null ? worldToUiCamera : Camera.main;
+        if (sceneCamera == null)
+        {
+            Debug.LogWarning("[炸彈爆炸] 找不到可用的相機（World To Ui Camera 沒填，且場景裡沒有 tag 為 MainCamera 的相機）");
+            return null;
+        }
+
+        Canvas overlayCanvas = explosionOverlayLayer.GetComponentInParent<Canvas>();
+        if (overlayCanvas == null)
+        {
+            Debug.LogWarning($"[炸彈爆炸] Explosion Overlay Layer（{explosionOverlayLayer.name}）不在任何 Canvas 底下，換算出來的座標可能不正確");
+        }
+
+        Camera canvasCamera = overlayCanvas != null && overlayCanvas.renderMode != RenderMode.ScreenSpaceOverlay
+            ? sceneCamera
+            : null;
+
+        Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(sceneCamera, targetEnemy.transform.position);
+
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(explosionOverlayLayer, screenPoint, canvasCamera, out Vector2 localPoint))
+        {
+            Debug.Log($"[炸彈爆炸] 敵人 {targetEnemy.actorId} 世界座標={targetEnemy.transform.position}，換算後畫面座標={screenPoint}，UI 本地座標={localPoint}");
+            return localPoint;
+        }
+
+        Debug.LogWarning("[炸彈爆炸] ScreenPointToLocalPointInRectangle 換算失敗");
+        return null;
     }
 
     private void PlayPopOutAndDestroy(IndicatorInstance instance)
