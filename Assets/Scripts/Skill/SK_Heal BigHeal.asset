@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HealSkillDefinition
   skillId: "\u5927\u88DC"
   displayName: "\u5927\u88DC"
-  icon: {fileID: -37626123, guid: faf9c145a51787747b2fa5d25bd3d32c, type: 3}
+  icon: {fileID: 1214067212, guid: a37ba830117fbbc4c865701f3631cbfe, type: 3}
   heal: 20

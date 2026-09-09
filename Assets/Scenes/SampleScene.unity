@@ -2900,8 +2900,8 @@ MonoBehaviour:
   - {fileID: 567869744}
   - {fileID: 1787957556}
   - {fileID: 1543897844}
-  attackSprite: {fileID: -392994925, guid: 5ba4d5ce761955b40abc15b2702c3e43, type: 3}
-  defenseSprite: {fileID: -1277555685, guid: d03e5005a19bdab408ae1e9e81d36a08, type: 3}
+  attackSprite: {fileID: 1625468608, guid: 4922ffb58b2873c4b9ed7e6726a2a026, type: 3}
+  defenseSprite: {fileID: 520582726, guid: ebcead25bc0e5174e8a99164f7eca83d, type: 3}
   uiThread: {fileID: 1577747617}
   gestureRouter: {fileID: 362660907}
   "\u6240\u6709\u6280\u80FD":
@@ -8028,8 +8028,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 3449618, guid: cb37d9e1cbd8c0d4a95c3c8312290268, type: 3}
-  m_Type: 0
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -8331,7 +8331,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -9518,7 +9518,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -882261529, guid: 47194a70900ebbc43b14db94c41e7834, type: 3}
+  m_Sprite: {fileID: -149792896, guid: 776a5095eeeedba499d91d870c4fd71a, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

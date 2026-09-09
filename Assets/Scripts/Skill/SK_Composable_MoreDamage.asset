@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ComposableSkillDefinition
   skillId: "\u6613\u50B7"
   displayName: "\u6613\u50B7"
-  icon: {fileID: -655898374, guid: 9e160641aee7b8f48a0a2c718c7c0347, type: 3}
+  icon: {fileID: -342843026, guid: dfb9b48ac4e8c6d4aa063d52831a6bcc, type: 3}
   effects:
   - {fileID: 11400000, guid: a7a711db0b2eaf947a1b7e89f5740e6a, type: 2}

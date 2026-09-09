@@ -16,6 +16,6 @@ MonoBehaviour:
   displayName: "\u69AE\u8B7D\u9867\u5BA2\u7684\u8B49\u660E"
   flavorText: "\u4F60\u662F\u500B\u512A\u8CEA\u9867\u5BA2\uFF0C\u5546\u4EBA\u8A18\u4F4F\u4F60\u4E86"
   effectDescription: "\u5546\u5E97\u7684\u5546\u54C1\u6253\u629880%"
-  icon: {fileID: 0}
+  icon: {fileID: -1551240215, guid: cab5be0b25506f043a10907af776a190, type: 3}
   price: 100
   effect: {fileID: 11400000, guid: 8f7ae294f4a67974f944954283ce4f28, type: 2}
