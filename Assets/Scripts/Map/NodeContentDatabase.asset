@@ -17,3 +17,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7aa8530add674fb45a30c21d252c1341, type: 2}
   nodeRewards:
   - {fileID: 11400000, guid: 6f940511b1958004b82ad5194420cfbc, type: 2}
+  eventDefinitions:
+  - {fileID: 11400000, guid: 1cfa2f32447b3f04d889dfe1e221828c, type: 2}
+  - {fileID: 11400000, guid: e23786f425f2ab341aaf9d62a7f670e7, type: 2}

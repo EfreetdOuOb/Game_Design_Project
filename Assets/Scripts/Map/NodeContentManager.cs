@@ -19,6 +19,7 @@ public class NodeContentManager : MonoBehaviour
 
     [Header("Event Encounter")]
     [SerializeField] private GameObject _eventPanelRoot;
+    [SerializeField] private EventEncounterPanelUI _eventPanelUI;
 
     [Header("Treasure Encounter")]
     [SerializeField] private CinemachineCamera _playerFollowCamera;
@@ -42,6 +43,7 @@ public class NodeContentManager : MonoBehaviour
     private readonly List<GameObject> _spawnedObjects = new();
 
     private MapNodeData _currentNodeData;
+    private EventDefinition _currentEventDefinition;
     private bool _eventEncounterActive;
     private bool _treasureEncounterActive;
     private bool _treasureOpened;
@@ -193,6 +195,8 @@ public class NodeContentManager : MonoBehaviour
         _eventEncounterActive = true;
         SetMapToggleButtonVisible(false);
 
+        _currentEventDefinition = _database != null ? _database.GetRandomEventDefinition() : null;
+
         if (_eventPanelRoot != null)
         {
             _eventPanelRoot.SetActive(true);
@@ -202,9 +206,15 @@ public class NodeContentManager : MonoBehaviour
             Debug.LogWarning("Event Panel Root 未指定");
         }
 
-        GrantNodeGoldReward(contentId);
+        if (_currentEventDefinition != null)
+            _eventPanelUI?.Display(_currentEventDefinition);
+        else
+            Debug.LogWarning("NodeContentDatabase 裡沒有設定任何 EventDefinition，事件面板不會顯示對應的文本/圖示");
 
-        Debug.Log($"事件節點開啟：contentId = {contentId}");
+        // 抽到哪個事件，金幣獎勵就查那個事件自己的 contentId；抽不到就退回節點本身的 contentId 當保底
+        GrantNodeGoldReward(_currentEventDefinition != null ? _currentEventDefinition.contentId : contentId);
+
+        Debug.Log($"事件節點開啟：節點 contentId = {contentId}，抽到的事件 = {(_currentEventDefinition != null ? _currentEventDefinition.contentId : "無")}");
     }
 
     // Event / Treasure 共用：依 contentId 查表發放固定金幣獎勵，查不到或獎勵是 0 就什麼都不做
@@ -228,7 +238,7 @@ public class NodeContentManager : MonoBehaviour
         if (_currentNodeData.mapNodeType != MapNodeType.Event)
             return string.Empty;
 
-        return _currentNodeData.contentId;
+        return _currentEventDefinition != null ? _currentEventDefinition.contentId : _currentNodeData.contentId;
     }
 
     public void CloseEventPanel()
@@ -242,6 +252,7 @@ public class NodeContentManager : MonoBehaviour
         }
 
         _eventEncounterActive = false;
+        _currentEventDefinition = null;
 
         _mapController?.CompleteCurrentNode();
         GameFlowController.Instance?.ReturnToMap();
@@ -566,6 +577,7 @@ public class NodeContentManager : MonoBehaviour
         }
 
         _eventEncounterActive = false;
+        _currentEventDefinition = null;
         _treasureEncounterActive = false;
         _treasureOpened = false;
         _restEncounterActive = false;

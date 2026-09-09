@@ -1390,6 +1390,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventEncounterPanelUI
   _nodeContentManager: {fileID: 2007795492}
+  _eventText: {fileID: 1915956880}
+  _eventIcon: {fileID: 0}
 --- !u!1001 &362660906
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6197,7 +6199,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1331590301
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9156,6 +9158,7 @@ MonoBehaviour:
   _mapController: {fileID: 472646868}
   _mapToggleButtonRoot: {fileID: 1632647098}
   _eventPanelRoot: {fileID: 347312018}
+  _eventPanelUI: {fileID: 347312022}
   _playerFollowCamera: {fileID: 858928957}
   _treasureCamera: {fileID: 1830763721}
   _activeCameraPriority: 20
