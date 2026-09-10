@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bc6f7e5eae198f438d7c76c216e6c60, type: 3}
   m_Name: Map1Settings
   m_EditorClassIdentifier: Assembly-CSharp::MapSettings
-  layerCount: 7
+  layerCount: 15
   mapNodeWidth: 150
   mapNodeHeight: 200
   padding: 200
@@ -21,23 +21,29 @@ MonoBehaviour:
   treasureWeight: 0.15
   restWeight: 0.1
   eventWeight: 0.1
+  enemyContentIds:
+  - battle_slime_01
+  - battle_goblin_01
+  - battle_pugilist_01
+  - battle_waterelemt_01
+  - battle_cyclops_01
   layerNodeCountSettings:
   - layerIndex: 0
     nodeCount: 2
   - layerIndex: 1
     nodeCount: 3
-  - layerIndex: 2
+  - layerIndex: 1
     nodeCount: 2
-  - layerIndex: 3
+  - layerIndex: 1
     nodeCount: 2
   layerFixedTypeSettings:
   - layerIndex: 0
     nodeTypes: 0100000001000000
   - layerIndex: 1
     nodeTypes: 040000000100000002000000
-  - layerIndex: 2
+  - layerIndex: 1
     nodeTypes: 0300000003000000
-  - layerIndex: 3
+  - layerIndex: 1
     nodeTypes: 0200000001000000
   layerNodeRuleSettings: []
   mapNodeSpriteSettings:

@@ -915,6 +915,7 @@ MonoBehaviour:
   actionDelay: 0.4
   attackAnimationStateName: "Armature|\u653B\u64CA"
   hitAnimationStateName: "Armature|\u53D7\u64CA"
+  idleAnimationStateName: New State
   attackAnimationDuration: 0.3
   canPlaceBomb: 1
   bombPlacementChance: 1
@@ -933,6 +934,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHitAnimator
   animator: {fileID: 6508185917655075408}
   hitAnimationStateName: "Armature|\u53D7\u64CA"
+  idleAnimationStateName: New State
   hitAnimationDuration: 0.3
 --- !u!114 &2396970320618891325
 MonoBehaviour:

@@ -11,15 +11,30 @@ public class EnemyDead : MonoBehaviour
 
     private Animator animator;
     private bool isDead = false;
-    private float deathAnimationDuration = 2f;
+    [Header("死亡動畫")]
+    public string deathAnimationStateName = "Dead";
+    public float deathAnimationDuration = 2f;
     private BattleController battleController;
 
     public bool IsDead => isDead;
 
+    private void Awake()
+    {
+        if (animator == null)
+            animator = GetComponent<Animator>();
+
+        if (enemyActor == null)
+            enemyActor = GetComponent<CombatActor>();
+    }
+
+    private void OnEnable()
+    {
+        if (enemyActor != null)
+            enemyActor.OnDeath += HandleDeath;
+    }
+
     private void Start()
     {
-        animator = GetComponent<Animator>();
-
         if (TurnManager.Instance != null)
             TurnManager.Instance.OnTurnCleanup += CheckDeath;
     }
@@ -55,8 +70,21 @@ public class EnemyDead : MonoBehaviour
 
         if (animator != null && animator.isActiveAndEnabled)
         {
-            animator.SetTrigger("Dead");
-            yield return new WaitForSeconds(deathAnimationDuration);
+            if (!string.IsNullOrEmpty(deathAnimationStateName))
+            {
+                animator.Play(deathAnimationStateName, 0, 0f);
+                yield return null;
+
+                AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+                if (state.IsName(deathAnimationStateName) && state.length > 0f)
+                    yield return new WaitForSeconds(state.length);
+                else
+                    yield return new WaitForSeconds(deathAnimationDuration);
+            }
+            else
+            {
+                yield return new WaitForSeconds(deathAnimationDuration);
+            }
         }
 
         GrantGoldDrop();
@@ -81,6 +109,9 @@ public class EnemyDead : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (enemyActor != null)
+            enemyActor.OnDeath -= HandleDeath;
+
         if (TurnManager.Instance != null)
             TurnManager.Instance.OnTurnCleanup -= CheckDeath;
     }

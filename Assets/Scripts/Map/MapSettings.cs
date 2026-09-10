@@ -17,6 +17,10 @@ public class MapSettings : ScriptableObject
     [Range(0f, 1f)] public float restWeight = 0.10f;
     [Range(0f, 1f)] public float eventWeight = 0.10f;
 
+    [Header("Enemy Encounter Pool")]
+    [Tooltip("普通敵人節點會從這些 BattleEncounterDefinition 的 contentId 中隨機選擇。留空時使用 battle_slime_01。")]
+    public List<string> enemyContentIds = new() { "battle_slime_01" };
+
     [Header("Layer Count Settings")]
     public List<LayerNodeCountSetting> layerNodeCountSettings = new();
 

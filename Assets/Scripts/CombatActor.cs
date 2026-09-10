@@ -87,7 +87,7 @@ public class CombatActor : MonoBehaviour
         currentHp = Mathf.Max(0, currentHp - reduced);
         Debug.Log($"[戰鬥] {actorId} 受到 {reduced} 傷害（原始={rawDamage}，倍率={damageMultiplier:F2}），HP={currentHp}/{maxHp}");
         CombatUI.Instance?.AppendBattleLog($"{actorId} 受到 {reduced} 傷害，HP {currentHp}/{maxHp}");
-        if (reduced > 0)
+        if (reduced > 0 && currentHp > 0)
             OnDamaged?.Invoke(reduced);
 
         if (currentHp <= 0)

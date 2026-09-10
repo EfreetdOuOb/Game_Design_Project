@@ -182,7 +182,7 @@ public class MapGenerator
         switch (nodeType)
         {
             case MapNodeType.Enemy:
-                return "battle_slime_01";
+                return GetRandomEnemyContentId();
 
             case MapNodeType.Boss:
                 return "battle_boss_01";
@@ -202,6 +202,21 @@ public class MapGenerator
             default:
                 return string.Empty;
         }
+    }
+
+    private string GetRandomEnemyContentId()
+    {
+        if (_settings.enemyContentIds == null || _settings.enemyContentIds.Count == 0)
+            return "battle_slime_01";
+
+        List<string> validIds = _settings.enemyContentIds
+            .Where(id => !string.IsNullOrWhiteSpace(id))
+            .ToList();
+
+        if (validIds.Count == 0)
+            return "battle_slime_01";
+
+        return validIds[Random.Range(0, validIds.Count)];
     }
 
     private void GenerateConnections(MapGraphData graphData)

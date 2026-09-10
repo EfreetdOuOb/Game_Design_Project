@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 533935e418e24aa44a6e70fc5af831ab, type: 3}
+  m_Name: battle_pugilist_01
+  m_EditorClassIdentifier: Assembly-CSharp::BattleEncounterDefinition
+  contentId: battle_pugilist_01
+  nodeType: 1
+  enemyPrefabs:
+  - {fileID: 6468006519958565659, guid: 60d11e75ee08e564cbd5fbe2618072c1, type: 3}
+  victoryDialogueLines: []

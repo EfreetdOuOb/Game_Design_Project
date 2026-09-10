@@ -885,6 +885,9 @@ PrefabInstance:
       addedObject: {fileID: 2198553439757150311}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9f2eb93c7e836fd4eb9ecce5cda0fa43, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 5300733744632296543}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9f2eb93c7e836fd4eb9ecce5cda0fa43, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 7868771634706413068}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9f2eb93c7e836fd4eb9ecce5cda0fa43, type: 3}
       insertIndex: -1
@@ -902,6 +905,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 6704112120521744254}
   m_SourcePrefab: {fileID: 100100000, guid: 9f2eb93c7e836fd4eb9ecce5cda0fa43, type: 3}
+--- !u!95 &3237781462349215715 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 9f2eb93c7e836fd4eb9ecce5cda0fa43, type: 3}
+  m_PrefabInstance: {fileID: 9044491098972211826}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &8161953461809116963 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 9f2eb93c7e836fd4eb9ecce5cda0fa43, type: 3}
@@ -925,10 +933,27 @@ MonoBehaviour:
   actionDelay: 0.4
   attackAnimationStateName: "Armature_002|\u653B\u64CA"
   hitAnimationStateName: "Armature_002|\u53D7\u64CA_001"
+  idleAnimationStateName: Armature_002|idle
   attackAnimationDuration: 0.3
   canPlaceBomb: 1
   bombPlacementChance: 0.5
   bombInitialTurns: 3
+--- !u!114 &5300733744632296543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8161953461809116963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5f487760c8b86d468ad80154fe7e6e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHitAnimator
+  animator: {fileID: 3237781462349215715}
+  hitAnimationStateName: "Armature_002|\u53D7\u64CA_001"
+  idleAnimationStateName: Armature_002|idle
+  hitAnimationDuration: 0.3
 --- !u!114 &7868771634706413068
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -964,9 +989,9 @@ MonoBehaviour:
   attackIntent: {fileID: 1798837853488862474}
   protectIntent: {fileID: 8133875613622166405}
   debuffContainer: {fileID: 6068889642090444359}
-  debuffSlotPrefab: {fileID: 5477580273698351961, guid: 7add07ebf0ccbf249bf02a2308eee8f1, type: 3}
+  debuffSlotPrefab: {fileID: 2414760941145028645, guid: 0d152a7182ebe384995ec52a3d4267cc, type: 3}
   debuffSprites:
-  - debuffId: "\u7570\u50B7"
+  - debuffId: Vulnerable
     sprite: {fileID: -1708121119, guid: 6049020b2cab69f4e816d272cdf7a150, type: 3}
   maxDebuffSlots: 6
   smoothSpeed: 100

@@ -15,4 +15,5 @@ MonoBehaviour:
   contentId: battle_slime_01
   nodeType: 1
   enemyPrefabs:
-  - {fileID: 574847649120406160, guid: 0ff86698d2069e8469504e1957c6b470, type: 3}
+  - {fileID: 3427361972974959457, guid: b13a89b910b10594ebe0d1b71025308e, type: 3}
+  victoryDialogueLines: []

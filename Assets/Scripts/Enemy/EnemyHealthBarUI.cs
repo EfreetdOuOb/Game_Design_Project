@@ -31,6 +31,7 @@ public class EnemyHealthBarUI : MonoBehaviour
     public float smoothSpeed = 8f;
 
     private EnemyPoise enemyPoise;
+    private EnemyCombatAI enemyCombatAI;
     private int lastIntentTurn = int.MinValue;
     private readonly List<Image> debuffIcons = new List<Image>();
     private readonly Dictionary<string, Sprite> debuffSpriteLookup = new Dictionary<string, Sprite>(StringComparer.Ordinal);
@@ -39,6 +40,10 @@ public class EnemyHealthBarUI : MonoBehaviour
     private void Start()
     {
         enemyPoise = GetComponent<EnemyPoise>();
+        enemyCombatAI = GetComponent<EnemyCombatAI>();
+        if (enemyCombatAI == null)
+            enemyCombatAI = GetComponentInParent<EnemyCombatAI>();
+
         RebuildDebuffSpriteLookup();
         RefreshImmediate();
     }
@@ -156,8 +161,43 @@ public class EnemyHealthBarUI : MonoBehaviour
         }
 
         lastIntentTurn = turn;
-        bool isAttackTurn = turn % 2 == 1;
+        if (enemyCombatAI != null)
+        {
+            EnemyActionStep currentAction = enemyCombatAI.CurrentAction;
 
+            if (attackIntent != null)
+                attackIntent.SetActive(false);
+
+            if (protectIntent != null)
+                protectIntent.SetActive(false);
+
+            if (currentAction != null && currentAction.intentIcon != null)
+            {
+                currentAction.intentIcon.SetActive(true);
+            }
+            else if (currentAction != null)
+            {
+                bool isDefenseAction = currentAction.actionType == EnemyActionType.Defense;
+                if (attackIntent != null)
+                    attackIntent.SetActive(!isDefenseAction);
+
+                if (protectIntent != null)
+                    protectIntent.SetActive(isDefenseAction);
+            }
+
+            if (enemyCombatAI.actionSequence != null)
+            {
+                for (int i = 0; i < enemyCombatAI.actionSequence.Count; i++)
+                {
+                    EnemyActionStep action = enemyCombatAI.actionSequence[i];
+                    if (action != null && action.intentIcon != null && action != currentAction)
+                        action.intentIcon.SetActive(false);
+                }
+            }
+            return;
+        }
+
+        bool isAttackTurn = turn % 2 == 1;
         if (attackIntent != null)
             attackIntent.SetActive(isAttackTurn);
 
