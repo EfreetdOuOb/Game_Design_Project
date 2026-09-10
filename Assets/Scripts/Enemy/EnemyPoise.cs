@@ -10,6 +10,7 @@ public class EnemyPoise : MonoBehaviour
     [SerializeField] private int stunTurnsOnBreak = 1;
 
     private int pendingStunTurns = 0;
+    private bool restorePoiseAfterStun = false;
     private CombatActor actor;
 
     public int MaxPoise => maxPoise;
@@ -61,12 +62,25 @@ public class EnemyPoise : MonoBehaviour
         if (currentPoise == 0)
         {
             pendingStunTurns = stunTurnsOnBreak;
+            restorePoiseAfterStun = true;
 
             Debug.Log($"[韌性] {ActorName} 韌性歸零，進入暈眩 {pendingStunTurns} 回合");
             CombatUI.Instance?.AppendBattleLog($"{ActorName} 韌性歸零，陷入暈眩");
 
             OnPoiseBroken?.Invoke();
         }
+    }
+
+    // 麻痺技能用：直接讓敵人暈眩指定回合數，不需要先打破韌性，
+    // 而且結束後不會像韌性歸零那樣把韌性補滿。
+    public void ApplyStun(int turns)
+    {
+        if (turns <= 0)
+            return;
+
+        pendingStunTurns += turns;
+        Debug.Log($"[韌性] {ActorName} 被麻痺，暈眩 +{turns} 回合（目前 {pendingStunTurns}）");
+        CombatUI.Instance?.AppendBattleLog($"{ActorName} 被麻痺，暈眩 {pendingStunTurns} 回合");
     }
 
     public bool TryConsumeStunTurn()
@@ -81,9 +95,18 @@ public class EnemyPoise : MonoBehaviour
 
         if (pendingStunTurns <= 0)
         {
-            ResetPoiseToFull();
             Debug.Log($"[韌性] {ActorName} 暈眩結束");
-            CombatUI.Instance?.AppendBattleLog($"{ActorName} 從暈眩中恢復，韌性恢復");
+
+            if (restorePoiseAfterStun)
+            {
+                restorePoiseAfterStun = false;
+                ResetPoiseToFull();
+                CombatUI.Instance?.AppendBattleLog($"{ActorName} 從暈眩中恢復，韌性恢復");
+            }
+            else
+            {
+                CombatUI.Instance?.AppendBattleLog($"{ActorName} 從麻痺中恢復");
+            }
         }
 
         return true;

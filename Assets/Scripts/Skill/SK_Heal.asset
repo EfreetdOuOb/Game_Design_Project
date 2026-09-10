@@ -15,4 +15,8 @@ MonoBehaviour:
   skillId: "\u6CBB\u7652"
   displayName: "\u6CBB\u7652"
   icon: {fileID: 319517081, guid: a2a61d4feab3c2e469c4e8f645719dce, type: 3}
-  heal: 20
+  heal: 18
+  upgradedBonusHeal: 12
+  upgradedBecomesRegen: 0
+  regenPerTurn: 10
+  regenTurns: 3

@@ -16,6 +16,12 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
     public bool enableSummaryLog = true;
     public bool scaleAttackWithActorPower = false;
 
+    [Header("升級加成（休息點冥想）")]
+    [Tooltip("攻擊升級後，每次攻擊額外增加的傷害")]
+    public int attackUpgradeBonusDamage = 5;
+    [Tooltip("防禦升級後，每個防禦點額外增加的防禦值")]
+    public int defenseUpgradeBonusPerPoint = 5;
+
     [Header("Poise")]
     [SerializeField] private int attackPointsPerPoiseDamage = 3;
 
@@ -166,6 +172,9 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
         if (target == null || target.currentHp <= 0 || attackCount <= 0)
             return 0;
 
+        bool attackUpgraded = SkillUpgradeManager.Instance != null
+            && SkillUpgradeManager.Instance.IsUpgraded(SkillUpgradeManager.AttackUpgradeId);
+
         int totalDamage = 0;
         for (int i = 0; i < attackCount; i++)
         {
@@ -173,8 +182,13 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
                 break;
 
             int rawDamage = baseAttackDamage;
+            if (attackUpgraded)
+                rawDamage += attackUpgradeBonusDamage;
             if (scaleAttackWithActorPower && self != null)
                 rawDamage += self.attackPower;
+
+            if (self != null)
+                rawDamage = Mathf.RoundToInt(rawDamage * self.GetOutgoingDamageMultiplier());
 
             int actualDamage = target.ReceiveDamage(rawDamage);
             totalDamage += actualDamage;
@@ -237,7 +251,14 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
         if (self == null || defenseCount <= 0)
             return 0;
 
-        int totalDefense = defenseCount * defenseBonusPerPoint;
+        int perPoint = defenseBonusPerPoint;
+        if (SkillUpgradeManager.Instance != null
+            && SkillUpgradeManager.Instance.IsUpgraded(SkillUpgradeManager.DefenseUpgradeId))
+        {
+            perPoint += defenseUpgradeBonusPerPoint;
+        }
+
+        int totalDefense = defenseCount * perPoint;
         self.AddTemporaryDefense(totalDefense);
         return totalDefense;
     }
@@ -272,11 +293,30 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
             self = self,
             target = target,
             gestureResult = result,
-            report = report
+            report = report,
+            skillUpgraded = SkillUpgradeManager.Instance != null && SkillUpgradeManager.Instance.IsUpgraded(skillId),
+            allEnemies = GetAliveEnemyActors()
         };
 
         skill.Execute(context);
         return report;
+    }
+
+    private System.Collections.Generic.List<CombatActor> GetAliveEnemyActors()
+    {
+        System.Collections.Generic.List<CombatActor> result = new System.Collections.Generic.List<CombatActor>();
+        EnemyCombatAI[] enemies = Object.FindObjectsByType<EnemyCombatAI>(FindObjectsInactive.Exclude);
+        for (int i = 0; i < enemies.Length; i++)
+        {
+            if (enemies[i] == null || enemies[i].enemyActor == null)
+                continue;
+            if (enemies[i].enemyActor.currentHp <= 0)
+                continue;
+
+            result.Add(enemies[i].enemyActor);
+        }
+
+        return result;
     }
 
     private string ResolveSkillId(GestureResult result)

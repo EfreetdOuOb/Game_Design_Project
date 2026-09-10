@@ -72,7 +72,7 @@ public class EnemyCombatAI : MonoBehaviour
 
         yield return new WaitForSeconds(attackAnimationDuration);
 
-        int damage = enemyActor.attackPower;
+        int damage = Mathf.RoundToInt(enemyActor.attackPower * enemyActor.GetOutgoingDamageMultiplier());
         int actual = playerActor.ReceiveDamage(damage);
 
         if (actual == 0 && enemyPoise != null)

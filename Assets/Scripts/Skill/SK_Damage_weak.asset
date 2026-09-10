@@ -17,3 +17,9 @@ MonoBehaviour:
   icon: {fileID: 1339438393, guid: 45c5bd8f74043fb4fa4aea3dc7265a37, type: 3}
   damage: 1
   scaleWithCasterAttackPower: 0
+  hitCount: 1
+  hitsAllEnemies: 0
+  extraEffects:
+  - {fileID: 11400000, guid: 7365544866a93bf4394d3e13e6743938, type: 2}
+  upgradedBonusDamage: 0
+  upgradedBonusHits: 0

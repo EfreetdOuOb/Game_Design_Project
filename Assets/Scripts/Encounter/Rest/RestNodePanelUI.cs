@@ -9,6 +9,9 @@ public class RestNodePanelUI : MonoBehaviour
     [SerializeField] private Button _restButton;
     [SerializeField] private Button _meditateButton;
 
+    [Header("冥想（技能升級）")]
+    [SerializeField] private SkillUpgradePanelUI _skillUpgradePanel;
+
     [Header("文字顯示")]
     [SerializeField] private Text _resultText;
 
@@ -21,6 +24,9 @@ public class RestNodePanelUI : MonoBehaviour
 
         if (_meditateButton != null)
             _meditateButton.interactable = true;
+
+        if (_skillUpgradePanel != null)
+            _skillUpgradePanel.gameObject.SetActive(false);
 
         if (_resultText != null)
             _resultText.text = string.Empty;
@@ -42,12 +48,24 @@ public class RestNodePanelUI : MonoBehaviour
 
     public void OnClickMeditate()
     {
-        // TODO：冥想升級技能的實際數值/選擇邏輯之後再補，目前先示意流程與 UI
-        if (_resultText != null)
-            _resultText.text = "你靜下心來冥想...（技能升級功能開發中）";
+        if (_skillUpgradePanel != null)
+        {
+            _skillUpgradePanel.Open(this);
+        }
+        else if (_resultText != null)
+        {
+            _resultText.text = "冥想面板未設定";
+        }
+    }
 
+    // 由 SkillUpgradePanelUI 在玩家實際升級一個技能後回呼：這次休息的冥想機會用掉了
+    public void NotifyMeditateUsed()
+    {
         if (_meditateButton != null)
             _meditateButton.interactable = false;
+
+        if (_resultText != null)
+            _resultText.text = "你完成了冥想，領悟了新的技巧";
     }
 
     public void OnClickNextStep()

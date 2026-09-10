@@ -15,5 +15,10 @@ MonoBehaviour:
   skillId: "\u80CC\u523A"
   displayName: "\u80CC\u523A"
   icon: {fileID: -1801678520, guid: d19ef765474df304ba68ffc5e2e2352f, type: 3}
-  damage: 7
+  damage: 10
   scaleWithCasterAttackPower: 0
+  hitCount: 1
+  hitsAllEnemies: 0
+  extraEffects: []
+  upgradedBonusDamage: 6
+  upgradedBonusHits: 0
