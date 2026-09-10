@@ -840,9 +840,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCombatAI
   enemyActor: {fileID: 6480987786355493828}
   playerActor: {fileID: 0}
-  defendBonus: 10
+  defendBonus: 7
   actionDelay: 0.4
-  animationDelay: 0.3
+  attackAnimationStateName: "Armature|\u653B\u64CA"
+  hitAnimationStateName: "Armature|\u53D7\u64CA"
+  attackAnimationDuration: 0.3
   canPlaceBomb: 1
   bombPlacementChance: 1
   bombInitialTurns: 2
@@ -859,6 +861,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDead
   enemyActor: {fileID: 6480987786355493828}
+  minGoldReward: 3
+  maxGoldReward: 8
 --- !u!114 &5985983533346596158
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -878,6 +882,10 @@ MonoBehaviour:
   poiseText: {fileID: 0}
   attackIntent: {fileID: 7390358563761415880}
   protectIntent: {fileID: 7350177326891125758}
+  debuffContainer: {fileID: 0}
+  debuffSlotPrefab: {fileID: 0}
+  debuffSprites: []
+  maxDebuffSlots: 6
   smoothSpeed: 8
 --- !u!114 &8126754490657196693
 MonoBehaviour:
@@ -926,6 +934,8 @@ MonoBehaviour:
   defensePower: 8
   currentHp: 100
   temporaryDefenseBonus: 0
+  weakReductionPerStack: 0.2
+  weakMinMultiplier: 0.2
 --- !u!136 &2198917767703412241
 CapsuleCollider:
   m_ObjectHideFlags: 0

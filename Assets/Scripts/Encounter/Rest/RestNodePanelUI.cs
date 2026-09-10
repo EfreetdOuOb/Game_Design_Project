@@ -26,7 +26,7 @@ public class RestNodePanelUI : MonoBehaviour
             _meditateButton.interactable = true;
 
         if (_skillUpgradePanel != null)
-            _skillUpgradePanel.gameObject.SetActive(false);
+            _skillUpgradePanel.Close();
 
         if (_resultText != null)
             _resultText.text = string.Empty;

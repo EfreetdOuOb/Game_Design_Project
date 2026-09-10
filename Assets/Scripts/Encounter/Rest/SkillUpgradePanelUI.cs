@@ -8,6 +8,10 @@ using UnityEngine.UI;
 /// </summary>
 public class SkillUpgradePanelUI : MonoBehaviour
 {
+    [Header("顯示")]
+    [Tooltip("冥想面板要開關的物件。留空的話會改為開關這個腳本自己所在的物件（不建議跟 RestNodePanelUI 共用同一個物件時留空）")]
+    [SerializeField] private GameObject _panelRoot;
+
     [Header("升級清單")]
     [Tooltip("所有可以在休息點升級的項目（攻擊/防禦 + 各技能）")]
     [SerializeField] private List<SkillUpgradeDefinition> _upgradeCatalog = new();
@@ -26,7 +30,7 @@ public class SkillUpgradePanelUI : MonoBehaviour
         _owner = owner;
         _usedThisVisit = false;
 
-        gameObject.SetActive(true);
+        SetPanelActive(true);
 
         if (_resultText != null)
             _resultText.text = "選擇一個技能強化";
@@ -36,7 +40,22 @@ public class SkillUpgradePanelUI : MonoBehaviour
 
     public void OnClickClose()
     {
-        gameObject.SetActive(false);
+        Close();
+    }
+
+    // 給 RestNodePanelUI 在打開休息面板時呼叫，確保冥想子面板一開始是關的
+    public void Close()
+    {
+        ClearSlots();
+        SetPanelActive(false);
+    }
+
+    private void SetPanelActive(bool active)
+    {
+        if (_panelRoot != null)
+            _panelRoot.SetActive(active);
+        else
+            gameObject.SetActive(active);
     }
 
     private void RebuildSlots()

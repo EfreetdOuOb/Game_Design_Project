@@ -39,6 +39,41 @@ public class EnemyCombatAI : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        if (TurnManager.Instance != null)
+            TurnManager.Instance.OnPlayerTurnStart += HandlePlayerTurnStart;
+    }
+
+    private void OnDisable()
+    {
+        if (TurnManager.Instance != null)
+            TurnManager.Instance.OnPlayerTurnStart -= HandlePlayerTurnStart;
+    }
+
+    // 防守回合時，敵人的防禦要在「玩家出手之前」就生效，否則玩家先攻擊、敵人才防禦，防禦等於沒用。
+    // 敵人攻/防是隔回合固定交替的（見 IsDefenseTurn），所以這裡在玩家回合一開始就先把盾架上。
+    private void HandlePlayerTurnStart()
+    {
+        int turn = TurnManager.Instance != null ? TurnManager.Instance.TurnNumber : 1;
+        if (!IsDefenseTurn(turn))
+            return;
+
+        if (!CanAct())
+            return;
+
+        if (enemyPoise != null && enemyPoise.IsStunned)
+            return;
+
+        enemyActor.AddTemporaryDefense(defendBonus);
+        CombatUI.Instance?.AppendBattleLog($"{enemyActor.actorId} 擺出防禦姿態，+{defendBonus} 暫時防禦");
+    }
+
+    private bool IsDefenseTurn(int turn)
+    {
+        return turn % 2 == 0;
+    }
+
     public bool CanAct()
     {
         return enemyActor != null
@@ -57,10 +92,10 @@ public class EnemyCombatAI : MonoBehaviour
 
         int turn = TurnManager.Instance != null ? TurnManager.Instance.TurnNumber : 1;
 
-        if (turn % 2 == 1)
-            yield return ExecuteAttack();
-        else
+        if (IsDefenseTurn(turn))
             yield return ExecuteDefend();
+        else
+            yield return ExecuteAttack();
 
         yield return TryPlaceRandomBomb();
     }
@@ -87,8 +122,7 @@ public class EnemyCombatAI : MonoBehaviour
 
     private IEnumerator ExecuteDefend()
     {
-        enemyActor.AddTemporaryDefense(defendBonus);
-        CombatUI.Instance?.AppendBattleLog($"{enemyActor.actorId} 防守，獲得 +{defendBonus} 暫時防禦");
+        // 防禦數值已經在 HandlePlayerTurnStart（玩家回合開始）就套用了，這裡只做演出。
         yield return new WaitForSeconds(actionDelay);
     }
 

@@ -358,7 +358,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &77525118
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2772,6 +2772,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 591319820}
+  - component: {fileID: 591319821}
   m_Layer: 0
   m_Name: SkillUpgradeManager
   m_TagString: Untagged
@@ -2794,6 +2795,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 498519395}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &591319821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591319819}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 650a5edca8cc2384eb6105d3812951c9, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!1 &630790791
 GameObject:
   m_ObjectHideFlags: 0
@@ -8105,7 +8118,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1547362148
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8184,7 +8197,7 @@ MonoBehaviour:
   _nodeContentManager: {fileID: 2007795492}
   _restButton: {fileID: 1739668}
   _meditateButton: {fileID: 572454763}
-  _skillUpgradePanel: {fileID: 0}
+  _skillUpgradePanel: {fileID: 1547362152}
   _resultText: {fileID: 920708645}
 --- !u!114 &1547362152
 MonoBehaviour:
@@ -8198,7 +8211,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19f22cf2f1b3ccf468ab066f8afe12a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkillUpgradePanelUI
-  _upgradeCatalog: []
+  _panelRoot: {fileID: 77525117}
+  _upgradeCatalog:
+  - {fileID: 11400000, guid: 8487c25f7a9a459f9cbdcfc00e260135, type: 2}
+  - {fileID: 11400000, guid: b087f2498b834de590daa282c7eb3bd6, type: 2}
+  - {fileID: 11400000, guid: dd743064c25e46ef9457ffe92526ad42, type: 2}
+  - {fileID: 11400000, guid: cc292dc68e944583bb7078dabedbcb60, type: 2}
+  - {fileID: 11400000, guid: 969f45422dcf4c9086a8615358ac0e9f, type: 2}
+  - {fileID: 11400000, guid: 79980d0b95ba44968bc365b7e0e50656, type: 2}
+  - {fileID: 11400000, guid: a75a11ccd37041abb03ef251958390f8, type: 2}
+  - {fileID: 11400000, guid: de432f2dbd7645c7b01daab9b329b846, type: 2}
+  - {fileID: 11400000, guid: a4b87430c97e42158f4e22fe9c0a65c8, type: 2}
+  - {fileID: 11400000, guid: 228af8403f074496bee88b525746c45e, type: 2}
   _slotPrefab: {fileID: 7714621535712517, guid: a29e2d5e545840947ba1924c1476d00a, type: 3}
   _slotContainer: {fileID: 77525118}
   _resultText: {fileID: 1039712845}

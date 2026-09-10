@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a9490e86562a4741b8a46c5250d58b9, type: 3}
+  m_Name: SkillUpgrade_Group
+  m_EditorClassIdentifier: Assembly-CSharp::SkillUpgradeDefinition
+  skillId: "\u7FA4\u9AD4"
+  displayName: "\u7FA4\u9AD4\u5F37\u5316"
+  upgradeDescription: "\u5C0D\u5168\u9AD4\u591A\u9644\u52A0\u4E00\u5C64\u6613\u50B7"
+  icon: {fileID: 1793782715, guid: 34a1abb70a8eb844aabc8250a10f67ca, type: 3}
