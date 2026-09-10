@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df1d6db80f3bacd40bc046d592865104, type: 3}
+  m_Name: Event_0010
+  m_EditorClassIdentifier: Assembly-CSharp::EventDefinition
+  contentId: 0010
+  eventText: "\u6839\u64DA\u5E2B\u5085\u7684\u6559\u5C0E\uFF0C\u9B54\u529B\u7684\u6D41\u52D5\u6703\u8DDF\u8457\u8EAB\u9AD4\u7684\u904B\u52D5\u4E00\u8D77\uFF0C\u624B\u52E2\u5C07\u9B54\u8853\u65BD\u653E\u51FA\u53BB\u7684\u4F4D\u7F6E\uFF0C\u56E0\u6B64\u5E2B\u5085\u6703\u6642\u4E0D\u6642\u8981\u6211\u5011\u64FA\u52D5\u624B\u81C2\uFF0C\u8B93\u9B54\u529B\u591A\u51DD\u805A\u5728\u624B\u90E8\u3002\r\n"
+  icon: {fileID: 0}
