@@ -139,6 +139,9 @@ public class MapController : MonoBehaviour
 
                     GameObject nodeLine = Instantiate(_nodeLine, _mapNodeParentRect);
                     nodeLine.SetActive(true);
+                    // Instantiate 預設把新物件加到最後一個 sibling，在 UI 裡代表畫在最上層，
+                    // 會蓋住節點按鈕。連線本來就該畫在節點下面，所以固定移到最前面的 sibling。
+                    nodeLine.transform.SetAsFirstSibling();
                     SetNodeLinePosition(nodeLine, startPosition, endPosition);
                 }
             }
