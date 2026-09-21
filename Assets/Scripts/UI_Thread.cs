@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections;
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -46,6 +47,10 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     private bool transformTriggeredThisGesture = false;
     private bool hasDraggedThisGesture = false;
     private bool isPlayingActionAnimations = false;
+    private bool subscribedToTurnManager;
+
+    public bool IsInputLocked { get; private set; }
+    public event Action<bool> OnInputLockChanged;
 
     private void Awake()
     {
@@ -58,6 +63,60 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         }
 
         
+    }
+
+    private void OnEnable()
+    {
+        SubscribeToTurnManager();
+    }
+
+    private void Start()
+    {
+        SubscribeToTurnManager();
+    }
+
+    private void SubscribeToTurnManager()
+    {
+        if (subscribedToTurnManager || TurnManager.Instance == null)
+            return;
+
+        TurnManager.Instance.OnPlayerTurnStart += HandlePlayerTurnStart;
+        TurnManager.Instance.OnEnemyTurnStart += HandleEnemyTurnStart;
+        subscribedToTurnManager = true;
+    }
+
+    private void UnsubscribeFromTurnManager()
+    {
+        if (!subscribedToTurnManager || TurnManager.Instance == null)
+            return;
+
+        TurnManager.Instance.OnPlayerTurnStart -= HandlePlayerTurnStart;
+        TurnManager.Instance.OnEnemyTurnStart -= HandleEnemyTurnStart;
+        subscribedToTurnManager = false;
+    }
+
+    private void OnDisable()
+    {
+        UnsubscribeFromTurnManager();
+    }
+
+    private void HandlePlayerTurnStart()
+    {
+        SetInputLocked(false);
+    }
+
+    private void HandleEnemyTurnStart()
+    {
+        SetInputLocked(true);
+    }
+
+    public void SetInputLocked(bool locked)
+    {
+        if (IsInputLocked == locked)
+            return;
+
+        IsInputLocked = locked;
+        OnInputLockChanged?.Invoke(locked);
     }
 
     private bool IsMiddlePoint(RectTransform point)
@@ -309,7 +368,7 @@ private Color GetBaseColorForFunction(PointFunction func)
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (isPlayingActionAnimations)
+        if (IsInputLocked || isPlayingActionAnimations)
             return;
 
         if(eventData.pointerEnter != null && eventData.pointerEnter.GetComponent<sta>() != null)
@@ -332,6 +391,9 @@ private Color GetBaseColorForFunction(PointFunction func)
     }
     public void OnDrag(PointerEventData eventData)
     {
+        if (IsInputLocked)
+            return;
+
         if (start != null)
         {
             isPress = true;
@@ -408,6 +470,7 @@ private Color GetBaseColorForFunction(PointFunction func)
     private IEnumerator PlayActionAnimationsAndEndTurn(GestureResult result)
     {
         isPlayingActionAnimations = true;
+        SetInputLocked(true);
 
         if (actionAnimationSequence != null)
             yield return actionAnimationSequence.Play(result, actionDispatcher);

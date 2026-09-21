@@ -3062,6 +3062,7 @@ GameObject:
   - component: {fileID: 643277912}
   - component: {fileID: 643277913}
   - component: {fileID: 643277914}
+  - component: {fileID: 643277915}
   m_Layer: 0
   m_Name: UIManager
   m_TagString: Untagged
@@ -3199,6 +3200,40 @@ MonoBehaviour:
   explosionBurstDuration: 0.35
   flyToEnemyDuration: 0.3
   explosionImpulseSource: {fileID: 1779953927}
+--- !u!114 &643277915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 643277909}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a958164bd1f9ccf408efc6fe13970e68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GestureInputVisualState
+  input: {fileID: 1577747617}
+  graphics:
+  - {fileID: 1624408657}
+  - {fileID: 1917313382}
+  - {fileID: 1062605565}
+  - {fileID: 1881324700}
+  - {fileID: 630790793}
+  - {fileID: 1004453983}
+  - {fileID: 1281391472}
+  - {fileID: 999152740}
+  - {fileID: 47995544}
+  - {fileID: 1582145681}
+  - {fileID: 938743600}
+  - {fileID: 1293255745}
+  - {fileID: 568857444}
+  - {fileID: 567869744}
+  - {fileID: 1787957556}
+  - {fileID: 1543897844}
+  - {fileID: 1849387930}
+  - {fileID: 1577747618}
+  lockedColor: {r: 0.55, g: 0.55, b: 0.55, a: 1}
+  lockedStrength: 1
 --- !u!1 &649332163
 GameObject:
   m_ObjectHideFlags: 0
