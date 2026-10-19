@@ -116,6 +116,8 @@ public class GameFlowController : MonoBehaviour
 
     public void RestartRun()
     {
+        TutorialUIControl.Instance?.ResetForNewRun();
+
         if (TurnManager.Instance != null)
         {
             TurnManager.Instance.IsBattleLocked = false;

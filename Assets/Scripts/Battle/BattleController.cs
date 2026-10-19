@@ -44,6 +44,7 @@ public class BattleController : MonoBehaviour
         BattleBombManager.Instance?.ClearAllBombs();
 
         _turnManager?.ResetBattle();
+        TutorialUIControl.Instance?.NotifyBattleStarted();
     }
 
     private void BindPlayer(CombatActor playerActor)

@@ -61,6 +61,7 @@ public class TurnManager : MonoBehaviour
 
         TurnNumber++;
         CurrentPhase = TurnPhase.PlayerTurn;
+        TutorialUIControl.Instance?.NotifyPlayerTurnStarted(TurnNumber);
         OnPlayerTurnStart?.Invoke();
     }
 }

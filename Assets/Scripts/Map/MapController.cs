@@ -31,6 +31,7 @@ public class MapController : MonoBehaviour
         RefreshNodeStates();
         ResetScrollPosition();
         OpenMap();
+        TutorialUIControl.Instance?.NotifyMapDisplayed();
     }
 
     public void ResetRun()
