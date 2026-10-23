@@ -8,7 +8,7 @@ using UnityEngine;
 public class PlayerUpgradeStatModifier : MonoBehaviour, IStatModifier
 {
     [Tooltip("攻擊強化後，每次攻擊增加的傷害")]
-    [SerializeField] private int _attackUpgradeBonus = 5;
+    [SerializeField] private int _attackUpgradeBonus = 3;
     [Tooltip("防禦強化後，每個防禦點增加的防禦值")]
     [SerializeField] private int _defenseUpgradeBonus = 2;
 

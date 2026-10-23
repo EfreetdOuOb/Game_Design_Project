@@ -1241,6 +1241,8 @@ MonoBehaviour:
     intentIcon: {fileID: 5277517036922953784}
     healAmount: 10
     attackPowerIncrease: 0
+    damageMultiplier: 1
+    hitCount: 1
   - actionType: 1
     animationStateName: 1
     animationDuration: 0.3
@@ -1248,7 +1250,7 @@ MonoBehaviour:
     healAmount: 0
     attackPowerIncrease: 2
   canPlaceBomb: 1
-  bombPlacementChance: 0.5
+  bombPlacementChance: 0.45
   bombInitialTurns: 3
 --- !u!114 &8464672555706346699
 MonoBehaviour:
@@ -1328,7 +1330,7 @@ MonoBehaviour:
   attackPower: 20
   defensePower: 10
   currentHp: 100
-  temporaryDefenseBonus: 0
+  shield: 0
   weakReductionPerStack: 0.2
   weakMinMultiplier: 0.2
 --- !u!136 &2368456009063023513

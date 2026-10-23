@@ -5615,6 +5615,20 @@ MonoBehaviour:
   _bodyFontSize: 42
   _hintFontSize: 30
   _font: {fileID: 0}
+--- !u!114 &780000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2124156212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79e1af5e842419e8b0f8c8a0926c0b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerUpgradeStatModifier
+  _attackUpgradeBonus: 3
+  _defenseUpgradeBonus: 2
 --- !u!1 &812665023
 GameObject:
   m_ObjectHideFlags: 0
@@ -13014,10 +13028,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CombatActor
   actorId: Player
   maxHp: 100
-  attackPower: 12
+  attackPower: 8
   defensePower: 5
   currentHp: 100
-  temporaryDefenseBonus: 0
+  shield: 0
   weakReductionPerStack: 0.2
   weakMinMultiplier: 0.2
 --- !u!114 &2124156218
@@ -13039,20 +13053,6 @@ MonoBehaviour:
   playerAnimator: {fileID: 2124156216}
   enableSummaryLog: 1
   attackPointsPerPoiseDamage: 3
---- !u!114 &780000001
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2124156212}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a79e1af5e842419e8b0f8c8a0926c0b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerUpgradeStatModifier
-  _attackUpgradeBonus: 5
-  _defenseUpgradeBonus: 2
 --- !u!95 &2124156219 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: f410480238ac091438d2e031e7a18368, type: 3}

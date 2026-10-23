@@ -1241,6 +1241,8 @@ MonoBehaviour:
     intentIcon: {fileID: 7929588915405716053}
     healAmount: 0
     attackPowerIncrease: 0
+    damageMultiplier: 1
+    hitCount: 1
   - actionType: 1
     animationStateName: 1
     animationDuration: 0.3
@@ -1331,10 +1333,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CombatActor
   actorId: Enemy
   maxHp: 100
-  attackPower: 15
+  attackPower: 37
   defensePower: 10
   currentHp: 100
-  temporaryDefenseBonus: 0
+  shield: 0
   weakReductionPerStack: 0.2
   weakMinMultiplier: 0.2
 --- !u!136 &106421426816613605

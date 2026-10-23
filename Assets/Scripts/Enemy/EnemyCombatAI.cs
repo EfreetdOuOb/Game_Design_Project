@@ -21,6 +21,12 @@ public class EnemyActionStep
     public GameObject intentIcon;
     public int healAmount = 10;
     public int attackPowerIncrease = 2;
+
+    [Header("攻擊類招式（Attack / HeavyAttack / Combo）")]
+    [Tooltip("這個招式每一下的傷害 = 敵人攻擊力 × 這個倍率。每個招式獨立調整，不互相影響。")]
+    public float damageMultiplier = 1f;
+    [Tooltip("這個招式連續打幾下（連擊設 3，其餘通常是 1）。")]
+    [Min(1)] public int hitCount = 1;
 }
 
 public class EnemyCombatAI : MonoBehaviour
@@ -125,10 +131,9 @@ public class EnemyCombatAI : MonoBehaviour
                 yield return ExecuteDefend(actionStep);
                 break;
             case EnemyActionType.HeavyAttack:
-                yield return ExecuteHeavyAttack(actionStep);
-                break;
             case EnemyActionType.Combo:
-                yield return ExecuteCombo(actionStep);
+            case EnemyActionType.Attack:
+                yield return ExecuteStrike(actionStep);
                 break;
             case EnemyActionType.Heal:
                 yield return ExecuteHeal(actionStep);
@@ -137,7 +142,7 @@ public class EnemyCombatAI : MonoBehaviour
                 yield return ExecuteEmpower(actionStep);
                 break;
             default:
-                yield return ExecuteAttack(actionStep);
+                yield return ExecuteStrike(actionStep);
                 break;
         }
 
@@ -185,37 +190,37 @@ public class EnemyCombatAI : MonoBehaviour
         defensePreparedThisTurn = true;
     }
 
-    private IEnumerator ExecuteAttack(EnemyActionStep actionStep)
+    // 攻擊類招式共用：每一下傷害 = 攻擊力 × 該招式的 damageMultiplier，打 hitCount 下。
+    // 各招式的傷害在 EnemyActionStep 上各自設定，不再寫死「重擊 2 倍、連擊 3 下」。
+    private IEnumerator ExecuteStrike(EnemyActionStep actionStep)
     {
         yield return PlayActionAnimation(actionStep);
 
-        DealDamage(1f, "攻擊");
-        yield return new WaitForSeconds(actionDelay);
-    }
+        int hits = Mathf.Max(1, actionStep.hitCount);
+        float multiplier = Mathf.Max(0f, actionStep.damageMultiplier);
+        string actionName = GetStrikeName(actionStep.actionType);
 
-    private IEnumerator ExecuteHeavyAttack(EnemyActionStep actionStep)
-    {
-        yield return PlayActionAnimation(actionStep);
-
-        DealDamage(2f, "重擊");
-        yield return new WaitForSeconds(actionDelay);
-    }
-
-    private IEnumerator ExecuteCombo(EnemyActionStep actionStep)
-    {
-        yield return PlayActionAnimation(actionStep);
-
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < hits; i++)
         {
             if (playerActor == null || playerActor.IsDead)
                 break;
 
-            DealDamage(1f, $"連擊 ({i + 1}/3)");
-            if (i < 2)
+            DealDamage(multiplier, hits > 1 ? $"{actionName} ({i + 1}/{hits})" : actionName);
+            if (i < hits - 1)
                 yield return new WaitForSeconds(actionDelay);
         }
 
         yield return new WaitForSeconds(actionDelay);
+    }
+
+    private static string GetStrikeName(EnemyActionType type)
+    {
+        switch (type)
+        {
+            case EnemyActionType.HeavyAttack: return "重擊";
+            case EnemyActionType.Combo: return "連擊";
+            default: return "攻擊";
+        }
     }
 
     private IEnumerator ExecuteHeal(EnemyActionStep actionStep)

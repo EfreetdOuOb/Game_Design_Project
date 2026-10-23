@@ -1319,13 +1319,15 @@ MonoBehaviour:
     animationDuration: 0.3
     intentIcon: {fileID: 2651148074148647606}
     healAmount: 0
-    attackPowerIncrease: 5
+    attackPowerIncrease: 10
   - actionType: 0
     animationStateName: "\u653B\u64CA"
     animationDuration: 0.3
     intentIcon: {fileID: 4314876788755950510}
     healAmount: 0
     attackPowerIncrease: 0
+    damageMultiplier: 1
+    hitCount: 1
   canPlaceBomb: 0
   bombPlacementChance: 0
   bombInitialTurns: 2
@@ -1404,7 +1406,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CombatActor
   actorId: Enemy
   maxHp: 100
-  attackPower: 10
+  attackPower: 25
   defensePower: 10
   currentHp: 100
   temporaryDefenseBonus: 0

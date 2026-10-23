@@ -1259,6 +1259,8 @@ MonoBehaviour:
     intentIcon: {fileID: 7465520923296362012}
     healAmount: 0
     attackPowerIncrease: 0
+    damageMultiplier: 1
+    hitCount: 1
   - actionType: 1
     animationStateName: 1
     animationDuration: 0.3
@@ -1266,8 +1268,8 @@ MonoBehaviour:
     healAmount: 0
     attackPowerIncrease: 0
   canPlaceBomb: 1
-  bombPlacementChance: 1
-  bombInitialTurns: 2
+  bombPlacementChance: 0.5
+  bombInitialTurns: 3
 --- !u!114 &8514875124923955715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1372,10 +1374,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CombatActor
   actorId: Actor
   maxHp: 100
-  attackPower: 30
+  attackPower: 20
   defensePower: 14
   currentHp: 100
-  temporaryDefenseBonus: 0
+  shield: 0
   weakReductionPerStack: 0.2
   weakMinMultiplier: 0.2
 --- !u!136 &4039118493453794621
