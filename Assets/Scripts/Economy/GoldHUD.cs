@@ -4,7 +4,8 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 常駐顯示玩家持有的金幣。金額變動時數字滾動，並依增減閃一下顏色。
-/// 可以自己拉一個 Text 放到 Gold Text；沒指定的話會在 Place Below 那個 UI 的正下方自動建一個。
+/// 目前指定的是原本商店面板裡的 GoldTxt（已搬到玩家血條下方常駐）；商店不再自己更新金幣文字，統一由這裡負責。
+/// 沒指定 Text 的話，會在 Place Below 那個 UI 的正下方自動建一個。
 /// 資料來源只有 <see cref="PlayerCurrency"/> 的 OnGoldChanged 事件，這裡不改任何金幣數值。
 /// </summary>
 public class GoldHUD : MonoBehaviour

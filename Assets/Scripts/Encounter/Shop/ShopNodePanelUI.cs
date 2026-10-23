@@ -14,9 +14,6 @@ public class ShopNodePanelUI : MonoBehaviour
     [SerializeField] private RelicShopSlotUI _slotPrefab;
     [SerializeField] private Transform _slotContainer;
 
-    [Header("金幣顯示")]
-    [SerializeField] private Text _goldText;
-
     [Header("文字顯示")]
     [SerializeField] private Text _resultText;
 
@@ -29,7 +26,6 @@ public class ShopNodePanelUI : MonoBehaviour
         if (_resultText != null)
             _resultText.text = string.Empty;
 
-        RefreshGoldText();
         RestockShelf();
     }
 
@@ -112,13 +108,6 @@ public class ShopNodePanelUI : MonoBehaviour
             _resultText.text = $"購買了「{relic.displayName}」";
 
         slot?.MarkSold();
-        RefreshGoldText();
-    }
-
-    private void RefreshGoldText()
-    {
-        if (_goldText != null)
-            _goldText.text = $"金幣：{(PlayerCurrency.Instance != null ? PlayerCurrency.Instance.CurrentGold : 0)}";
     }
 
     private void Shuffle(List<RelicDefinition> list)
