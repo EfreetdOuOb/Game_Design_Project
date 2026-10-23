@@ -1,5 +1,11 @@
 using UnityEngine;
 
+public enum StunCause
+{
+    PoiseBreak,  // 韌性歸零 → 暈眩
+    Paralysis    // 麻痺技能
+}
+
 public class EnemyPoise : MonoBehaviour
 {
     [Header("Poise Settings")]
@@ -22,6 +28,7 @@ public class EnemyPoise : MonoBehaviour
 
     public event System.Action OnPoiseBroken; // 韌性剛好歸零那一刻觸發一次
     public event System.Action OnStunChanged; // 暈眩回合數有變動時觸發（UI／特效用）
+    public event System.Action<StunCause> OnStunApplied; // 每次「新增暈眩」的當下觸發，並說明原因（跳字用）
 
     private void Awake()
     {
@@ -71,6 +78,7 @@ public class EnemyPoise : MonoBehaviour
             pendingStunTurns = stunTurnsOnBreak;
             restorePoiseAfterStun = true;
             OnStunChanged?.Invoke();
+            OnStunApplied?.Invoke(StunCause.PoiseBreak);
 
             Debug.Log($"[韌性] {ActorName} 韌性歸零，進入暈眩 {pendingStunTurns} 回合");
             CombatUI.Instance?.AppendBattleLog($"{ActorName} 韌性歸零，陷入暈眩");
@@ -88,6 +96,7 @@ public class EnemyPoise : MonoBehaviour
 
         pendingStunTurns += turns;
         OnStunChanged?.Invoke();
+        OnStunApplied?.Invoke(StunCause.Paralysis);
         Debug.Log($"[韌性] {ActorName} 被麻痺，暈眩 +{turns} 回合（目前 {pendingStunTurns}）");
         CombatUI.Instance?.AppendBattleLog($"{ActorName} 被麻痺，暈眩 {pendingStunTurns} 回合");
     }

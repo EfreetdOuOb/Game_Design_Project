@@ -34,6 +34,8 @@ public class EnemyCombatAI : MonoBehaviour
     public CombatActor enemyActor;
     public CombatActor playerActor;
     public float actionDelay = 0.4f;
+    [Tooltip("敵人因暈眩跳過行動時，停下來給玩家看暈眩特效的時間（秒）")]
+    public float stunBeatDuration = 1.0f;
     public string attackAnimationStateName = "Armature|攻擊";
     public string hitAnimationStateName = "Armature|受擊";
     public string idleAnimationStateName = "Armature|idle";
@@ -122,8 +124,17 @@ public class EnemyCombatAI : MonoBehaviour
         if (!CanAct())
             yield break;
 
-        if (enemyPoise != null && enemyPoise.TryConsumeStunTurn())
+        if (enemyPoise != null && enemyPoise.IsStunned)
+        {
+            // 先停一拍，讓玩家看到暈眩（星星、變色）再扣掉暈眩回合；
+            // 不然暈眩剛成立就在同一刻被消耗，特效根本來不及出現
+            yield return new WaitForSeconds(stunBeatDuration);
+            enemyPoise.TryConsumeStunTurn();
+
+            // 被跳過的這一回合，原本要出的招式也算用掉，下一回合輪到序列裡的下一招
+            AdvanceActionSequence();
             yield break;
+        }
 
         EnemyActionStep actionStep = GetCurrentAction();
         EnemyActionType action = actionStep.actionType;

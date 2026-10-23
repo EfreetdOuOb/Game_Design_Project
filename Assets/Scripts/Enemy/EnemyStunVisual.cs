@@ -18,6 +18,12 @@ public class EnemyStunVisual : MonoBehaviour
     [SerializeField, Min(0f)] private float _tintPulseSpeed = 3f;
     [SerializeField, Min(0f)] private float _fadeDuration = 0.25f;
 
+    [Header("跳字")]
+    [SerializeField] private string _poiseBreakText = "暈眩！";
+    [SerializeField] private Color _poiseBreakTextColor = new Color(1f, 0.9f, 0.2f, 1f);
+    [SerializeField] private string _paralysisText = "麻痺！";
+    [SerializeField] private Color _paralysisTextColor = new Color(0.45f, 0.85f, 1f, 1f);
+
     [Header("頭上特效")]
     [Tooltip("選填：放你自己的特效 prefab（暈眩星星、電光…）。留空就用程式產生的轉圈星星。")]
     [SerializeField] private GameObject _customEffectPrefab;
@@ -52,16 +58,19 @@ public class EnemyStunVisual : MonoBehaviour
             return;
 
         poise.OnStunChanged += HandleStunChanged;
+        poise.OnStunApplied += HandleStunApplied;
         HandleStunChanged();
     }
 
     private void OnDisable()
     {
         if (poise != null)
+        {
             poise.OnStunChanged -= HandleStunChanged;
+            poise.OnStunApplied -= HandleStunApplied;
+        }
 
         SetStunned(false, true);
-
     }
 
     private void OnDestroy()
@@ -104,6 +113,20 @@ public class EnemyStunVisual : MonoBehaviour
 
         if (effectRoot != null)
             effectRoot.gameObject.SetActive(stunned);
+    }
+
+    // 每次新增暈眩都跳字，並依原因分開顯示：韌性歸零 =「暈眩！」、麻痺技能 =「麻痺！」
+    private void HandleStunApplied(StunCause cause)
+    {
+        tint.EnsureCache();
+        float height = tint.BoundsReady ? tint.ModelBounds.size.y : 1f;
+        bool paralysis = cause == StunCause.Paralysis;
+
+        WorldPopupText.Spawn(
+            tint.HeadPosition + Vector3.up * (height * (_headOffset + 0.25f)),
+            height * 0.14f,
+            paralysis ? _paralysisText : _poiseBreakText,
+            paralysis ? _paralysisTextColor : _poiseBreakTextColor);
     }
 
     private void Update()

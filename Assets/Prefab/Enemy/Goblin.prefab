@@ -6053,7 +6053,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCombatAI
   enemyActor: {fileID: 8990683012628090487}
   playerActor: {fileID: 0}
-  actionDelay: 0.4
+  actionDelay: 0.25
   attackAnimationStateName: "\u653B\u64CA"
   hitAnimationStateName: "\u53D7\u64CA"
   idleAnimationStateName: Idle
@@ -6164,7 +6164,7 @@ MonoBehaviour:
   attackPower: 13
   defensePower: 10
   currentHp: 100
-  temporaryDefenseBonus: 0
+  shield: 0
   weakReductionPerStack: 0.2
   weakMinMultiplier: 0.2
 --- !u!136 &7559797810941349822
