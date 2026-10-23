@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 敵人狀態欄裡的一個格子：圖示 + 右下角剩餘回合 + 左上角層數（≥2 才顯示）。
-/// 新的狀態出現時播「印章蓋下去」的進場動畫；沒有圖示時改顯示文字標籤。
+/// 新的狀態出現時播「印章蓋下去」的進場動畫；呼叫端保證有圖示才會顯示格子。
 /// 文字與動畫都在執行時建立，格子 prefab 只要有一個 Image 就能用。
 /// </summary>
 [RequireComponent(typeof(Image))]
@@ -13,12 +13,9 @@ public class DebuffSlotView : MonoBehaviour
     // World Space 的小 Canvas 上文字會糊，所以字用 4 倍大再縮回 1/4
     private const float TextOversample = 4f;
 
-    private static readonly Color PlaceholderColor = new Color(0.12f, 0.14f, 0.2f, 0.9f);
-
     private Image icon;
     private Text turnsText;
     private Text stacksText;
-    private Text labelText;
     private Vector3 baseScale;
     private bool baseScaleCaptured;
     private string boundId;
@@ -40,7 +37,7 @@ public class DebuffSlotView : MonoBehaviour
     }
 
     /// <summary>更新內容；回傳 true 代表這次是「新的狀態」（外層可以據此決定要不要播音效）。</summary>
-    public bool Bind(string debuffId, Sprite sprite, string label, int stacks, int turns, string badge = null)
+    public bool Bind(string debuffId, Sprite sprite, int stacks, int turns, string badge = null)
     {
         EnsureBuilt();
 
@@ -53,11 +50,9 @@ public class DebuffSlotView : MonoBehaviour
         boundTurns = turns;
         boundBadge = badge;
 
-        bool hasSprite = sprite != null;
         icon.enabled = true;
         icon.sprite = sprite;
-        icon.color = hasSprite ? Color.white : PlaceholderColor;
-        labelText.text = hasSprite ? string.Empty : label;
+        icon.color = Color.white;
 
         // badge 有值時取代回合數（例如強化的「+10」，這種狀態沒有回合限制）
         turnsText.text = !string.IsNullOrEmpty(badge) ? badge : (turns > 0 ? turns.ToString() : string.Empty);
@@ -144,7 +139,6 @@ public class DebuffSlotView : MonoBehaviour
 
         turnsText = CreateCornerText("Turns", font, fontSize, TextAnchor.LowerRight, new Vector2(1f, 0f), size, new Color(1f, 1f, 1f, 1f));
         stacksText = CreateCornerText("Stacks", font, fontSize, TextAnchor.UpperLeft, new Vector2(0f, 1f), size, new Color(1f, 0.9f, 0.3f, 1f));
-        labelText = CreateCornerText("Label", font, fontSize * 0.8f, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), size, Color.white);
     }
 
     private Text CreateCornerText(string objectName, Font font, float fontSize, TextAnchor alignment,

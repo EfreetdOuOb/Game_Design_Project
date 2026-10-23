@@ -47,14 +47,6 @@ public class EnemyHealthBarUI : MonoBehaviour
     /// <summary>敵人攻擊力強化（強化招式）在狀態欄上用的 id；沒有回合限制，右下角顯示累積的攻擊增加量。</summary>
     public const string AttackUpDebuffId = "AttackUp";
 
-    private static readonly Dictionary<string, string> DefaultDebuffLabels = new Dictionary<string, string>(StringComparer.Ordinal)
-    {
-        { CombatActor.VulnerableDebuffId, "易傷" },
-        { CombatActor.WeakDebuffId, "虛弱" },
-        { StunDebuffId, "暈眩" },
-        { AttackUpDebuffId, "強化" }
-    };
-
     private readonly Dictionary<string, DebuffSlotView> debuffSlots = new Dictionary<string, DebuffSlotView>(StringComparer.Ordinal);
     private readonly List<DebuffDisplay> debuffDisplayBuffer = new List<DebuffDisplay>();
     private readonly HashSet<string> usedDebuffIds = new HashSet<string>(StringComparer.Ordinal);
@@ -288,12 +280,17 @@ public class EnemyHealthBarUI : MonoBehaviour
         for (int i = 0; i < shown; i++)
         {
             DebuffDisplay display = debuffDisplayBuffer[i];
+            // 沒有設定圖示的狀態（例如暈眩、強化）不佔狀態列，只靠特效表現；之後在 debuffSprites 加圖就會自動出現
+            Sprite sprite = GetDebuffSprite(display.id);
+            if (sprite == null)
+                continue;
+
             DebuffSlotView slot = GetOrCreateSlot(display.id);
             if (slot == null)
                 continue;
 
             slot.transform.SetSiblingIndex(i);
-            slot.Bind(display.id, GetDebuffSprite(display.id), GetDebuffLabel(display.id), display.stacks, display.turns, display.badge);
+            slot.Bind(display.id, sprite, display.stacks, display.turns, display.badge);
             usedDebuffIds.Add(display.id);
         }
 
@@ -363,11 +360,6 @@ public class EnemyHealthBarUI : MonoBehaviour
         }
 
         return builder.ToString();
-    }
-
-    private string GetDebuffLabel(string debuffId)
-    {
-        return DefaultDebuffLabels.TryGetValue(debuffId, out string label) ? label : debuffId;
     }
 
     private Sprite GetDebuffSprite(string debuffId)

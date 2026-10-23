@@ -37,10 +37,7 @@ public class EnemyTintController : MonoBehaviour
     public bool BoundsReady { get; private set; }
     public Bounds ModelBounds => bounds;
 
-    /// <summary>其他特效（例如抖動）暫時加在 transform 上的位移，算頭頂位置時會扣掉。</summary>
-    public Vector3 ExternalOffset { get; set; }
-
-    public Vector3 HeadPosition => transform.position - ExternalOffset + headLocalOffset;
+    public Vector3 HeadPosition => transform.position + headLocalOffset;
 
     private void Awake()
     {

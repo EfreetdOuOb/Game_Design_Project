@@ -2,7 +2,7 @@ using DG.Tweening;
 using UnityEngine;
 
 /// <summary>
-/// 敵人暈眩（麻痺、韌性歸零共用）時的表現：整隻變色 + 輕微抖動 + 頭上轉圈的星星。
+/// 敵人暈眩（麻痺、韌性歸零共用）時的表現：整隻變色閃動 + 頭上轉圈的星星。
 /// 由 <see cref="EnemyPoise"/> 在 Awake 自動掛上預設版本；想自訂（換顏色、換成自己的特效 prefab）
 /// 就直接在敵人 prefab 上掛這個元件，EnemyPoise 發現已經有就不會再加。
 /// 只負責「看起來」，不影響任何戰鬥數值。
@@ -11,17 +11,12 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class EnemyStunVisual : MonoBehaviour
 {
-    [Header("變色")]
+    [Header("變色（閃動）")]
     [SerializeField] private Color _tintColor = new Color(1f, 0.92f, 0.35f, 1f);
     [SerializeField, Range(0f, 1f)] private float _tintStrength = 0.55f;
     [Tooltip("變色強弱來回閃動的速度（次/秒），0 = 不閃動")]
     [SerializeField, Min(0f)] private float _tintPulseSpeed = 3f;
     [SerializeField, Min(0f)] private float _fadeDuration = 0.25f;
-
-    [Header("抖動")]
-    [Tooltip("抖動幅度，單位是敵人外框大小的比例")]
-    [SerializeField, Min(0f)] private float _shakeAmount = 0.02f;
-    [SerializeField, Min(0f)] private float _shakeSpeed = 55f;
 
     [Header("頭上特效")]
     [Tooltip("選填：放你自己的特效 prefab（暈眩星星、電光…）。留空就用程式產生的轉圈星星。")]
@@ -37,9 +32,8 @@ public class EnemyStunVisual : MonoBehaviour
     private EnemyPoise poise;
     private EnemyTintController tint;
     private bool stunned;
-    private float strength;          // 0 ~ 1，目前變色／抖動程度（淡入淡出）
+    private float strength;          // 0 ~ 1，目前變色程度（淡入淡出）
     private Tween strengthTween;
-    private Vector3 appliedShake;
 
     private Transform effectRoot;
     private Transform[] stars;
@@ -68,9 +62,6 @@ public class EnemyStunVisual : MonoBehaviour
 
         SetStunned(false, true);
 
-        // 停用時把抖動的偏移還回去，避免敵人停在偏掉的位置
-        transform.position -= appliedShake;
-        appliedShake = Vector3.zero;
     }
 
     private void OnDestroy()
@@ -125,7 +116,6 @@ public class EnemyStunVisual : MonoBehaviour
             ApplyTint(strength * pulse);
         }
 
-        UpdateShake();
         UpdateHeadEffect();
     }
 
@@ -135,31 +125,6 @@ public class EnemyStunVisual : MonoBehaviour
             return;
 
         tint.SetChannel(TintChannel.Stun, _tintColor, _tintStrength * amount);
-    }
-
-    private void UpdateShake()
-    {
-        // 先還原上一幀加的偏移，再依目前強度加新的，這樣敵人被其他動畫移動時也不會累積誤差
-        transform.position -= appliedShake;
-        appliedShake = Vector3.zero;
-        tint.ExternalOffset = Vector3.zero;
-
-        if (strength <= 0.001f)
-            return;
-
-        tint.EnsureCache();
-        if (!tint.BoundsReady)
-            return;
-
-        Camera cam = Camera.main;
-        Vector3 right = cam != null ? cam.transform.right : Vector3.right;
-        Vector3 up = cam != null ? cam.transform.up : Vector3.up;
-
-        float size = tint.ModelBounds.size.magnitude * _shakeAmount * strength;
-        float t = Time.time * _shakeSpeed;
-        appliedShake = right * (Mathf.Sin(t) * size) + up * (Mathf.Sin(t * 1.7f + 1f) * size * 0.5f);
-        transform.position += appliedShake;
-        tint.ExternalOffset = appliedShake;
     }
 
     // ---- 頭上特效 ----
