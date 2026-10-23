@@ -33,7 +33,31 @@ public class EnemyHealthBarUI : MonoBehaviour
     private EnemyPoise enemyPoise;
     private EnemyCombatAI enemyCombatAI;
     private int lastIntentTurn = int.MinValue;
-    private readonly List<Image> debuffIcons = new List<Image>();
+    private struct DebuffDisplay
+    {
+        public string id;
+        public int stacks;
+        public int turns;
+        public string badge;
+    }
+
+    /// <summary>暈眩（麻痺／韌性歸零）在狀態欄上用的 id；想換圖就在 debuffSprites 加一筆這個 id。</summary>
+    public const string StunDebuffId = "Stun";
+
+    /// <summary>敵人攻擊力強化（強化招式）在狀態欄上用的 id；沒有回合限制，右下角顯示累積的攻擊增加量。</summary>
+    public const string AttackUpDebuffId = "AttackUp";
+
+    private static readonly Dictionary<string, string> DefaultDebuffLabels = new Dictionary<string, string>(StringComparer.Ordinal)
+    {
+        { CombatActor.VulnerableDebuffId, "易傷" },
+        { CombatActor.WeakDebuffId, "虛弱" },
+        { StunDebuffId, "暈眩" },
+        { AttackUpDebuffId, "強化" }
+    };
+
+    private readonly Dictionary<string, DebuffSlotView> debuffSlots = new Dictionary<string, DebuffSlotView>(StringComparer.Ordinal);
+    private readonly List<DebuffDisplay> debuffDisplayBuffer = new List<DebuffDisplay>();
+    private readonly HashSet<string> usedDebuffIds = new HashSet<string>(StringComparer.Ordinal);
     private readonly Dictionary<string, Sprite> debuffSpriteLookup = new Dictionary<string, Sprite>(StringComparer.Ordinal);
     private string lastDebuffSignature = string.Empty;
 
@@ -212,79 +236,101 @@ public class EnemyHealthBarUI : MonoBehaviour
             return;
         }
 
-        var activeDebuffs = enemyActor.ActiveDebuffs;
-        if (activeDebuffs == null || activeDebuffs.Count == 0)
+        BuildDebuffDisplayList();
+        if (debuffDisplayBuffer.Count == 0)
         {
-            if (debuffIcons.Count > 0)
-            {
-                for (int i = 0; i < debuffIcons.Count; i++)
-                {
-                    if (debuffIcons[i] != null)
-                        debuffIcons[i].enabled = false;
-                }
-            }
-
+            HideAllDebuffSlots();
             lastDebuffSignature = string.Empty;
             return;
         }
 
-        string signature = BuildDebuffSignature(activeDebuffs);
+        string signature = BuildDebuffSignature();
         if (string.Equals(signature, lastDebuffSignature, StringComparison.Ordinal))
         {
             return;
         }
 
         lastDebuffSignature = signature;
-        RefreshDebuffSlots(activeDebuffs);
+        RefreshDebuffSlots();
     }
 
-    private void RefreshDebuffSlots(IReadOnlyList<CombatActor.DebuffState> activeDebuffs)
+    // 狀態欄要顯示的東西 = CombatActor 的 debuff + 暈眩（麻痺／韌性歸零，暈眩狀態存在 EnemyPoise）
+    private void BuildDebuffDisplayList()
     {
-        int slotCount = Mathf.Min(activeDebuffs.Count, maxDebuffSlots);
-        EnsureSlotCount(slotCount);
+        debuffDisplayBuffer.Clear();
 
-        for (int i = 0; i < debuffIcons.Count; i++)
+        var activeDebuffs = enemyActor.ActiveDebuffs;
+        if (activeDebuffs != null)
         {
-            bool shouldShow = i < slotCount;
-            if (debuffIcons[i] != null)
+            for (int i = 0; i < activeDebuffs.Count; i++)
             {
-                debuffIcons[i].enabled = shouldShow;
-                if (shouldShow)
-                {
-                    var state = activeDebuffs[i];
-                    debuffIcons[i].sprite = GetDebuffSprite(state.debuffId);
-                    debuffIcons[i].color = debuffIcons[i].sprite != null ? Color.white : new Color(1f, 1f, 1f, 0.35f);
-                }
+                CombatActor.DebuffState state = activeDebuffs[i];
+                if (state == null)
+                    continue;
+
+                debuffDisplayBuffer.Add(new DebuffDisplay { id = state.debuffId, stacks = state.stacks, turns = state.remainingTurns });
             }
+        }
+
+        if (enemyPoise != null && enemyPoise.StunTurns > 0)
+            debuffDisplayBuffer.Add(new DebuffDisplay { id = StunDebuffId, stacks = 1, turns = enemyPoise.StunTurns });
+
+        if (enemyActor.AttackBuff > 0)
+            debuffDisplayBuffer.Add(new DebuffDisplay { id = AttackUpDebuffId, stacks = 1, turns = 0, badge = "+" + enemyActor.AttackBuff });
+    }
+
+    // 每種狀態固定用同一個格子（用 id 對應），這樣其他狀態到期、格子順序變動時，不會讓留著的圖示重播進場動畫
+    private void RefreshDebuffSlots()
+    {
+        usedDebuffIds.Clear();
+        int shown = Mathf.Min(debuffDisplayBuffer.Count, maxDebuffSlots);
+
+        for (int i = 0; i < shown; i++)
+        {
+            DebuffDisplay display = debuffDisplayBuffer[i];
+            DebuffSlotView slot = GetOrCreateSlot(display.id);
+            if (slot == null)
+                continue;
+
+            slot.transform.SetSiblingIndex(i);
+            slot.Bind(display.id, GetDebuffSprite(display.id), GetDebuffLabel(display.id), display.stacks, display.turns, display.badge);
+            usedDebuffIds.Add(display.id);
+        }
+
+        foreach (KeyValuePair<string, DebuffSlotView> pair in debuffSlots)
+        {
+            if (pair.Value != null && !usedDebuffIds.Contains(pair.Key))
+                pair.Value.Hide();
         }
     }
 
-    private void EnsureSlotCount(int requiredCount)
+    private void HideAllDebuffSlots()
     {
-        while (debuffIcons.Count < requiredCount)
+        foreach (DebuffSlotView slot in debuffSlots.Values)
         {
-            GameObject slot = debuffSlotPrefab != null ? Instantiate(debuffSlotPrefab, debuffContainer) : CreateDefaultDebuffSlot();
-            var icon = slot.GetComponent<Image>();
-            if (icon == null)
-            {
-                icon = slot.AddComponent<Image>();
-            }
-
-            icon.raycastTarget = false;
-            icon.enabled = false;
-            debuffIcons.Add(icon);
+            if (slot != null)
+                slot.Hide();
         }
+    }
 
-        while (debuffIcons.Count > requiredCount)
-        {
-            int lastIndex = debuffIcons.Count - 1;
-            if (debuffIcons[lastIndex] != null && debuffIcons[lastIndex].gameObject != null)
-            {
-                Destroy(debuffIcons[lastIndex].gameObject);
-            }
+    private DebuffSlotView GetOrCreateSlot(string debuffId)
+    {
+        if (string.IsNullOrEmpty(debuffId))
+            return null;
 
-            debuffIcons.RemoveAt(lastIndex);
-        }
+        if (debuffSlots.TryGetValue(debuffId, out DebuffSlotView existing) && existing != null)
+            return existing;
+
+        GameObject slotObject = debuffSlotPrefab != null ? Instantiate(debuffSlotPrefab, debuffContainer) : CreateDefaultDebuffSlot();
+        slotObject.name = "Debuff_" + debuffId;
+
+        DebuffSlotView slot = slotObject.GetComponent<DebuffSlotView>();
+        if (slot == null)
+            slot = slotObject.AddComponent<DebuffSlotView>();
+
+        slotObject.SetActive(false);
+        debuffSlots[debuffId] = slot;
+        return slot;
     }
 
     private GameObject CreateDefaultDebuffSlot()
@@ -300,31 +346,28 @@ public class EnemyHealthBarUI : MonoBehaviour
         return slot;
     }
 
-    private string BuildDebuffSignature(IReadOnlyList<CombatActor.DebuffState> activeDebuffs)
+    private string BuildDebuffSignature()
     {
-        if (activeDebuffs == null || activeDebuffs.Count == 0)
-        {
-            return string.Empty;
-        }
-
         var builder = new System.Text.StringBuilder();
-        for (int i = 0; i < activeDebuffs.Count; i++)
+        for (int i = 0; i < debuffDisplayBuffer.Count; i++)
         {
-            var state = activeDebuffs[i];
-            if (state == null)
-            {
-                continue;
-            }
-
-            builder.Append(state.debuffId);
+            DebuffDisplay display = debuffDisplayBuffer[i];
+            builder.Append(display.id);
             builder.Append('|');
-            builder.Append(state.stacks);
+            builder.Append(display.stacks);
             builder.Append('|');
-            builder.Append(state.remainingTurns);
+            builder.Append(display.turns);
+            builder.Append('|');
+            builder.Append(display.badge);
             builder.Append(';');
         }
 
         return builder.ToString();
+    }
+
+    private string GetDebuffLabel(string debuffId)
+    {
+        return DefaultDebuffLabels.TryGetValue(debuffId, out string label) ? label : debuffId;
     }
 
     private Sprite GetDebuffSprite(string debuffId)

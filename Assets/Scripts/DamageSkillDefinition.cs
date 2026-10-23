@@ -15,6 +15,10 @@ public class DamageSkillDefinition : SkillDefinition
     [Tooltip("造成傷害後額外執行的效果（虛弱、麻痺、群體的易傷…）")]
     public List<SkillEffectDefinition> extraEffects = new List<SkillEffectDefinition>();
 
+    [Header("條件加成")]
+    [Tooltip("目標處於暈眩或有任何 debuff（易傷、虛弱…）時，傷害乘上這個倍率（背刺用）。1 = 沒有加成。")]
+    public float afflictedTargetMultiplier = 1f;
+
     [Header("升級")]
     [Tooltip("升級後每次攻擊額外增加的傷害")]
     public int upgradedBonusDamage = 0;
@@ -49,6 +53,22 @@ public class DamageSkillDefinition : SkillDefinition
         context.target = originalTarget;
     }
 
+    // 暈眩（麻痺、韌性歸零）或身上有任何 debuff
+    private static bool IsAfflicted(CombatActor target)
+    {
+        if (target == null)
+            return false;
+
+        if (target.ActiveDebuffs != null && target.ActiveDebuffs.Count > 0)
+            return true;
+
+        EnemyPoise poise = target.GetComponent<EnemyPoise>();
+        if (poise == null)
+            poise = target.GetComponentInParent<EnemyPoise>();
+
+        return poise != null && poise.IsStunned;
+    }
+
     private void ExecuteOnCurrentTarget(SkillExecutionContext context)
     {
         CombatActor self = context.self;
@@ -62,13 +82,15 @@ public class DamageSkillDefinition : SkillDefinition
 
         int hits = Mathf.Max(1, hitCount + (context.skillUpgraded ? upgradedBonusHits : 0));
 
+        float multiplier = IsAfflicted(target) ? afflictedTargetMultiplier : 1f;
+
         int totalActual = 0;
         for (int i = 0; i < hits; i++)
         {
             if (target.currentHp <= 0)
                 break;
 
-            totalActual += DamageCalculator.Deal(new DamageRequest(self, target, perHit)).HpLoss;
+            totalActual += DamageCalculator.Deal(new DamageRequest(self, target, perHit, multiplier)).HpLoss;
         }
 
         if (context.report != null)

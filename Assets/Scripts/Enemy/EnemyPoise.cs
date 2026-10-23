@@ -17,12 +17,19 @@ public class EnemyPoise : MonoBehaviour
     public int CurrentPoise => currentPoise;
     public bool IsBroken => currentPoise <= 0;
     public bool IsStunned => pendingStunTurns > 0;
+    /// <summary>剩餘暈眩回合數（麻痺與韌性歸零共用）</summary>
+    public int StunTurns => pendingStunTurns;
 
     public event System.Action OnPoiseBroken; // 韌性剛好歸零那一刻觸發一次
+    public event System.Action OnStunChanged; // 暈眩回合數有變動時觸發（UI／特效用）
 
     private void Awake()
     {
         actor = GetComponent<CombatActor>();
+
+        // 暈眩的預設表現（變色、抖動、頭上特效）；想自訂就自己在 prefab 上掛 EnemyStunVisual
+        if (GetComponent<EnemyStunVisual>() == null)
+            gameObject.AddComponent<EnemyStunVisual>();
 
         maxPoise = Mathf.Max(1, maxPoise);
         currentPoise = Mathf.Clamp(currentPoise <= 0 ? maxPoise : currentPoise, 0, maxPoise);
@@ -63,6 +70,7 @@ public class EnemyPoise : MonoBehaviour
         {
             pendingStunTurns = stunTurnsOnBreak;
             restorePoiseAfterStun = true;
+            OnStunChanged?.Invoke();
 
             Debug.Log($"[韌性] {ActorName} 韌性歸零，進入暈眩 {pendingStunTurns} 回合");
             CombatUI.Instance?.AppendBattleLog($"{ActorName} 韌性歸零，陷入暈眩");
@@ -79,6 +87,7 @@ public class EnemyPoise : MonoBehaviour
             return;
 
         pendingStunTurns += turns;
+        OnStunChanged?.Invoke();
         Debug.Log($"[韌性] {ActorName} 被麻痺，暈眩 +{turns} 回合（目前 {pendingStunTurns}）");
         CombatUI.Instance?.AppendBattleLog($"{ActorName} 被麻痺，暈眩 {pendingStunTurns} 回合");
     }
@@ -89,6 +98,7 @@ public class EnemyPoise : MonoBehaviour
             return false;
 
         pendingStunTurns--;
+        OnStunChanged?.Invoke();
 
         Debug.Log($"[韌性] {ActorName} 因暈眩跳過行動，剩餘暈眩回合={pendingStunTurns}");
         CombatUI.Instance?.AppendBattleLog($"{ActorName} 暈眩，無法行動");

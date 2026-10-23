@@ -43,13 +43,28 @@ public class CombatActor : MonoBehaviour
     public IReadOnlyList<DebuffState> ActiveDebuffs => debuffs;
 
     private readonly List<IStatModifier> statModifiers = new List<IStatModifier>();
+    private int attackBuff;
 
-    // 有效攻擊／防禦 = 基礎數值 + 所有加成來源（技能升級、遺物…）。戰鬥結算一律用這兩個
+    /// <summary>戰鬥中累積的攻擊力強化（敵人的「強化」招式），戰鬥重置時歸零</summary>
+    public int AttackBuff => attackBuff;
+    public event Action<int> OnAttackBuffed;
+
+    public void AddAttackBuff(int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        attackBuff += amount;
+        Debug.Log($"[戰鬥] {actorId} 攻擊力強化 +{amount}（累計 +{attackBuff}）");
+        OnAttackBuffed?.Invoke(amount);
+    }
+
+    // 有效攻擊／防禦 = 基礎數值 + 戰鬥中的強化 + 所有加成來源（技能升級、遺物…）。戰鬥結算一律用這兩個
     public int EffectiveAttackPower
     {
         get
         {
-            int total = attackPower;
+            int total = attackPower + attackBuff;
             for (int i = 0; i < statModifiers.Count; i++)
                 total += statModifiers[i].AttackBonus;
             return Mathf.Max(0, total);
@@ -149,6 +164,7 @@ public class CombatActor : MonoBehaviour
         IsDead = false;
         currentHp = maxHp;
         shield = 0;
+        attackBuff = 0;
         debuffs.Clear();
         regens.Clear();
     }

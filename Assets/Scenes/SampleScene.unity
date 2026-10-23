@@ -10015,8 +10015,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 79980d0b95ba44968bc365b7e0e50656, type: 2}
   - {fileID: 11400000, guid: a75a11ccd37041abb03ef251958390f8, type: 2}
   - {fileID: 11400000, guid: de432f2dbd7645c7b01daab9b329b846, type: 2}
-  - {fileID: 11400000, guid: a4b87430c97e42158f4e22fe9c0a65c8, type: 2}
-  - {fileID: 11400000, guid: 228af8403f074496bee88b525746c45e, type: 2}
   _slotPrefab: {fileID: 7714621535712517, guid: a29e2d5e545840947ba1924c1476d00a, type: 3}
   _slotContainer: {fileID: 77525118}
   _resultText: {fileID: 1039712845}

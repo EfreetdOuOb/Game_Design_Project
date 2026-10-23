@@ -77,6 +77,10 @@ public class EnemyCombatAI : MonoBehaviour
 
         animationController.hitAnimationStateName = hitAnimationStateName;
         animationController.idleAnimationStateName = idleAnimationStateName;
+
+        // 強化招式的「閃光 + 跳字」表現（預設版本，不用改 prefab）
+        if (GetComponent<EnemyBuffFeedback>() == null)
+            gameObject.AddComponent<EnemyBuffFeedback>();
     }
 
     private void OnEnable()
@@ -238,8 +242,8 @@ public class EnemyCombatAI : MonoBehaviour
         yield return PlayActionAnimation(actionStep);
 
         int attackPowerIncrease = Mathf.Max(0, actionStep.attackPowerIncrease);
-        enemyActor.attackPower += attackPowerIncrease;
-        CombatUI.Instance?.AppendBattleLog($"{enemyActor.actorId} 強化攻擊力 +{attackPowerIncrease}（目前 {enemyActor.attackPower}）");
+        enemyActor.AddAttackBuff(attackPowerIncrease);
+        CombatUI.Instance?.AppendBattleLog($"{enemyActor.actorId} 強化攻擊力 +{attackPowerIncrease}（目前 {enemyActor.EffectiveAttackPower}）");
         yield return new WaitForSeconds(actionDelay);
     }
 
