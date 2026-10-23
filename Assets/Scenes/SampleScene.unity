@@ -8726,6 +8726,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1336919086}
   - component: {fileID: 1336919087}
+  - component: {fileID: 780000002}
+  - component: {fileID: 780000003}
   m_Layer: 5
   m_Name: Player
   m_TagString: Untagged
@@ -13944,3 +13946,31 @@ SceneRoots:
   - {fileID: 2120177152}
   - {fileID: 1843801305}
   - {fileID: 328496492}
+--- !u!114 &780000002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1336919085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c769cd4b27f4dd59a25854d5369cea1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IncomingDamageIndicator
+  _player: {fileID: 2124156217}
+  _hpBar: {fileID: 1787313716}
+--- !u!114 &780000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1336919085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a10f4a3c011248d6b6555b87914f26de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GoldHUD
+  _goldText: {fileID: 0}
+  _placeBelow: {fileID: 1787313715}

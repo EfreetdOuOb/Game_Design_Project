@@ -85,16 +85,52 @@ public class EnemyCombatAI : MonoBehaviour
             gameObject.AddComponent<EnemyBuffFeedback>();
     }
 
+    private static readonly List<EnemyCombatAI> ActiveEnemies = new List<EnemyCombatAI>();
+
+    /// <summary>目前啟用中的敵人（UI 預告傷害用，免得每幀去 Find）</summary>
+    public static IReadOnlyList<EnemyCombatAI> Active => ActiveEnemies;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        ActiveEnemies.Clear();
+    }
+
     private void OnEnable()
     {
+        ActiveEnemies.Add(this);
+
         if (TurnManager.Instance != null)
             TurnManager.Instance.OnPlayerTurnStart += HandlePlayerTurnStart;
     }
 
     private void OnDisable()
     {
+        ActiveEnemies.Remove(this);
+
         if (TurnManager.Instance != null)
             TurnManager.Instance.OnPlayerTurnStart -= HandlePlayerTurnStart;
+    }
+
+    /// <summary>
+    /// 預告：這個敵人這回合出手會對玩家造成多少傷害（吃完虛弱、易傷等倍率，還沒扣護盾）。
+    /// 暈眩中、無法行動、或這招不是攻擊類就回傳 0。
+    /// </summary>
+    public int PreviewDamageToPlayer()
+    {
+        if (!CanAct() || (enemyPoise != null && enemyPoise.IsStunned))
+            return 0;
+
+        EnemyActionStep step = GetCurrentAction();
+        if (step.actionType != EnemyActionType.Attack
+            && step.actionType != EnemyActionType.HeavyAttack
+            && step.actionType != EnemyActionType.Combo)
+            return 0;
+
+        int perHit = DamageCalculator.Calculate(new DamageRequest(
+            enemyActor, playerActor, enemyActor.EffectiveAttackPower, Mathf.Max(0f, step.damageMultiplier)));
+
+        return perHit * Mathf.Max(1, step.hitCount);
     }
 
     // 防禦動作要在玩家出手之前生效，所以在玩家回合開始時先套用當前序列動作。

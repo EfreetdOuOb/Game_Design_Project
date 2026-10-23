@@ -59,18 +59,31 @@ public readonly struct DamageResult
 /// </summary>
 public static class DamageCalculator
 {
-    public static DamageResult Deal(DamageRequest request)
+    /// <summary>
+    /// 只算「吃完所有倍率、還沒扣護盾」的傷害，不會扣血也不會動護盾。
+    /// 給預告類的 UI（敵人即將造成的傷害）用，保證預告和實際結算用同一套公式。
+    /// </summary>
+    public static int Calculate(DamageRequest request)
     {
         CombatActor target = request.target;
         if (target == null || target.IsDead)
-            return default;
+            return 0;
 
         float amount = request.baseAmount * request.multiplier;
         if (request.source != null)
             amount *= request.source.GetOutgoingDamageMultiplier();
         amount *= target.GetDamageMultiplierFromDebuffs();
 
-        int calculated = Mathf.Max(0, Mathf.RoundToInt(amount));
+        return Mathf.Max(0, Mathf.RoundToInt(amount));
+    }
+
+    public static DamageResult Deal(DamageRequest request)
+    {
+        CombatActor target = request.target;
+        if (target == null || target.IsDead)
+            return default;
+
+        int calculated = Calculate(request);
 
         bool ignoreShield = (request.flags & DamageFlags.IgnoreShield) != 0;
         int absorbed = ignoreShield ? 0 : target.AbsorbWithShield(calculated);

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+// 要比 CombatActor 早訂閱 OnTurnCleanup：炸彈引爆（吃玩家剩下的護盾）在護盾清零之前。
+// 不固定的話，Unity 各物件 Start 的先後不一定，護盾能不能擋炸彈會變成隨機。
+[DefaultExecutionOrder(-100)]
 public class BattleBombManager : MonoBehaviour
 {
     public static BattleBombManager Instance { get; private set; }
@@ -212,6 +215,32 @@ public class BattleBombManager : MonoBehaviour
         }
 
         OnBombsConsumedForDamage?.Invoke(bombCount, totalDamage, targetEnemy);
+    }
+
+    /// <summary>
+    /// 預告：這回合結算時會引爆的炸彈，對 target 造成的傷害總和（吃完遺物與易傷等倍率，還沒扣護盾）。
+    /// 規則和 ResolveTurn 一致：本回合被碰到的炸彈先延緩，再倒數 1。
+    /// </summary>
+    public int PreviewTimerDetonationDamage(CombatActor target)
+    {
+        if (target == null)
+            return 0;
+
+        int total = 0;
+        foreach (BombState bomb in activeBombs.Values)
+        {
+            int remaining = bomb.remainingTurns + (bomb.touchedThisTurn ? delayAmountOnTouch : 0) - 1;
+            if (remaining > 0)
+                continue;
+
+            int damage = RelicManager.Instance != null
+                ? RelicManager.Instance.ApplyBombDamageModifiers(damageOnTimerDetonate)
+                : damageOnTimerDetonate;
+
+            total += DamageCalculator.Calculate(new DamageRequest(null, target, damage));
+        }
+
+        return total;
     }
 
     public bool HasBombAt(int pointId) => activeBombs.ContainsKey(pointId);
