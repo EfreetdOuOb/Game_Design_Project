@@ -90,11 +90,11 @@ public class CombatUI : MonoBehaviour
         if (hpText != null)
             hpText.text = $"血量：{actor.currentHp}/{actor.maxHp}";
         if (attackText != null)
-            attackText.text = $"攻擊：{actor.attackPower}";
+            attackText.text = $"攻擊：{actor.EffectiveAttackPower}";
         if (defenseText != null)
-            defenseText.text = $"防禦：{actor.defensePower}";
+            defenseText.text = $"防禦：{actor.EffectiveDefensePower}";
         if (tempDefenseText != null)
-            tempDefenseText.text = $"暫時防禦：{actor.temporaryDefenseBonus}";
+            tempDefenseText.text = $"護盾：{actor.shield}";
     }
 
     private void RefreshSkillUI()

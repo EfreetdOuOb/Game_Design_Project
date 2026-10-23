@@ -183,12 +183,10 @@ public class BattleBombManager : MonoBehaviour
             : damageOnTimerDetonate;
 
         Debug.Log($"[炸彈] pointId={bomb.pointId} 倒數結束，引爆！（基礎傷害={damageOnTimerDetonate}，遺物加成後={finalDamage}）");
-        CombatUI.Instance?.AppendBattleLog($"炸彈引爆，造成 {finalDamage} 傷害");
-
-        if (playerActor != null)
-        {
-            playerActor.ReceiveDamage(finalDamage);
-        }
+        int actualDamage = playerActor != null
+            ? DamageCalculator.Deal(new DamageRequest(null, playerActor, finalDamage)).HpLoss
+            : 0;
+        CombatUI.Instance?.AppendBattleLog($"炸彈引爆，造成 {actualDamage} 傷害");
 
         OnBombDetonatedByTimer?.Invoke(bomb.pointId);
     }
@@ -208,7 +206,7 @@ public class BattleBombManager : MonoBehaviour
 
         if (targetEnemy != null)
         {
-            int actualDamage = targetEnemy.ReceiveDamage(totalDamage);
+            int actualDamage = DamageCalculator.Deal(new DamageRequest(null, targetEnemy, totalDamage)).HpLoss;
             Debug.Log($"[炸彈] 敵人暈眩，消耗 {bombCount} 顆未爆炸彈，造成 {actualDamage} 傷害");
             CombatUI.Instance?.AppendBattleLog($"{targetEnemy.actorId} 暈眩，{bombCount} 顆未爆炸彈反打造成 {actualDamage} 傷害");
         }

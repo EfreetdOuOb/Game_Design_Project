@@ -7757,6 +7757,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f410480238ac091438d2e031e7a18368, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2124156214}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f410480238ac091438d2e031e7a18368, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 780000001}
   m_SourcePrefab: {fileID: 100100000, guid: f410480238ac091438d2e031e7a18368, type: 3}
 --- !u!1 &1130164799
 GameObject:
@@ -13011,7 +13014,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CombatActor
   actorId: Player
   maxHp: 100
-  attackPower: 5
+  attackPower: 12
   defensePower: 5
   currentHp: 100
   temporaryDefenseBonus: 0
@@ -13034,13 +13037,22 @@ MonoBehaviour:
   skillLibrary: {fileID: 520664341}
   skillSlotProviderBehaviour: {fileID: 362660907}
   playerAnimator: {fileID: 2124156216}
-  baseAttackDamage: 12
-  defenseBonusPerPoint: 10
   enableSummaryLog: 1
-  scaleAttackWithActorPower: 0
-  attackUpgradeBonusDamage: 5
-  defenseUpgradeBonusPerPoint: 5
   attackPointsPerPoiseDamage: 3
+--- !u!114 &780000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2124156212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79e1af5e842419e8b0f8c8a0926c0b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerUpgradeStatModifier
+  _attackUpgradeBonus: 5
+  _defenseUpgradeBonus: 2
 --- !u!95 &2124156219 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: f410480238ac091438d2e031e7a18368, type: 3}

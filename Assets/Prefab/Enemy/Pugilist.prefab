@@ -1308,7 +1308,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCombatAI
   enemyActor: {fileID: 5701139608961779145}
   playerActor: {fileID: 0}
-  defendBonus: 5
   actionDelay: 0.2
   attackAnimationStateName: "\u653B\u64CA"
   hitAnimationStateName: "\u53D7\u64CA"

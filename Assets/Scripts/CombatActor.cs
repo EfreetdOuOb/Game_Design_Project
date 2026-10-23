@@ -28,7 +28,9 @@ public class CombatActor : MonoBehaviour
 
     [Header("Runtime")]
     public int currentHp = 100;
-    public int temporaryDefenseBonus = 0;
+    [Tooltip("護盾：先吸收傷害並被扣掉，回合清算時歸零")]
+    [UnityEngine.Serialization.FormerlySerializedAs("temporaryDefenseBonus")]
+    public int shield = 0;
     [SerializeField] private List<DebuffState> debuffs = new List<DebuffState>();
     private readonly List<RegenState> regens = new List<RegenState>();
 
@@ -39,6 +41,42 @@ public class CombatActor : MonoBehaviour
     [SerializeField] private float weakMinMultiplier = 0.2f;
 
     public IReadOnlyList<DebuffState> ActiveDebuffs => debuffs;
+
+    private readonly List<IStatModifier> statModifiers = new List<IStatModifier>();
+
+    // 有效攻擊／防禦 = 基礎數值 + 所有加成來源（技能升級、遺物…）。戰鬥結算一律用這兩個
+    public int EffectiveAttackPower
+    {
+        get
+        {
+            int total = attackPower;
+            for (int i = 0; i < statModifiers.Count; i++)
+                total += statModifiers[i].AttackBonus;
+            return Mathf.Max(0, total);
+        }
+    }
+
+    public int EffectiveDefensePower
+    {
+        get
+        {
+            int total = defensePower;
+            for (int i = 0; i < statModifiers.Count; i++)
+                total += statModifiers[i].DefenseBonus;
+            return Mathf.Max(0, total);
+        }
+    }
+
+    public void AddStatModifier(IStatModifier modifier)
+    {
+        if (modifier != null && !statModifiers.Contains(modifier))
+            statModifiers.Add(modifier);
+    }
+
+    public void RemoveStatModifier(IStatModifier modifier)
+    {
+        statModifiers.Remove(modifier);
+    }
 
     public event Action OnDeath;
     public event Action<int> OnDamaged;
@@ -74,28 +112,35 @@ public class CombatActor : MonoBehaviour
         }
     }
 
-    public int ReceiveDamage(int rawDamage)
+    /// <summary>
+    /// 直接扣血並處理受傷／死亡事件，不做任何傷害計算。
+    /// 只給 <see cref="DamageCalculator"/> 呼叫；要傷害一個角色請走 DamageCalculator.Deal。
+    /// </summary>
+    public int ApplyHpLoss(int amount)
     {
         if (IsDead)
-        {
             return 0;
-        }
 
-        float damageMultiplier = GetDamageMultiplierFromDebuffs();
-        int adjustedDamage = Mathf.RoundToInt(rawDamage * damageMultiplier);
-        int reduced = Mathf.Max(0, adjustedDamage - temporaryDefenseBonus);
-        currentHp = Mathf.Max(0, currentHp - reduced);
-        Debug.Log($"[戰鬥] {actorId} 受到 {reduced} 傷害（原始={rawDamage}，倍率={damageMultiplier:F2}），HP={currentHp}/{maxHp}");
-        CombatUI.Instance?.AppendBattleLog($"{actorId} 受到 {reduced} 傷害，HP {currentHp}/{maxHp}");
-        if (reduced > 0 && currentHp > 0)
-            OnDamaged?.Invoke(reduced);
+        int loss = Mathf.Max(0, amount);
+        currentHp = Mathf.Max(0, currentHp - loss);
+        if (loss > 0 && currentHp > 0)
+            OnDamaged?.Invoke(loss);
 
         if (currentHp <= 0)
-        {
             MarkDead();
-        }
 
-        return reduced;
+        return loss;
+    }
+
+    /// <summary>
+    /// 護盾先吸收傷害，被吸收的部分會從護盾扣掉；回傳實際吸收量。
+    /// 只給 <see cref="DamageCalculator"/> 呼叫。
+    /// </summary>
+    public int AbsorbWithShield(int damage)
+    {
+        int absorbed = Mathf.Clamp(damage, 0, shield);
+        shield -= absorbed;
+        return absorbed;
     }
 
     public void ResetToDefaultStats()
@@ -103,12 +148,12 @@ public class CombatActor : MonoBehaviour
         gameObject.SetActive(true);
         IsDead = false;
         currentHp = maxHp;
-        temporaryDefenseBonus = 0;
+        shield = 0;
         debuffs.Clear();
         regens.Clear();
     }
 
-    // 虛弱：降低這個角色「造成」的傷害。傷害來源端要自己乘上這個倍率。
+    // 虛弱：降低這個角色「造成」的傷害。由 DamageCalculator 統一乘上。
     public float GetOutgoingDamageMultiplier()
     {
         int weakStacks = GetDebuffStacks(WeakDebuffId);
@@ -166,16 +211,16 @@ public class CombatActor : MonoBehaviour
         return actual;
     }
 
-    public void AddTemporaryDefense(int amount)
+    public void AddShield(int amount)
     {
-        temporaryDefenseBonus += Mathf.Max(0, amount);
-        Debug.Log($"[戰鬥] {actorId} 防禦加成 +{amount}，目前總加成={temporaryDefenseBonus}");
+        shield += Mathf.Max(0, amount);
+        Debug.Log($"[戰鬥] {actorId} 護盾 +{amount}，目前護盾={shield}");
     }
 
     private void ClearRoundDefense()
     {
-        temporaryDefenseBonus = 0;
-        Debug.Log($"[回合清算] {actorId} 防禦加成已清除");
+        shield = 0;
+        Debug.Log($"[回合清算] {actorId} 護盾已清除");
     }
 
     public void ApplyDebuff(string debuffId, int stacks, int durationTurns)

@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// 記錄本局哪些技能已經升過級（每個技能只能升一次）。
-/// 這裡只是一個「旗標倉庫」——實際升級後效果怎麼變，是寫在各技能資產／效果資產／GestureCombatActionHandler 裡，
+/// 這裡只是一個「旗標倉庫」——實際升級後效果怎麼變，是寫在各技能資產／效果資產／PlayerUpgradeStatModifier（攻擊、防禦強化）裡，
 /// 由它們自己去問「我升級了嗎」，SkillUpgradeManager 不認識任何戰鬥細節。
 /// 比照 RelicManager 的單例風格，RestartRun 時重置。
 /// </summary>

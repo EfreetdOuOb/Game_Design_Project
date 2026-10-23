@@ -1247,7 +1247,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyCombatAI
   enemyActor: {fileID: 6551404219302457835}
   playerActor: {fileID: 0}
-  defendBonus: 7
   actionDelay: 0.4
   attackAnimationStateName: "\u653B\u64CA"
   hitAnimationStateName: "\u53D7\u64CA"
@@ -1374,7 +1373,7 @@ MonoBehaviour:
   actorId: Actor
   maxHp: 100
   attackPower: 30
-  defensePower: 8
+  defensePower: 14
   currentHp: 100
   temporaryDefenseBonus: 0
   weakReductionPerStack: 0.2

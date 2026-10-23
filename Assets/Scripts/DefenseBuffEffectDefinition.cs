@@ -12,7 +12,7 @@ public class DefenseBuffEffectDefinition : SkillEffectDefinition
             return;
         }
 
-        context.self.AddTemporaryDefense(defenseBonus);
+        context.self.AddShield(defenseBonus);
         if (context.report != null)
         {
             context.report.totalDefenseAdded += defenseBonus;

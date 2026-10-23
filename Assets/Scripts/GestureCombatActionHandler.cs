@@ -1,6 +1,11 @@
 using System.Text;
 using UnityEngine;
 
+/// <summary>
+/// 法陣手勢 → 戰鬥的轉接器：只負責「回報」玩家畫了幾個攻擊／防禦／技能點，
+/// 並把它們翻譯成對 <see cref="CombatActionResolver"/> 的呼叫。
+/// 傷害與防禦的數值不在這裡，一律由 <see cref="CombatActor"/> 的攻擊力／防禦力決定（和敵人同一套基準）。
+/// </summary>
 public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
 {
     [Header("Dependencies")]
@@ -11,16 +16,7 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
     public PlayerAnimator playerAnimator;
 
     [Header("Tuning")]
-    public int baseAttackDamage = 15;
-    public int defenseBonusPerPoint = 10;
     public bool enableSummaryLog = true;
-    public bool scaleAttackWithActorPower = false;
-
-    [Header("升級加成（休息點冥想）")]
-    [Tooltip("攻擊升級後，每次攻擊額外增加的傷害")]
-    public int attackUpgradeBonusDamage = 5;
-    [Tooltip("防禦升級後，每個防禦點額外增加的防禦值")]
-    public int defenseUpgradeBonusPerPoint = 5;
 
     [Header("Poise")]
     [SerializeField] private int attackPointsPerPoiseDamage = 3;
@@ -172,26 +168,14 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
         if (target == null || target.currentHp <= 0 || attackCount <= 0)
             return 0;
 
-        bool attackUpgraded = SkillUpgradeManager.Instance != null
-            && SkillUpgradeManager.Instance.IsUpgraded(SkillUpgradeManager.AttackUpgradeId);
-
+        // 一個攻擊點 = 出手一次；傷害多少完全由 self 的攻擊力決定
         int totalDamage = 0;
         for (int i = 0; i < attackCount; i++)
         {
             if (target == null || target.currentHp <= 0)
                 break;
 
-            int rawDamage = baseAttackDamage;
-            if (attackUpgraded)
-                rawDamage += attackUpgradeBonusDamage;
-            if (scaleAttackWithActorPower && self != null)
-                rawDamage += self.attackPower;
-
-            if (self != null)
-                rawDamage = Mathf.RoundToInt(rawDamage * self.GetOutgoingDamageMultiplier());
-
-            int actualDamage = target.ReceiveDamage(rawDamage);
-            totalDamage += actualDamage;
+            totalDamage += CombatActionResolver.Strike(self, target).HpLoss;
         }
 
         return totalDamage;
@@ -248,19 +232,8 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
 
     private int ExecuteDefense(int defenseCount)
     {
-        if (self == null || defenseCount <= 0)
-            return 0;
-
-        int perPoint = defenseBonusPerPoint;
-        if (SkillUpgradeManager.Instance != null
-            && SkillUpgradeManager.Instance.IsUpgraded(SkillUpgradeManager.DefenseUpgradeId))
-        {
-            perPoint += defenseUpgradeBonusPerPoint;
-        }
-
-        int totalDefense = defenseCount * perPoint;
-        self.AddTemporaryDefense(totalDefense);
-        return totalDefense;
+        // 一個防禦點 = 防守一次；防禦值多少完全由 self 的防禦力決定
+        return CombatActionResolver.Defend(self, defenseCount);
     }
 
     private SkillExecutionReport ExecuteSkill(GestureResult result, int skillCount)

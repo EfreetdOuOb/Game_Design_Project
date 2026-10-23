@@ -25,12 +25,7 @@ public class DamageEffectDefinition : SkillEffectDefinition
         int perHit = baseDamage + (context.skillUpgraded ? upgradedBonusDamage : 0);
         if (scaleWithAttackPower && context.self != null)
         {
-            perHit += context.self.attackPower;
-        }
-
-        if (context.self != null)
-        {
-            perHit = Mathf.RoundToInt(perHit * context.self.GetOutgoingDamageMultiplier());
+            perHit += context.self.EffectiveAttackPower;
         }
 
         int hits = Mathf.Max(1, hitCount + (context.skillUpgraded ? upgradedBonusHits : 0));
@@ -41,7 +36,7 @@ public class DamageEffectDefinition : SkillEffectDefinition
             if (context.target == null || context.target.currentHp <= 0)
                 break;
 
-            totalActual += context.target.ReceiveDamage(perHit);
+            totalActual += DamageCalculator.Deal(new DamageRequest(context.self, context.target, perHit)).HpLoss;
         }
 
         if (context.report != null)

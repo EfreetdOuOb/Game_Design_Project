@@ -58,10 +58,7 @@ public class DamageSkillDefinition : SkillDefinition
 
         int perHit = damage + (context.skillUpgraded ? upgradedBonusDamage : 0);
         if (scaleWithCasterAttackPower && self != null)
-            perHit += self.attackPower;
-
-        if (self != null)
-            perHit = Mathf.RoundToInt(perHit * self.GetOutgoingDamageMultiplier());
+            perHit += self.EffectiveAttackPower;
 
         int hits = Mathf.Max(1, hitCount + (context.skillUpgraded ? upgradedBonusHits : 0));
 
@@ -71,7 +68,7 @@ public class DamageSkillDefinition : SkillDefinition
             if (target.currentHp <= 0)
                 break;
 
-            totalActual += target.ReceiveDamage(perHit);
+            totalActual += DamageCalculator.Deal(new DamageRequest(self, target, perHit)).HpLoss;
         }
 
         if (context.report != null)
