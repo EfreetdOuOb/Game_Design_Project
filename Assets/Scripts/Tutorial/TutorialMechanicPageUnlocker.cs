@@ -1,25 +1,17 @@
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TutorialMechanicPageUnlocker : MonoBehaviour
 {
-    private static readonly System.Collections.Generic.HashSet<string> ResetBooksThisSession = new System.Collections.Generic.HashSet<string>();
-
-    [Serializable]
-    public class TutorialPageEntry
-    {
-        public string pageId;
-        public GameObject pageRoot;
-    }
+    private const string BombPageId = "bomb";
+    private static readonly HashSet<string> ResetBooksThisSession = new HashSet<string>();
 
     [Header("教學書")]
     [SerializeField] private TutorialReplayPanel _tutorialPanel;
-    [SerializeField] private TutorialPageEntry[] _pages;
+    [Tooltip("填入 TutorialReplayPanel 大頁設定的 pageId。")]
+    [SerializeField] private string[] _unlockablePageIds;
     [SerializeField] private string _saveKey = "MainTutorialBook";
     [SerializeField] private bool _resetRecordsOnStartupForTesting;
-
-    [Header("炸彈首次出現")]
-    [SerializeField] private string _bombPageId = "bomb";
 
     private BattleBombManager _subscribedBombManager;
 
@@ -37,7 +29,7 @@ public class TutorialMechanicPageUnlocker : MonoBehaviour
     private void Start()
     {
         ResetRecordsIfTestingEnabled();
-        RegisterPreviouslyUnlockedPages();
+        ApplySavedUnlockStates();
         TrySubscribeToBombManager();
     }
 
@@ -51,17 +43,15 @@ public class TutorialMechanicPageUnlocker : MonoBehaviour
 
     public bool UnlockPage(string pageId)
     {
-        if (_tutorialPanel == null || !TryGetPage(pageId, out GameObject page))
+        if (_tutorialPanel == null || string.IsNullOrWhiteSpace(pageId))
             return false;
 
         string preferenceKey = GetPreferenceKey(pageId);
-        if (PlayerPrefs.GetInt(preferenceKey, 0) == 1)
-        {
-            _tutorialPanel.RegisterPage(pageId, page, false, false);
+        bool alreadyUnlocked = PlayerPrefs.GetInt(preferenceKey, 0) == 1;
+        if (!SetBigPageUnlocked(pageId, true, !alreadyUnlocked))
             return false;
-        }
 
-        if (!_tutorialPanel.RegisterPage(pageId, page))
+        if (alreadyUnlocked)
             return false;
 
         PlayerPrefs.SetInt(preferenceKey, 1);
@@ -80,22 +70,22 @@ public class TutorialMechanicPageUnlocker : MonoBehaviour
 
     private void HandleBombRegistered(int pointId, int remainingTurns)
     {
-        UnlockPage(_bombPageId);
+        UnlockPage(BombPageId);
     }
 
-    private void RegisterPreviouslyUnlockedPages()
+    private void ApplySavedUnlockStates()
     {
-        if (_tutorialPanel == null || _pages == null)
+        if (_tutorialPanel == null || _unlockablePageIds == null)
             return;
 
-        for (int i = 0; i < _pages.Length; i++)
+        for (int i = 0; i < _unlockablePageIds.Length; i++)
         {
-            TutorialPageEntry entry = _pages[i];
-            if (entry == null || string.IsNullOrWhiteSpace(entry.pageId) || entry.pageRoot == null)
+            string pageId = _unlockablePageIds[i];
+            if (string.IsNullOrWhiteSpace(pageId))
                 continue;
 
-            if (PlayerPrefs.GetInt(GetPreferenceKey(entry.pageId), 0) == 1)
-                _tutorialPanel.RegisterPage(entry.pageId, entry.pageRoot, false, false);
+            bool isUnlocked = PlayerPrefs.GetInt(GetPreferenceKey(pageId), 0) == 1;
+            SetBigPageUnlocked(pageId, isUnlocked);
         }
     }
 
@@ -104,13 +94,13 @@ public class TutorialMechanicPageUnlocker : MonoBehaviour
         if (!_resetRecordsOnStartupForTesting || !ResetBooksThisSession.Add(GetBookKey()))
             return;
 
-        if (_pages != null)
+        if (_unlockablePageIds != null)
         {
-            for (int i = 0; i < _pages.Length; i++)
+            for (int i = 0; i < _unlockablePageIds.Length; i++)
             {
-                TutorialPageEntry entry = _pages[i];
-                if (entry != null && !string.IsNullOrWhiteSpace(entry.pageId))
-                    PlayerPrefs.DeleteKey(GetPreferenceKey(entry.pageId));
+                string pageId = _unlockablePageIds[i];
+                if (!string.IsNullOrWhiteSpace(pageId))
+                    PlayerPrefs.DeleteKey(GetPreferenceKey(pageId));
             }
         }
 
@@ -120,23 +110,16 @@ public class TutorialMechanicPageUnlocker : MonoBehaviour
             PlayerPrefs.Save();
     }
 
-    private bool TryGetPage(string pageId, out GameObject page)
+    private bool SetBigPageUnlocked(string pageId, bool unlocked, bool showUnreadNotification = false)
     {
-        page = null;
-        if (string.IsNullOrWhiteSpace(pageId) || _pages == null)
+        if (_tutorialPanel == null)
             return false;
 
-        for (int i = 0; i < _pages.Length; i++)
-        {
-            TutorialPageEntry entry = _pages[i];
-            if (entry == null || entry.pageId != pageId || entry.pageRoot == null)
-                continue;
+        bool updated = _tutorialPanel.SetBigPageUnlocked(pageId, unlocked, showUnreadNotification);
+        if (!updated)
+            Debug.LogWarning($"Tutorial page '{pageId}' is not configured in TutorialReplayPanel big pages.", this);
 
-            page = entry.pageRoot;
-            return true;
-        }
-
-        return false;
+        return updated;
     }
 
     private string GetPreferenceKey(string pageId)
