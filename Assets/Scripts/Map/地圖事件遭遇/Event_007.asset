@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EventDefinition
   contentId: 007
   eventText: "\u6700\u5049\u5927\u7684\u62F3\u9B25\u58EB\uFF0C\u4ED6\u5011\u6703\u5728\u6230\u9B25\u4E2D\u4E0D\u65B7\u8B8A\u5F37\uFF0C\u60F3\u6230\u52DD\u4ED6\u7684\u8A71\uFF0C\u6216\u8A31\u901F\u6230\u901F\u6C7A\u662F\u4E00\u500B\u597D\u7684\u9078\u64C7"
-  icon: {fileID: 0}
+  icon: {fileID: 1103729600, guid: 12a3f90a5f191f347978d03b6b3a6d6c, type: 3}
