@@ -388,16 +388,16 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2408328776014687048}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.009875907, y: 0.009875907, z: 0.009875907}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 3319355602309022119}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.051, y: 0.2642}
-  m_SizeDelta: {x: 2.2759, y: 0.3845}
+  m_AnchoredPosition: {x: 0.03, y: 0.28}
+  m_SizeDelta: {x: 244.5667, y: 37.8404}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &4543487901669323822
 MonoBehaviour:
@@ -1248,6 +1248,7 @@ MonoBehaviour:
   enemyActor: {fileID: 6551404219302457835}
   playerActor: {fileID: 0}
   actionDelay: 0.4
+  stunBeatDuration: 1
   attackAnimationStateName: "\u653B\u64CA"
   hitAnimationStateName: "\u53D7\u64CA"
   idleAnimationStateName: idle
@@ -1267,6 +1268,8 @@ MonoBehaviour:
     intentIcon: {fileID: 157939724132707781}
     healAmount: 0
     attackPowerIncrease: 0
+    damageMultiplier: 1
+    hitCount: 1
   canPlaceBomb: 1
   bombPlacementChance: 0.5
   bombInitialTurns: 3
@@ -1323,7 +1326,7 @@ MonoBehaviour:
   attackIntent: {fileID: 7465520923296362012}
   protectIntent: {fileID: 157939724132707781}
   debuffContainer: {fileID: 6625112883710793123}
-  debuffSlotPrefab: {fileID: 2414760941145028645, guid: 0d152a7182ebe384995ec52a3d4267cc, type: 3}
+  debuffSlotPrefab: {fileID: 5477580273698351961, guid: 7add07ebf0ccbf249bf02a2308eee8f1, type: 3}
   debuffSprites:
   - debuffId: Vulnerable
     sprite: {fileID: -1708121119, guid: 6049020b2cab69f4e816d272cdf7a150, type: 3}
