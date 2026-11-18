@@ -17,7 +17,7 @@ public class MapNodeEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     [Header("可點提示")]
     [Tooltip("選填：自己的光圈圖。留空使用程式畫的圓環。")]
     [SerializeField] private Sprite _ringSprite;
-    [SerializeField] private Color _ringColor = new Color(1f, 0.9f, 0.45f, 1f);
+    [SerializeField] private Color _ringColor = new Color(0.78f, 0.16f, 0.12f, 1f);
     [Tooltip("光圈擴散一輪需要的秒數")]
     [SerializeField, Min(0.1f)] private float _pulseSeconds = 1.3f;
     [SerializeField, Min(1f)] private float _ringMaxScale = 1.45f;
