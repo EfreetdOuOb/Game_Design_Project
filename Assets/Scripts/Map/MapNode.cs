@@ -13,6 +13,13 @@ public class MapNode : MonoBehaviour
     public bool isUnlocked;
     public bool isCompleted;
 
+    private void Awake()
+    {
+        // 可點提示、完成標記、名稱提示都由這個元件負責（預設版本，不用改 prefab）
+        if (GetComponent<MapNodeEffects>() == null)
+            gameObject.AddComponent<MapNodeEffects>();
+    }
+
     public void SetMapNodeType(MapNodeData mapNodeData)
     {
         layerIndex = mapNodeData.layerIndex;

@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,9 +13,44 @@ public class MapController : MonoBehaviour
     [SerializeField] private RectTransform _mapNodeParentRect;
     [SerializeField] private GameObject _mapPanel;
 
+    [Header("進度提示")]
+    [Tooltip("還沒走、也還不能選的連線")]
+    [SerializeField] private Color _lineIdleColor = new Color(0f, 0f, 0f, 0.75f);
+    [Tooltip("已經走完第一步、現在可以選的連線（下一步的選項）")]
+    [SerializeField] private Color _lineAvailableColor = new Color(1f, 1f, 1f, 0.9f);
+    [Tooltip("已經走過的路")]
+    [SerializeField] private Color _lineTraveledColor = new Color(1f, 0.82f, 0.3f, 1f);
+    [SerializeField, Min(1f)] private float _availableLineThickness = 1.3f;
+    [SerializeField, Min(1f)] private float _traveledLineThickness = 1.8f;
+
+    [Header("自動捲動")]
+    [Tooltip("打開地圖時，自動把畫面捲到目前進度的位置")]
+    [SerializeField] private bool _autoFocusProgress = true;
+    [SerializeField, Min(0f)] private float _focusDuration = 0.6f;
+
     private MapGraphData _mapGraphData;
     private MapNode[][] _mapNodeArray;
     private MapProgressData _progress;
+    private readonly List<MapLineView> _lineViews = new List<MapLineView>();
+    private Tween _focusTween;
+
+    private enum LineState
+    {
+        Idle,       // 還沒走
+        Available,  // 下一步可以選的路
+        Traveled    // 已走過
+    }
+
+    private class MapLineView
+    {
+        public Image image;
+        public RectTransform rect;
+        public float baseThickness;
+        public int fromLayer;
+        public int fromNode;
+        public int toLayer;
+        public int toNode;
+    }
 
     private void Start()
     {
@@ -27,6 +64,7 @@ public class MapController : MonoBehaviour
         SetView();
         CreateMapView();
         SetNodeLines();
+        MapNodeTooltip.Create(_mapNodeParentRect);
         InitializeProgress();
         RefreshNodeStates();
         ResetScrollPosition();
@@ -54,6 +92,8 @@ public class MapController : MonoBehaviour
         _mapNodeArray = null;
         _mapGraphData = null;
         _progress = null;
+        _lineViews.Clear();
+        _focusTween?.Kill();
     }
 
     private void GenerateMapData()
@@ -195,6 +235,18 @@ public class MapController : MonoBehaviour
                     // 會蓋住節點按鈕。連線本來就該畫在節點下面，所以固定移到最前面的 sibling。
                     nodeLine.transform.SetAsFirstSibling();
                     SetNodeLinePosition(nodeLine, startPosition, endPosition);
+
+                    RectTransform lineRect = nodeLine.GetComponent<RectTransform>();
+                    _lineViews.Add(new MapLineView
+                    {
+                        image = nodeLine.GetComponent<Image>(),
+                        rect = lineRect,
+                        baseThickness = lineRect.sizeDelta.y,
+                        fromLayer = i,
+                        fromNode = j,
+                        toLayer = i + 1,
+                        toNode = nextIndex
+                    });
                 }
             }
         }
@@ -250,6 +302,8 @@ public class MapController : MonoBehaviour
                 _mapNodeArray[i][j].SetState(unlocked, completed);
             }
         }
+
+        RefreshLineStates();
     }
 
     private void OnNodeClicked(int layerIndex, int nodeIndex)
@@ -307,6 +361,8 @@ public class MapController : MonoBehaviour
     {
         if (_mapPanel != null)
             _mapPanel.SetActive(true);
+
+        FocusProgress();
     }
 
     public void CloseMap()
@@ -317,8 +373,14 @@ public class MapController : MonoBehaviour
 
     public void ToggleMap()
     {
-        if (_mapPanel != null)
-            _mapPanel.SetActive(!_mapPanel.activeSelf);
+        if (_mapPanel == null)
+            return;
+
+        bool opening = !_mapPanel.activeSelf;
+        _mapPanel.SetActive(opening);
+
+        if (opening)
+            FocusProgress();
     }
 
     // 節點面板呼叫「觀看當前地圖」時，暫時關閉節點按鈕互動，
@@ -343,6 +405,148 @@ public class MapController : MonoBehaviour
                     node._button.interactable = false;
             }
         }
+    }
+
+    // ---- 進度提示 ----
+
+    // 依目前進度替每一條連線上色：走過的亮金色加粗、下一步的選項偏白、其餘維持暗色
+    private void RefreshLineStates()
+    {
+        if (_progress == null)
+            return;
+
+        for (int i = 0; i < _lineViews.Count; i++)
+        {
+            MapLineView line = _lineViews[i];
+            if (line.image == null)
+                continue;
+
+            LineState state = GetLineState(line);
+            Color color = state == LineState.Traveled ? _lineTraveledColor
+                : state == LineState.Available ? _lineAvailableColor
+                : _lineIdleColor;
+            float thickness = state == LineState.Traveled ? _traveledLineThickness
+                : state == LineState.Available ? _availableLineThickness
+                : 1f;
+
+            line.image.color = color;
+            Vector2 size = line.rect.sizeDelta;
+            size.y = line.baseThickness * thickness;
+            line.rect.sizeDelta = size;
+        }
+    }
+
+    private LineState GetLineState(MapLineView line)
+    {
+        bool fromDone = _progress.completedNodes.Contains(_progress.GetKey(line.fromLayer, line.fromNode));
+        if (!fromDone)
+            return LineState.Idle;
+
+        string toKey = _progress.GetKey(line.toLayer, line.toNode);
+        bool toDone = _progress.completedNodes.Contains(toKey);
+        bool toInProgress = _progress.currentLayer == line.toLayer && _progress.currentNodeIndex == line.toNode;
+        if (toDone || toInProgress)
+            return LineState.Traveled;
+
+        return _progress.unlockedNodes.Contains(toKey) ? LineState.Available : LineState.Idle;
+    }
+
+    // 把畫面捲到「目前進度」：還沒完成的可選節點所在的最前面一層；全走完就停在最後一層。
+    // 這樣回到地圖時，玩家一眼就在目前位置，不用自己拖。
+    private void FocusProgress()
+    {
+        if (!_autoFocusProgress || _progress == null || _mapNodeArray == null || _mapNodeParentRect == null)
+            return;
+
+        ScrollRect scrollRect = _mapNodeParentRect.GetComponentInParent<ScrollRect>();
+        if (scrollRect == null || scrollRect.viewport == null || !scrollRect.gameObject.activeInHierarchy)
+            return;
+
+        // 地圖剛被打開，版面要先更新，才量得到正確的內容區與可視範圍大小
+        Canvas.ForceUpdateCanvases();
+
+        if (!TryGetProgressFocusPoint(out Vector2 focusPoint))
+            return;
+
+        Vector2 contentSize = _mapNodeParentRect.rect.size;
+        Vector2 viewportSize = scrollRect.viewport.rect.size;
+        Vector2 pivot = _mapNodeParentRect.pivot;
+
+        _focusTween?.Kill();
+
+        if (IsHorizontal)
+        {
+            float scrollable = contentSize.x - viewportSize.x;
+            float distanceFromLeft = focusPoint.x + pivot.x * contentSize.x;
+            float target = scrollable <= 0f ? 0f : Mathf.Clamp01((distanceFromLeft - viewportSize.x * 0.5f) / scrollable);
+            _focusTween = _focusDuration > 0f
+                ? scrollRect.DOHorizontalNormalizedPos(target, _focusDuration).SetEase(Ease.OutCubic).SetLink(scrollRect.gameObject)
+                : null;
+            if (_focusDuration <= 0f)
+                scrollRect.horizontalNormalizedPosition = target;
+        }
+        else
+        {
+            float scrollable = contentSize.y - viewportSize.y;
+            float distanceFromBottom = focusPoint.y + pivot.y * contentSize.y;
+            float target = scrollable <= 0f ? 0f : Mathf.Clamp01((distanceFromBottom - viewportSize.y * 0.5f) / scrollable);
+            _focusTween = _focusDuration > 0f
+                ? scrollRect.DOVerticalNormalizedPos(target, _focusDuration).SetEase(Ease.OutCubic).SetLink(scrollRect.gameObject)
+                : null;
+            if (_focusDuration <= 0f)
+                scrollRect.verticalNormalizedPosition = target;
+        }
+    }
+
+    private bool TryGetProgressFocusPoint(out Vector2 point)
+    {
+        point = Vector2.zero;
+
+        int focusLayer = _mapNodeArray.Length - 1;
+        for (int i = 0; i < _mapNodeArray.Length; i++)
+        {
+            if (HasSelectableNode(i))
+            {
+                focusLayer = i;
+                break;
+            }
+        }
+
+        Vector2 sum = Vector2.zero;
+        int count = 0;
+        for (int j = 0; j < _mapNodeArray[focusLayer].Length; j++)
+        {
+            MapNode node = _mapNodeArray[focusLayer][j];
+            if (node == null)
+                continue;
+
+            // 該層有可選節點時只看可選的，沒有（例如全走完）就取整層
+            bool selectable = _progress.unlockedNodes.Contains(_progress.GetKey(focusLayer, j))
+                && !_progress.completedNodes.Contains(_progress.GetKey(focusLayer, j));
+            if (HasSelectableNode(focusLayer) && !selectable)
+                continue;
+
+            sum += (Vector2)node.transform.localPosition;
+            count++;
+        }
+
+        if (count == 0)
+            return false;
+
+        point = sum / count;
+        return true;
+    }
+
+    private bool HasSelectableNode(int layer)
+    {
+        for (int j = 0; j < _mapNodeArray[layer].Length; j++)
+        {
+            string key = _progress.GetKey(layer, j);
+            if (_progress.unlockedNodes.Contains(key) && !_progress.completedNodes.Contains(key))
+                return true;
+        }
+
+        return false;
     }
 
     // 回到起點：直向是最下面、橫向是最左邊
