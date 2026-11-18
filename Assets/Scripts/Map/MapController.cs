@@ -70,19 +70,68 @@ public class MapController : MonoBehaviour
 
     private void SetView()
     {
-        var size = _mapNodeParentRect.sizeDelta;
-        size.y = _mapSettings.mapNodeHeight * (_mapSettings.layerCount - 1) + _mapSettings.padding * 2;
-        _mapNodeParentRect.sizeDelta = size;
+        float layerLength = _mapSettings.mapNodeHeight * (_mapSettings.layerCount - 1) + _mapSettings.padding * 2;
+
+        if (!IsHorizontal)
+        {
+            var size = _mapNodeParentRect.sizeDelta;
+            size.y = layerLength;
+            _mapNodeParentRect.sizeDelta = size;
+            ConfigureScrollRect();
+            return;
+        }
+
+        // 橫向：內容區貼著左邊、上下撐滿可視範圍，寬度就是整張地圖的長度。
+        // 原點（localPosition 0,0）在內容區的左側正中間，節點才能以它為中心上下展開。
+        _mapNodeParentRect.anchorMin = new Vector2(0f, 0f);
+        _mapNodeParentRect.anchorMax = new Vector2(0f, 1f);
+        _mapNodeParentRect.pivot = new Vector2(0f, 0.5f);
+        _mapNodeParentRect.sizeDelta = new Vector2(layerLength, 0f);
+        _mapNodeParentRect.anchoredPosition = Vector2.zero;
+
+        ConfigureScrollRect();
     }
 
+    private bool IsHorizontal => _mapSettings.orientation == MapOrientation.Horizontal;
+
+    // 卷動方向跟著地圖方向走：橫向只能左右拖，直向只能上下拖
+    private void ConfigureScrollRect()
+    {
+        ScrollRect scrollRect = _mapNodeParentRect.GetComponentInParent<ScrollRect>();
+        if (scrollRect == null)
+            return;
+
+        scrollRect.horizontal = IsHorizontal;
+        scrollRect.vertical = !IsHorizontal;
+
+        // 原本只有直向捲軸；橫向用不到它，關掉並把原本為它讓出的可視範圍還回來
+        if (IsHorizontal && scrollRect.verticalScrollbar != null)
+        {
+            scrollRect.verticalScrollbar.gameObject.SetActive(false);
+            scrollRect.verticalScrollbar = null;
+
+            RectTransform viewport = scrollRect.viewport;
+            if (viewport != null)
+            {
+                viewport.anchorMin = Vector2.zero;
+                viewport.anchorMax = Vector2.one;
+                viewport.offsetMin = Vector2.zero;
+                viewport.offsetMax = Vector2.zero;
+            }
+        }
+    }
+
+    // 座標用「層方向（along）」和「同層展開方向（cross）」兩個軸來算，最後才依地圖方向換成畫面座標：
+    //   直向：cross = 左右、along = 由下往上
+    //   橫向：cross = 上下（第 0 個在最上面）、along = 由左往右
     private void CreateMapView()
     {
-        int offsetY = _mapSettings.padding;
+        int offsetAlong = _mapSettings.padding;
 
         for (int i = 0; i < _mapGraphData.layers.Count; i++)
         {
             var layer = _mapGraphData.layers[i];
-            int offsetX = -(layer.nodes.Count - 1) * _mapSettings.mapNodeWidth / 2;
+            int offsetCross = -(layer.nodes.Count - 1) * _mapSettings.mapNodeWidth / 2;
 
             for (int j = 0; j < layer.nodes.Count; j++)
             {
@@ -105,21 +154,23 @@ public class MapController : MonoBehaviour
                     button.onClick.AddListener(() => OnNodeClicked(capturedLayer, capturedNode));
                 }
 
-                int roomOffsetX = offsetX + Random.Range(-_mapSettings.mapNodeWidth / 8, _mapSettings.mapNodeWidth / 8);
-                int roomOffsetY = offsetY;
+                int roomCross = offsetCross + Random.Range(-_mapSettings.mapNodeWidth / 8, _mapSettings.mapNodeWidth / 8);
+                int roomAlong = offsetAlong;
 
                 if (i != 0 && i != _mapSettings.layerCount - 1)
                 {
-                    roomOffsetY = offsetY + Random.Range(-_mapSettings.mapNodeHeight / 10, _mapSettings.mapNodeHeight / 10);
+                    roomAlong = offsetAlong + Random.Range(-_mapSettings.mapNodeHeight / 10, _mapSettings.mapNodeHeight / 10);
                 }
 
-                nodeObject.transform.localPosition = new Vector3(roomOffsetX, roomOffsetY);
+                nodeObject.transform.localPosition = IsHorizontal
+                    ? new Vector3(roomAlong, -roomCross)
+                    : new Vector3(roomCross, roomAlong);
                 nodeObject.SetActive(true);
 
-                offsetX += _mapSettings.mapNodeWidth;
+                offsetCross += _mapSettings.mapNodeWidth;
             }
 
-            offsetY += _mapSettings.mapNodeHeight;
+            offsetAlong += _mapSettings.mapNodeHeight;
         }
     }
 
@@ -294,10 +345,19 @@ public class MapController : MonoBehaviour
         }
     }
 
+    // 回到起點：直向是最下面、橫向是最左邊
     private void ResetScrollPosition()
     {
         ScrollRect scrollRect = _mapNodeParentRect.GetComponentInParent<ScrollRect>();
-        if (scrollRect != null)
+        if (scrollRect == null)
+            return;
+
+        // 內容區剛改過大小，先讓版面更新完，再設定捲動位置才會對
+        Canvas.ForceUpdateCanvases();
+
+        if (IsHorizontal)
+            scrollRect.horizontalNormalizedPosition = 0f;
+        else
             scrollRect.verticalNormalizedPosition = 0f;
     }
 }

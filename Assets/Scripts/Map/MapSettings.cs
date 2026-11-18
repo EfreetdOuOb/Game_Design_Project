@@ -5,9 +5,14 @@ using UnityEngine;
 public class MapSettings : ScriptableObject
 {
     [Header("Map Layout")]
+    [Tooltip("Horizontal：地圖由左往右推進（起點在最左）。Vertical：由下往上推進（起點在最下）。")]
+    public MapOrientation orientation = MapOrientation.Horizontal;
     public int layerCount = 16;
+    [Tooltip("同一層裡，相鄰節點的間距（Vertical 時是左右間距，Horizontal 時是上下間距）")]
     public int mapNodeWidth = 100;
+    [Tooltip("層與層之間的間距（Vertical 時是上下間距，Horizontal 時是左右間距）")]
     public int mapNodeHeight = 100;
+    [Tooltip("地圖起點與終點兩端留的空白")]
     public int padding = 50;
 
     [Header("Default Spawn Weight")]
@@ -66,6 +71,12 @@ public class MapSettings : ScriptableObject
             }
         }
     }
+}
+
+public enum MapOrientation
+{
+    Vertical,
+    Horizontal
 }
 
 [System.Serializable]
