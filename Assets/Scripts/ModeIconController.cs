@@ -53,6 +53,10 @@ public class ModeSwitchImageController : MonoBehaviour
         初始化检查();
         初始化UI();
         订阅事件();
+
+        // 每個攻擊／防禦點旁標出實際數值（預設版本，沒有就自動掛上）
+        if (GetComponent<GesturePointValueLabels>() == null)
+            gameObject.AddComponent<GesturePointValueLabels>();
     }
 
     private void OnDestroy()

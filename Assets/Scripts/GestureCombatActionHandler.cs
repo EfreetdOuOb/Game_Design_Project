@@ -138,6 +138,11 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
             }
         }
 
+        // 「轉換」結果只是通知系統形態切換了（技能格重抽等），由 GestureActionRouter 處理。
+        // 它帶的是整條手勢，如果這裡也結算，後面動畫流程再逐點結算一次，所有點位的效果就會執行兩次。
+        if (result.resolvedFunction == PointFunction.Transform)
+            return;
+
         if (!HasValidTarget())
             AutoSelectFirstAliveEnemy();
 

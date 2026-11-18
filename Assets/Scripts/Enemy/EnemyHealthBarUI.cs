@@ -60,6 +60,13 @@ public class EnemyHealthBarUI : MonoBehaviour
         if (enemyCombatAI == null)
             enemyCombatAI = GetComponentInParent<EnemyCombatAI>();
 
+        // 資訊顯示：護盾徽章（玩家、敵人共用）與敵人意圖圖示下的數字；沒有就自動掛上預設版本
+        if (enemyActor != null && hpSlider != null && GetComponent<ShieldBadge>() == null)
+            gameObject.AddComponent<ShieldBadge>().Bind(enemyActor, hpSlider);
+
+        if (enemyCombatAI != null && GetComponent<EnemyIntentNumbers>() == null)
+            gameObject.AddComponent<EnemyIntentNumbers>();
+
         RebuildDebuffSpriteLookup();
         RefreshImmediate();
     }

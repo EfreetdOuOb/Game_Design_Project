@@ -29,6 +29,25 @@ public class EnemyActionStep
     [Min(1)] public int hitCount = 1;
 }
 
+/// <summary>一個敵人招式「實際會發生什麼」的數值整理，給意圖數字與懸浮說明共用。</summary>
+public struct IntentInfo
+{
+    public EnemyActionType type;
+    /// <summary>攻擊類：每一下的傷害（吃完攻擊力、倍率、虛弱、易傷，還沒扣護盾）</summary>
+    public int perHit;
+    /// <summary>攻擊類：打幾下</summary>
+    public int hits;
+    /// <summary>防禦：獲得的護盾；回血：回復量；強化：攻擊力增加量</summary>
+    public int amount;
+    /// <summary>攻擊類的倍率（對照敵人攻擊力用）</summary>
+    public float multiplier;
+    /// <summary>圖示旁的短標籤，例如「12」「8×3」「+10」「攻+10」</summary>
+    public string label;
+
+    public bool IsAttack => type == EnemyActionType.Attack || type == EnemyActionType.HeavyAttack || type == EnemyActionType.Combo;
+    public int TotalDamage => IsAttack ? perHit * hits : 0;
+}
+
 public class EnemyCombatAI : MonoBehaviour
 {
     public CombatActor enemyActor;
@@ -198,6 +217,48 @@ public class EnemyCombatAI : MonoBehaviour
         }
 
         yield return TryPlaceRandomBomb();
+    }
+
+    /// <summary>
+    /// 整理某個招式實際的數值（目前狀態下）：攻擊類每下多少、打幾下；防禦／回血／強化的量。
+    /// 數字用的是和實際結算同一套公式，所以會即時反映敵人的強化、玩家的易傷等。
+    /// </summary>
+    public IntentInfo DescribeIntent(EnemyActionStep step)
+    {
+        IntentInfo info = new IntentInfo { type = step.actionType, hits = 1, multiplier = 1f, label = string.Empty };
+        if (enemyActor == null)
+            return info;
+
+        switch (step.actionType)
+        {
+            case EnemyActionType.Attack:
+            case EnemyActionType.HeavyAttack:
+            case EnemyActionType.Combo:
+                info.multiplier = Mathf.Max(0f, step.damageMultiplier);
+                info.hits = Mathf.Max(1, step.hitCount);
+                info.perHit = playerActor != null && !playerActor.IsDead
+                    ? DamageCalculator.Calculate(new DamageRequest(enemyActor, playerActor, enemyActor.EffectiveAttackPower, info.multiplier))
+                    : Mathf.RoundToInt(enemyActor.EffectiveAttackPower * info.multiplier * enemyActor.GetOutgoingDamageMultiplier());
+                info.label = info.hits > 1 ? (info.perHit + "×" + info.hits) : info.perHit.ToString();
+                break;
+
+            case EnemyActionType.Defense:
+                info.amount = enemyActor.EffectiveDefensePower;
+                info.label = "+" + info.amount;
+                break;
+
+            case EnemyActionType.Heal:
+                info.amount = Mathf.Max(0, step.healAmount);
+                info.label = "+" + info.amount;
+                break;
+
+            case EnemyActionType.Empower:
+                info.amount = Mathf.Max(0, step.attackPowerIncrease);
+                info.label = "攻+" + info.amount;
+                break;
+        }
+
+        return info;
     }
 
     private EnemyActionStep GetCurrentAction()

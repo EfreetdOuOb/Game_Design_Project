@@ -44,6 +44,11 @@ public class IncomingDamageIndicator : MonoBehaviour
     /// <summary>目前的預告傷害（已扣護盾），給其他 UI 取用。</summary>
     public int PredictedDamage { get; private set; }
 
+    /// <summary>預告傷害的明細（給懸浮說明用）：敵人出手、炸彈引爆（都還沒扣護盾），以及被護盾吸收的量。</summary>
+    public int IncomingFromEnemies { get; private set; }
+    public int IncomingFromBombs { get; private set; }
+    public int ShieldAbsorbed { get; private set; }
+
     private void Awake()
     {
         BuildGhost();
@@ -123,6 +128,10 @@ public class IncomingDamageIndicator : MonoBehaviour
 
     private int ComputePredictedDamage()
     {
+        IncomingFromEnemies = 0;
+        IncomingFromBombs = 0;
+        ShieldAbsorbed = 0;
+
         if (_player == null || _player.IsDead)
             return 0;
 
@@ -130,19 +139,24 @@ public class IncomingDamageIndicator : MonoBehaviour
         if (TurnManager.Instance != null && TurnManager.Instance.CurrentPhase != TurnPhase.PlayerTurn)
             return 0;
 
-        int total = 0;
+        int fromEnemies = 0;
         var enemies = EnemyCombatAI.Active;
         for (int i = 0; i < enemies.Count; i++)
         {
             if (enemies[i] != null)
-                total += enemies[i].PreviewDamageToPlayer();
+                fromEnemies += enemies[i].PreviewDamageToPlayer();
         }
 
         // 炸彈在回合結算時引爆，比敵人出手晚、比護盾清零早，所以和敵人傷害一起被同一池護盾吸收
-        if (BattleBombManager.Instance != null)
-            total += BattleBombManager.Instance.PreviewTimerDetonationDamage(_player);
+        int fromBombs = BattleBombManager.Instance != null
+            ? BattleBombManager.Instance.PreviewTimerDetonationDamage(_player)
+            : 0;
 
         // 護盾是整體吸收量，所以先加總再扣
+        int total = fromEnemies + fromBombs;
+        IncomingFromEnemies = fromEnemies;
+        IncomingFromBombs = fromBombs;
+        ShieldAbsorbed = Mathf.Min(total, _player.shield);
         return Mathf.Max(0, total - _player.shield);
     }
 
