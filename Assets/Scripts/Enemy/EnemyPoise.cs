@@ -28,6 +28,7 @@ public class EnemyPoise : MonoBehaviour
 
     public event System.Action OnPoiseBroken; // 韌性剛好歸零那一刻觸發一次
     public event System.Action OnStunChanged; // 暈眩回合數有變動時觸發（UI／特效用）
+    public event System.Action<int> OnPoiseReduced;   // 韌性實際被扣掉時觸發（帶扣掉的量，跳字用）
     public event System.Action<StunCause> OnStunApplied; // 每次「新增暈眩」的當下觸發，並說明原因（跳字用）
 
     private void Awake()
@@ -72,6 +73,7 @@ public class EnemyPoise : MonoBehaviour
         currentPoise = Mathf.Max(0, currentPoise - amount);
 
         Debug.Log($"[韌性] {ActorName} 韌性 -{amount}（{before} -> {currentPoise}/{maxPoise}）");
+        OnPoiseReduced?.Invoke(before - currentPoise);
 
         if (currentPoise == 0)
         {

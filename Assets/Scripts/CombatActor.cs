@@ -96,12 +96,34 @@ public class CombatActor : MonoBehaviour
     public event Action OnDeath;
     public event Action<int> OnDamaged;
 
+    // ---- 數值變化事件：給戰鬥回饋（跳字等）用，只通知「發生了什麼」，不影響任何數值 ----
+    /// <summary>一次傷害結算完成（含被護盾吸收的量、是否完全擋下）</summary>
+    public event Action<DamageResult> OnDamageResolved;
+    /// <summary>實際回復了多少血</summary>
+    public event Action<int> OnHealed;
+    /// <summary>獲得了多少護盾</summary>
+    public event Action<int> OnShieldGained;
+    /// <summary>回合結算時，還沒用掉就消失的護盾量</summary>
+    public event Action<int> OnShieldExpired;
+    /// <summary>被施加 debuff：id、這次增加的層數、施加後剩餘回合</summary>
+    public event Action<string, int, int> OnDebuffApplied;
+
+    /// <summary>只給 DamageCalculator 呼叫：傷害結算完成後通知外界。</summary>
+    public void NotifyDamageResolved(DamageResult result)
+    {
+        OnDamageResolved?.Invoke(result);
+    }
+
     public bool IsDead { get; private set; }
 
     private void Awake()
     {
         currentHp = Mathf.Clamp(currentHp <= 0 ? maxHp : currentHp, 0, maxHp);
         IsDead = currentHp <= 0;
+
+        // 傷害、回復、護盾等數值變化的跳字提示（預設版本，不用改 prefab）
+        if (GetComponent<CombatFeedbackPresenter>() == null)
+            gameObject.AddComponent<CombatFeedbackPresenter>();
     }
     private void Start()  
 {
@@ -224,6 +246,8 @@ public class CombatActor : MonoBehaviour
         currentHp = Mathf.Min(maxHp, currentHp + Mathf.Max(0, amount));
         int actual = currentHp - before;
         Debug.Log($"[戰鬥] {actorId} 回復 {actual}，HP={currentHp}/{maxHp}");
+        if (actual > 0)
+            OnHealed?.Invoke(actual);
         return actual;
     }
 
@@ -231,11 +255,16 @@ public class CombatActor : MonoBehaviour
     {
         shield += Mathf.Max(0, amount);
         Debug.Log($"[戰鬥] {actorId} 護盾 +{amount}，目前護盾={shield}");
+        if (amount > 0)
+            OnShieldGained?.Invoke(amount);
     }
 
     private void ClearRoundDefense()
     {
+        int expired = shield;
         shield = 0;
+        if (expired > 0)
+            OnShieldExpired?.Invoke(expired);
         Debug.Log($"[回合清算] {actorId} 護盾已清除");
     }
 
@@ -273,6 +302,7 @@ public class CombatActor : MonoBehaviour
         }
 
         Debug.Log($"[戰鬥] {actorId} 被施加 Debuff：{debuffId}，層數={state.stacks}，剩餘回合={state.remainingTurns}");
+        OnDebuffApplied?.Invoke(debuffId, Mathf.Max(1, stacks), state.remainingTurns);
     }
 
     public bool HasDebuff(string debuffId)

@@ -26,6 +26,7 @@ public class GoldHUD : MonoBehaviour
 
     private PlayerCurrency subscribed;
     private int displayedGold;
+    private int lastKnownGold;
     private Tween countTween;
     private Sequence flashSequence;
 
@@ -66,6 +67,7 @@ public class GoldHUD : MonoBehaviour
         subscribed.OnGoldChanged += HandleGoldChanged;
 
         displayedGold = subscribed.CurrentGold;
+        lastKnownGold = displayedGold;
         SetText(displayedGold);
     }
 
@@ -88,6 +90,58 @@ public class GoldHUD : MonoBehaviour
 
         if (total != previous)
             PlayFlash(total > previous ? _gainColor : _spendColor);
+
+        // 增減量的跳字（用「上一次的實際金額」算，數字還在滾動時連續變動也不會算錯）
+        int delta = total - lastKnownGold;
+        lastKnownGold = total;
+        if (delta != 0)
+            SpawnDeltaText(delta);
+    }
+
+    // 金額旁飄出「+15」「-30」，往上飄並淡出
+    private void SpawnDeltaText(int delta)
+    {
+        if (_goldText == null || !gameObject.activeInHierarchy)
+            return;
+
+        int alignment = (int)_goldText.alignment;
+        int vertical = alignment / 3;      // 0 上、1 中、2 下
+        float anchorY = vertical == 0 ? 1f : (vertical == 1 ? 0.5f : 0f);
+
+        GameObject go = new GameObject("GoldDelta", typeof(RectTransform), typeof(Text), typeof(Outline));
+        go.layer = _goldText.gameObject.layer;
+        RectTransform rect = (RectTransform)go.transform;
+        rect.SetParent(_goldText.transform, false);
+
+        // 接在目前文字的右邊（文字是靠左對齊時用實際文字寬度，其餘情況貼在文字框右緣）
+        bool leftAligned = alignment % 3 == 0;
+        float x = leftAligned ? _goldText.preferredWidth + _goldText.fontSize * 0.4f : _goldText.rectTransform.rect.width + _goldText.fontSize * 0.4f;
+        rect.anchorMin = new Vector2(0f, anchorY);
+        rect.anchorMax = new Vector2(0f, anchorY);
+        rect.pivot = new Vector2(0f, anchorY);
+        rect.sizeDelta = new Vector2(_goldText.fontSize * 6f, _goldText.fontSize * 1.4f);
+        rect.anchoredPosition = new Vector2(x, 0f);
+
+        Text label = go.GetComponent<Text>();
+        label.font = _goldText.font;
+        label.fontSize = _goldText.fontSize;
+        label.fontStyle = FontStyle.Bold;
+        label.alignment = TextAnchor.MiddleLeft;
+        label.horizontalOverflow = HorizontalWrapMode.Overflow;
+        label.verticalOverflow = VerticalWrapMode.Overflow;
+        label.color = delta > 0 ? _gainColor : _spendColor;
+        label.text = (delta > 0 ? "+" : "") + delta;
+        label.raycastTarget = false;
+
+        Outline outline = go.GetComponent<Outline>();
+        outline.effectColor = new Color(0f, 0f, 0f, 0.9f);
+        outline.effectDistance = new Vector2(2f, -2f);
+
+        Sequence floatUp = DOTween.Sequence().SetLink(go);
+        floatUp.Append(rect.DOAnchorPosY(_goldText.fontSize * 1.2f, 0.9f).SetEase(Ease.OutQuad));
+        floatUp.Insert(0.45f, label.DOFade(0f, 0.45f));
+        floatUp.Insert(0.45f, outline.DOFade(0f, 0.45f));
+        floatUp.OnComplete(() => Destroy(go));
     }
 
     private void PlayFlash(Color color)

@@ -383,6 +383,7 @@ public class EnemyCombatAI : MonoBehaviour
 
         DamageResult result = CombatActionResolver.Strike(enemyActor, playerActor, powerMultiplier);
 
+        // 每一下各自判斷：這一下被護盾完全吃掉，就扣敵人 1 點韌性
         if (result.FullyBlocked && enemyPoise != null)
         {
             enemyPoise.ReducePoise(1);

@@ -94,6 +94,8 @@ public static class DamageCalculator
         CombatUI.Instance?.AppendBattleLog(
             $"{target.actorId} 受到 {hpLoss} 傷害{(absorbed > 0 ? $"（護盾吸收 {absorbed}）" : string.Empty)}，HP {target.currentHp}/{target.maxHp}");
 
-        return new DamageResult(calculated, absorbed, hpLoss);
+        DamageResult result = new DamageResult(calculated, absorbed, hpLoss);
+        target.NotifyDamageResolved(result);
+        return result;
     }
 }
