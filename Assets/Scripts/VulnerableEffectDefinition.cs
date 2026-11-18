@@ -34,4 +34,24 @@ public class VulnerableEffectDefinition : SkillEffectDefinition
 
         Debug.Log($"[技能效果] {debuffId} 效果觸發，增加 {finalStacks} 層，持續 {finalDuration} 回合（升級={context.skillUpgraded}）");
     }
+
+    public override string Describe(bool upgraded)
+    {
+        int finalStacks = Mathf.Max(1, stacks + (upgraded ? upgradedBonusStacks : 0));
+        int finalDuration = Mathf.Max(1, durationTurns + (upgraded ? upgradedBonusDuration : 0));
+        int percent = Mathf.RoundToInt(CombatActor.VulnerableBonusPerStack * 100f * finalStacks);
+        return "施加 " + TooltipText.Keyword("易傷") + " " + finalStacks + " 層（持續 " + TooltipText.Keyword(finalDuration)
+            + " 回合）：目標受到的傷害 +" + TooltipText.Damage(percent + "%");
+    }
+
+    public override string DescribeUpgrade()
+    {
+        if (upgradedBonusStacks > 0 && upgradedBonusDuration > 0)
+            return "易傷 +" + TooltipText.Keyword(upgradedBonusStacks) + " 層，持續 +" + TooltipText.Keyword(upgradedBonusDuration) + " 回合";
+        if (upgradedBonusStacks > 0)
+            return "易傷 +" + TooltipText.Keyword(upgradedBonusStacks) + " 層";
+        if (upgradedBonusDuration > 0)
+            return "易傷持續 +" + TooltipText.Keyword(upgradedBonusDuration) + " 回合";
+        return null;
+    }
 }

@@ -6,6 +6,8 @@ public class CombatActor : MonoBehaviour
 {
     public const string VulnerableDebuffId = "Vulnerable";
     public const string WeakDebuffId = "Weak";
+    /// <summary>每一層易傷讓受到的傷害增加的比例</summary>
+    public const float VulnerableBonusPerStack = 0.2f;
 
     public class DebuffState
     {
@@ -41,6 +43,9 @@ public class CombatActor : MonoBehaviour
     [SerializeField] private float weakMinMultiplier = 0.2f;
 
     public IReadOnlyList<DebuffState> ActiveDebuffs => debuffs;
+    /// <summary>每一層虛弱讓造成的傷害降低的比例（說明文字用）</summary>
+    public float WeakReductionPerStack => weakReductionPerStack;
+    public float WeakMinMultiplier => weakMinMultiplier;
 
     private readonly List<IStatModifier> statModifiers = new List<IStatModifier>();
     private int attackBuff;
@@ -358,7 +363,7 @@ public class CombatActor : MonoBehaviour
 
             if (debuffs[i].debuffId == VulnerableDebuffId)
             {
-                multiplier *= 1f + (0.2f * debuffs[i].stacks);
+                multiplier *= 1f + (VulnerableBonusPerStack * debuffs[i].stacks);
             }
         }
 

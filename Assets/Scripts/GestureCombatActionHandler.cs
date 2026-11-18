@@ -23,6 +23,9 @@ public class GestureCombatActionHandler : MonoBehaviour, IGestureActionHandler
 
     
 
+    /// <summary>每累計幾個攻擊點削 1 點敵人韌性（說明文字用）</summary>
+    public int AttackPointsPerPoiseDamage => Mathf.Max(1, attackPointsPerPoiseDamage);
+
     private ISkillSlotProvider skillSlotProvider;
     private int currentTurnAttackPointCount = 0;
 

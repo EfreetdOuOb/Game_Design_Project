@@ -23,6 +23,8 @@ public class EnemyPoise : MonoBehaviour
     public int CurrentPoise => currentPoise;
     public bool IsBroken => currentPoise <= 0;
     public bool IsStunned => pendingStunTurns > 0;
+    /// <summary>韌性歸零時的暈眩回合數（說明文字用）</summary>
+    public int StunTurnsOnBreak => stunTurnsOnBreak;
     /// <summary>剩餘暈眩回合數（麻痺與韌性歸零共用）</summary>
     public int StunTurns => pendingStunTurns;
 

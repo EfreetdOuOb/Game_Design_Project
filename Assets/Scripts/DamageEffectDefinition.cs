@@ -48,4 +48,25 @@ public class DamageEffectDefinition : SkillEffectDefinition
         if (context.self != null && context.target != null)
             CombatUI.Instance?.AppendBattleLog($"{context.self.actorId} 對 {context.target.actorId} 造成 {totalActual} 傷害");
     }
+
+    public override string Describe(bool upgraded)
+    {
+        int perHit = baseDamage + (upgraded ? upgradedBonusDamage : 0);
+        int hits = Mathf.Max(1, hitCount + (upgraded ? upgradedBonusHits : 0));
+        string amount = TooltipText.Damage(perHit) + (scaleWithAttackPower ? " + 攻擊力" : string.Empty);
+        return hits > 1
+            ? "造成 " + amount + " 點傷害，連續 " + TooltipText.Keyword(hits) + " 次"
+            : "造成 " + amount + " 點傷害";
+    }
+
+    public override string DescribeUpgrade()
+    {
+        if (upgradedBonusDamage > 0 && upgradedBonusHits > 0)
+            return "每次傷害 +" + TooltipText.Keyword(upgradedBonusDamage) + "，攻擊次數 +" + TooltipText.Keyword(upgradedBonusHits);
+        if (upgradedBonusDamage > 0)
+            return "每次傷害 +" + TooltipText.Keyword(upgradedBonusDamage);
+        if (upgradedBonusHits > 0)
+            return "攻擊次數 +" + TooltipText.Keyword(upgradedBonusHits);
+        return null;
+    }
 }

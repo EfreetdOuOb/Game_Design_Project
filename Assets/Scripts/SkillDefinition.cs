@@ -30,4 +30,19 @@ public abstract class SkillDefinition : ScriptableObject
     public Sprite icon;
 
     public abstract void Execute(SkillExecutionContext context);
+
+    /// <summary>
+    /// 技能說明（一行一條，可用富文字），給懸浮說明用。數字取自資產本身，所以改資產說明就跟著變。
+    /// upgraded = 玩家這局是否已經把這個技能強化過。
+    /// </summary>
+    public virtual System.Collections.Generic.List<string> DescribeLines(bool upgraded)
+    {
+        return new System.Collections.Generic.List<string>();
+    }
+
+    /// <summary>強化後會多出什麼（尚未強化的技能才會顯示）。</summary>
+    public virtual System.Collections.Generic.List<string> DescribeUpgradeLines()
+    {
+        return new System.Collections.Generic.List<string>();
+    }
 }

@@ -19,4 +19,9 @@ public class DefenseBuffEffectDefinition : SkillEffectDefinition
         }
         Debug.Log($"[技能效果] 防禦增益效果觸發，增加 {defenseBonus}。");
     }
+
+    public override string Describe(bool upgraded)
+    {
+        return "獲得 " + TooltipText.Shield(defenseBonus) + " 點護盾";
+    }
 }

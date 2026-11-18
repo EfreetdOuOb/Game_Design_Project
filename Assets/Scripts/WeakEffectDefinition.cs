@@ -25,4 +25,18 @@ public class WeakEffectDefinition : SkillEffectDefinition
 
         Debug.Log($"[技能效果] 虛弱觸發，{stacks} 層，持續 {finalDuration} 回合（升級={context.skillUpgraded}）");
     }
+
+    public override string Describe(bool upgraded)
+    {
+        int finalStacks = Mathf.Max(1, stacks);
+        int finalDuration = Mathf.Max(1, durationTurns + (upgraded ? upgradedBonusDuration : 0));
+        int percent = Mathf.RoundToInt(0.2f * 100f * finalStacks);
+        return "施加 " + TooltipText.Keyword("虛弱") + " " + finalStacks + " 層（持續 " + TooltipText.Keyword(finalDuration)
+            + " 回合）：目標造成的傷害 -" + TooltipText.Shield(percent + "%");
+    }
+
+    public override string DescribeUpgrade()
+    {
+        return upgradedBonusDuration > 0 ? "虛弱持續 +" + TooltipText.Keyword(upgradedBonusDuration) + " 回合" : null;
+    }
 }

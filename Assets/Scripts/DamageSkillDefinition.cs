@@ -108,4 +108,53 @@ public class DamageSkillDefinition : SkillDefinition
             extraEffects[i]?.Apply(context);
         }
     }
+
+    public override System.Collections.Generic.List<string> DescribeLines(bool upgraded)
+    {
+        var lines = new System.Collections.Generic.List<string>();
+        int perHit = damage + (upgraded ? upgradedBonusDamage : 0);
+        int hits = Mathf.Max(1, hitCount + (upgraded ? upgradedBonusHits : 0));
+        string targetText = hitsAllEnemies ? "所有敵人" : "目標";
+
+        if (perHit > 0 || scaleWithCasterAttackPower)
+        {
+            string amount = TooltipText.Damage(perHit) + (scaleWithCasterAttackPower ? " + 攻擊力" : string.Empty);
+            lines.Add(hits > 1
+                ? "對" + targetText + "造成 " + amount + " 點傷害，連續 " + TooltipText.Keyword(hits) + " 次"
+                : "對" + targetText + "造成 " + amount + " 點傷害");
+        }
+
+        if (afflictedTargetMultiplier > 1.001f)
+        {
+            lines.Add("目標暈眩或有負面狀態時，傷害 ×" + TooltipText.Keyword(afflictedTargetMultiplier.ToString("0.##"))
+                + "（每次 " + TooltipText.Damage(Mathf.RoundToInt(perHit * afflictedTargetMultiplier)) + "）");
+        }
+
+        for (int i = 0; i < extraEffects.Count; i++)
+        {
+            string text = extraEffects[i] != null ? extraEffects[i].Describe(upgraded) : null;
+            if (!string.IsNullOrEmpty(text))
+                lines.Add(text);
+        }
+
+        return lines;
+    }
+
+    public override System.Collections.Generic.List<string> DescribeUpgradeLines()
+    {
+        var lines = new System.Collections.Generic.List<string>();
+        if (upgradedBonusDamage > 0)
+            lines.Add("每次傷害 +" + TooltipText.Keyword(upgradedBonusDamage));
+        if (upgradedBonusHits > 0)
+            lines.Add("攻擊次數 +" + TooltipText.Keyword(upgradedBonusHits));
+
+        for (int i = 0; i < extraEffects.Count; i++)
+        {
+            string text = extraEffects[i] != null ? extraEffects[i].DescribeUpgrade() : null;
+            if (!string.IsNullOrEmpty(text))
+                lines.Add(text);
+        }
+
+        return lines;
+    }
 }

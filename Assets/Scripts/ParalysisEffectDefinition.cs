@@ -46,4 +46,16 @@ public class ParalysisEffectDefinition : SkillEffectDefinition
         context.report?.appliedDebuffs.Add($"麻痺({stunTurns}回合)");
         Debug.Log($"[技能效果] 麻痺命中（機率={finalChance:P0}），暈眩 {stunTurns} 回合");
     }
+
+    public override string Describe(bool upgraded)
+    {
+        float finalChance = Mathf.Clamp01(chance + (upgraded ? upgradedBonusChance : 0f));
+        return TooltipText.Keyword(Mathf.RoundToInt(finalChance * 100f) + "%") + " 機率使目標 " + TooltipText.Keyword("暈眩")
+            + " " + Mathf.Max(1, stunTurns) + " 回合（跳過行動，該回合原本的招式也算用掉）";
+    }
+
+    public override string DescribeUpgrade()
+    {
+        return upgradedBonusChance > 0f ? "暈眩機率 +" + TooltipText.Keyword(Mathf.RoundToInt(upgradedBonusChance * 100f) + "%") : null;
+    }
 }

@@ -67,6 +67,10 @@ public class EnemyHealthBarUI : MonoBehaviour
         if (enemyCombatAI != null && GetComponent<EnemyIntentNumbers>() == null)
             gameObject.AddComponent<EnemyIntentNumbers>();
 
+        // 懸浮說明：血條、韌性條、意圖圖示（玩家血條則是預計受傷明細）
+        if (GetComponent<EnemyInfoTooltips>() == null)
+            gameObject.AddComponent<EnemyInfoTooltips>();
+
         RebuildDebuffSpriteLookup();
         RefreshImmediate();
     }
@@ -327,6 +331,8 @@ public class EnemyHealthBarUI : MonoBehaviour
 
         GameObject slotObject = debuffSlotPrefab != null ? Instantiate(debuffSlotPrefab, debuffContainer) : CreateDefaultDebuffSlot();
         slotObject.name = "Debuff_" + debuffId;
+        string capturedId = debuffId;
+        TooltipTrigger.Attach(slotObject, () => CombatTooltips.ForDebuff(enemyActor, capturedId));
 
         DebuffSlotView slot = slotObject.GetComponent<DebuffSlotView>();
         if (slot == null)

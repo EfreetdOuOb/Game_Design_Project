@@ -219,6 +219,41 @@ public class EnemyCombatAI : MonoBehaviour
         yield return TryPlaceRandomBomb();
     }
 
+    /// <summary>招式的顯示名稱（意圖數字旁、懸浮說明用）</summary>
+    public static string ActionName(EnemyActionType type)
+    {
+        switch (type)
+        {
+            case EnemyActionType.HeavyAttack: return "重擊";
+            case EnemyActionType.Combo: return "連擊";
+            case EnemyActionType.Defense: return "防禦";
+            case EnemyActionType.Heal: return "回復";
+            case EnemyActionType.Empower: return "強化";
+            default: return "攻擊";
+        }
+    }
+
+    /// <summary>
+    /// 從「目前這一招」開始往後 count 招（行動序列會循環，所以一定湊得滿）。
+    /// 玩家可以據此預判敵人接下來的行動順序。
+    /// </summary>
+    public List<EnemyActionStep> GetUpcomingActions(int count)
+    {
+        List<EnemyActionStep> result = new List<EnemyActionStep>();
+        if (actionSequence == null || actionSequence.Count == 0)
+            return result;
+
+        int index = Mathf.Clamp(actionSequenceIndex, 0, actionSequence.Count - 1);
+        for (int i = 0; i < count; i++)
+        {
+            EnemyActionStep step = actionSequence[(index + i) % actionSequence.Count];
+            if (step != null)
+                result.Add(step);
+        }
+
+        return result;
+    }
+
     /// <summary>
     /// 整理某個招式實際的數值（目前狀態下）：攻擊類每下多少、打幾下；防禦／回血／強化的量。
     /// 數字用的是和實際結算同一套公式，所以會即時反映敵人的強化、玩家的易傷等。

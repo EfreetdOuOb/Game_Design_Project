@@ -36,6 +36,8 @@ public class RelicShopSlotUI : MonoBehaviour
         if (priceText != null)
             priceText.text = $"{effectivePrice} 金幣";
 
+        TooltipTrigger.Attach(gameObject, () => CombatTooltips.ForRelic(relic));
+
         if (buyButton != null)
         {
             buyButton.interactable = true;

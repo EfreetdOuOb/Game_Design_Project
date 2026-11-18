@@ -96,6 +96,19 @@ public class BattleBombManager : MonoBehaviour
 
     public int MaxActiveBombs => maxActiveBombs;
 
+    /// <summary>手勢經過炸彈所在的點時，倒數延緩的回合數（說明文字用）</summary>
+    public int DelayOnTouch => delayAmountOnTouch;
+
+    /// <summary>一顆炸彈到期引爆時，對 target 造成的傷害（含遺物加成與易傷等倍率，還沒扣護盾）。</summary>
+    public int PreviewSingleBombDamage(CombatActor target)
+    {
+        int damage = RelicManager.Instance != null
+            ? RelicManager.Instance.ApplyBombDamageModifiers(damageOnTimerDetonate)
+            : damageOnTimerDetonate;
+
+        return target != null ? DamageCalculator.Calculate(new DamageRequest(null, target, damage)) : damage;
+    }
+
     public bool RegisterBomb(int pointId, int initialTurns)
     {
         if (activeBombs.ContainsKey(pointId))

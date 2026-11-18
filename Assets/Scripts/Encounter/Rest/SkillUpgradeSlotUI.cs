@@ -33,6 +33,8 @@ public class SkillUpgradeSlotUI : MonoBehaviour
         if (descriptionText != null)
             descriptionText.text = definition.upgradeDescription;
 
+        TooltipTrigger.Attach(gameObject, () => CombatTooltips.ForUpgrade(definition));
+
         SetUpgraded(alreadyUpgraded);
 
         if (upgradeButton != null)

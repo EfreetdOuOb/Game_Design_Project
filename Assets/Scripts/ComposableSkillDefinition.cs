@@ -19,4 +19,30 @@ public class ComposableSkillDefinition : SkillDefinition
             effect.Apply(context);
         }
     }
+
+    public override System.Collections.Generic.List<string> DescribeLines(bool upgraded)
+    {
+        var lines = new System.Collections.Generic.List<string>();
+        for (int i = 0; i < effects.Count; i++)
+        {
+            string text = effects[i] != null ? effects[i].Describe(upgraded) : null;
+            if (!string.IsNullOrEmpty(text))
+                lines.Add(text);
+        }
+
+        return lines;
+    }
+
+    public override System.Collections.Generic.List<string> DescribeUpgradeLines()
+    {
+        var lines = new System.Collections.Generic.List<string>();
+        for (int i = 0; i < effects.Count; i++)
+        {
+            string text = effects[i] != null ? effects[i].DescribeUpgrade() : null;
+            if (!string.IsNullOrEmpty(text))
+                lines.Add(text);
+        }
+
+        return lines;
+    }
 }

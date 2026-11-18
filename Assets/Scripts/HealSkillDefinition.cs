@@ -37,4 +37,24 @@ public class HealSkillDefinition : SkillDefinition
         }
         Debug.Log($"[技能] {displayName}（{skillId}）回復 {finalHeal}（升級={context.skillUpgraded}）。");
     }
+
+    public override System.Collections.Generic.List<string> DescribeLines(bool upgraded)
+    {
+        var lines = new System.Collections.Generic.List<string>();
+        if (upgraded && upgradedBecomesRegen)
+            lines.Add("每回合回復 " + TooltipText.Heal(regenPerTurn) + " 點生命，持續 " + regenTurns + " 回合");
+        else
+            lines.Add("回復 " + TooltipText.Heal(heal + (upgraded ? upgradedBonusHeal : 0)) + " 點生命");
+        return lines;
+    }
+
+    public override System.Collections.Generic.List<string> DescribeUpgradeLines()
+    {
+        var lines = new System.Collections.Generic.List<string>();
+        if (upgradedBecomesRegen)
+            lines.Add("改為每回合回復 " + TooltipText.Heal(regenPerTurn) + "，持續 " + regenTurns + " 回合");
+        else if (upgradedBonusHeal > 0)
+            lines.Add("回復量 +" + TooltipText.Keyword(upgradedBonusHeal));
+        return lines;
+    }
 }

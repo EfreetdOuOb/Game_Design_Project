@@ -57,6 +57,10 @@ public class ModeSwitchImageController : MonoBehaviour
         // 每個攻擊／防禦點旁標出實際數值（預設版本，沒有就自動掛上）
         if (GetComponent<GesturePointValueLabels>() == null)
             gameObject.AddComponent<GesturePointValueLabels>();
+
+        // 游標移到點位上的說明（攻擊／防禦點、技能詳細、轉換點、炸彈）
+        if (GetComponent<GesturePointTooltips>() == null)
+            gameObject.AddComponent<GesturePointTooltips>();
     }
 
     private void OnDestroy()

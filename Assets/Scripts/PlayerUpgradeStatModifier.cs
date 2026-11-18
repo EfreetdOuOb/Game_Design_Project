@@ -14,6 +14,10 @@ public class PlayerUpgradeStatModifier : MonoBehaviour, IStatModifier
 
     private CombatActor _actor;
 
+    /// <summary>強化後的加成量（說明文字用，不管有沒有強化都回傳設定值）</summary>
+    public int AttackUpgradeBonus => _attackUpgradeBonus;
+    public int DefenseUpgradeBonus => _defenseUpgradeBonus;
+
     public int AttackBonus => IsUpgraded(SkillUpgradeManager.AttackUpgradeId) ? _attackUpgradeBonus : 0;
     public int DefenseBonus => IsUpgraded(SkillUpgradeManager.DefenseUpgradeId) ? _defenseUpgradeBonus : 0;
 

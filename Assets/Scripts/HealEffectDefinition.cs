@@ -36,4 +36,19 @@ public class HealEffectDefinition : SkillEffectDefinition
         }
         Debug.Log($"[技能效果] 治療效果觸發，回復 {finalHeal}（升級={context.skillUpgraded}）。");
     }
+
+    public override string Describe(bool upgraded)
+    {
+        if (upgraded && upgradedBecomesRegen)
+            return "每回合回復 " + TooltipText.Heal(regenPerTurn) + " 點生命，持續 " + regenTurns + " 回合";
+
+        return "回復 " + TooltipText.Heal(healAmount + (upgraded ? upgradedBonusHeal : 0)) + " 點生命";
+    }
+
+    public override string DescribeUpgrade()
+    {
+        if (upgradedBecomesRegen)
+            return "改為每回合回復 " + TooltipText.Heal(regenPerTurn) + "，持續 " + regenTurns + " 回合";
+        return upgradedBonusHeal > 0 ? "回復量 +" + TooltipText.Keyword(upgradedBonusHeal) : null;
+    }
 }

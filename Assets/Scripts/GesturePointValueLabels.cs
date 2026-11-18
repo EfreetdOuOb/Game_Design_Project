@@ -26,7 +26,7 @@ public class GesturePointValueLabels : MonoBehaviour
 
     private void Start()
     {
-        GestureCombatActionHandler handler = Object.FindFirstObjectByType<GestureCombatActionHandler>();
+        GestureCombatActionHandler handler = Object.FindAnyObjectByType<GestureCombatActionHandler>();
         if (handler != null)
             player = handler.self;
 

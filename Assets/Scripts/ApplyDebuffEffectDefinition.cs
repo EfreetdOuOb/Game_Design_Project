@@ -21,4 +21,9 @@ public class ApplyDebuffEffectDefinition : SkillEffectDefinition
         }
         Debug.Log($"[技能效果] Debuff 效果觸發，套用 {debuffId}，層數={stacks}，持續回合={durationTurns}。");
     }
+
+    public override string Describe(bool upgraded)
+    {
+        return "施加 " + TooltipText.Keyword(debuffId) + " " + stacks + " 層，持續 " + durationTurns + " 回合";
+    }
 }

@@ -142,6 +142,8 @@ public class ShieldBadge : MonoBehaviour
         outline.effectColor = new Color(0f, 0.1f, 0.3f, 0.9f);
         outline.effectDistance = new Vector2(2f, -2f);
 
+        TooltipTrigger.Attach(go, () => CombatTooltips.ForShield(_actor));
+
         built = true;
         lastShield = _actor.shield;
         label.text = lastShield.ToString();
