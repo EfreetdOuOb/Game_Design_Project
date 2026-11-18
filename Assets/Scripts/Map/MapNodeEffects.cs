@@ -7,7 +7,7 @@ using UnityEngine.UI;
 /// 地圖節點的互動與進度提示：
 ///   · 可以點的節點：外圍有往外擴散的光圈；滑鼠移上去會放大、光圈變亮；點下去彈一下
 ///   · 已完成的節點：蓋上半透明的完成印章（圓圈加勾勾），大小約等於節點，隱隱蓋在圖案上
-///   · 滑鼠移上任何節點：顯示節點類型名稱（<see cref="MapNodeTooltip"/>）
+///   · 滑鼠移上可選的節點、過往（已完成）的節點、休息區、首領：顯示節點類型名稱（<see cref="MapNodeTooltip"/>）
 /// 只讀取 <see cref="MapNode"/> 的狀態，不改任何地圖或流程資料。由 MapNode 自動掛上，圖形都是程式畫的，
 /// 想換成自己的圖，指定 Ring / Badge 的 Sprite 即可。
 /// </summary>
@@ -177,7 +177,11 @@ public class MapNodeEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     public void OnPointerEnter(PointerEventData eventData)
     {
         hovered = true;
-        MapNodeTooltip.Instance?.Show(node);
+
+        // 名稱提示只給「可選的節點」與「過往（已完成）的節點」，避免提前洩漏還沒走到的內容；
+        // 首領、休息區（外觀上本來就和可選節點一樣）不受這個限制
+        if (IsSelectable || (node != null && (node.isCompleted || node.IsAlwaysClear || node._mapNodeType == MapNodeType.Boss)))
+            MapNodeTooltip.Instance?.Show(node);
 
         if (IsSelectable)
         {

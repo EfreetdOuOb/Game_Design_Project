@@ -14,6 +14,17 @@ public class MapNode : MonoBehaviour
     public bool isCompleted;
     [Tooltip("已完成節點的圖案顏色（越暗越不搶眼）")]
     public Color completedColor = new Color(0.4f, 0.4f, 0.4f, 1f);
+    // 這些類型的節點即使還不能選，外觀也和可選節點一樣（純白、不套用按鈕的半透明停用色）。
+    // 只影響顯示，能不能點、解鎖、完成的流程都照原本的設定。目前只有休息區；商店不在內。
+    // 刻意寫成程式碼常數而不是 Inspector 欄位：欄位會被 Unity 序列化進編輯器記憶體，
+    // 改預設值時舊的值可能還殘留，造成「改了程式但畫面沒變」。要增減類型直接改這裡。
+    private static readonly MapNodeType[] AlwaysClearTypes = { MapNodeType.Rest };
+
+    /// <summary>這個節點的外觀是否要和可選節點一樣（休息區）；只影響顯示</summary>
+    public bool IsAlwaysClear => System.Array.IndexOf(AlwaysClearTypes, _mapNodeType) >= 0;
+
+    private ColorBlock _originalColors;
+    private bool _colorsCached;
 
     private void Awake()
     {
@@ -45,10 +56,29 @@ public class MapNode : MonoBehaviour
         if (_button != null)
         {
             _button.interactable = unlocked && !completed;
+            ApplyButtonTint();
         }
 
         RefreshVisual();
     }
+    // 按鈕本身有「不可點時變灰、半透明（Disabled Color，約 50% 透明）」的設定，會疊在圖案顏色上，
+    // 所以光改 Image 顏色，休息區還是會被它壓成半透明。休息區在還沒完成時把停用色換成純白，等於不套用；
+    // 完成後恢復原本的停用色，和其他已完成節點一樣暗。
+    private void ApplyButtonTint()
+    {
+        if (!_colorsCached)
+        {
+            _originalColors = _button.colors;
+            _colorsCached = true;
+        }
+
+        ColorBlock colors = _originalColors;
+        if (IsAlwaysClear && !isCompleted)
+            colors.disabledColor = Color.white;
+
+        _button.colors = colors;
+    }
+
     private void RefreshVisual()
     {
         if (_image == null) return;
@@ -57,7 +87,7 @@ public class MapNode : MonoBehaviour
         {
             _image.color = completedColor;
         }
-        else if (isUnlocked)
+        else if (isUnlocked || IsAlwaysClear)
         {
             _image.color = Color.white;
         }

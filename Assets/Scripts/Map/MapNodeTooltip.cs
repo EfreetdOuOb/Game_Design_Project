@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 滑鼠移上地圖節點時，在節點上方顯示類型名稱（普通戰鬥、商店、休息區…）。
+/// 滑鼠移上「可選的節點」、「過往的節點」、休息區或首領時，在節點上方顯示類型名稱（普通戰鬥、商店、休息區…）。
 /// 整張地圖只會有一個，由 <see cref="MapController"/> 每次重建地圖時建立，
 /// 放在節點同一個父物件下，所以座標可以直接沿用節點的 localPosition。
 /// </summary>

@@ -409,7 +409,7 @@ public class MapController : MonoBehaviour
 
     // ---- 進度提示 ----
 
-    // 依目前進度替每一條連線上色：走過的亮金色加粗、下一步的選項偏白、其餘維持暗色
+    // 依目前進度替每一條連線上色：走過的深琥珀色加粗、下一步的選項磚紅色、其餘維持暗色
     private void RefreshLineStates()
     {
         if (_progress == null)
