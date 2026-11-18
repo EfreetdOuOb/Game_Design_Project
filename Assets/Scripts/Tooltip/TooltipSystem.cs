@@ -51,6 +51,7 @@ public class TooltipSystem : MonoBehaviour
     private TooltipContent current;
     private float refreshTimer;
     private float showAt;
+    private bool showWhilePressed;
     private float lastVisibleTime = -10f;
 
     private RectTransform canvasRect;
@@ -60,10 +61,12 @@ public class TooltipSystem : MonoBehaviour
     private Text bodyText;
 
     /// <summary>owner 是呼叫端自己（用來之後只由同一個人關掉）。</summary>
-    public void Show(object owner, Func<TooltipContent> provider)
+    /// <param name="showWhilePressed">true：按住滑鼠（例如畫手勢到一半）時也照常顯示；預設會先藏起來，免得擋到操作</param>
+    public void Show(object owner, Func<TooltipContent> provider, bool showWhilePressed = false)
     {
         this.owner = owner;
         this.provider = provider;
+        this.showWhilePressed = showWhilePressed;
         current = null;
         refreshTimer = 0f;
 
@@ -90,9 +93,9 @@ public class TooltipSystem : MonoBehaviour
         if (owner == null || provider == null)
             return;
 
-        // 按住滑鼠（畫手勢、拖曳）時先藏起來，放開還在原處就再顯示
+        // 按住滑鼠（畫手勢、拖曳）時先藏起來，放開還在原處就再顯示；法陣點位的說明例外（畫到一半想看技能）
         Mouse mouse = Mouse.current;
-        if (mouse != null && (mouse.leftButton.isPressed || mouse.rightButton.isPressed))
+        if (!showWhilePressed && mouse != null && (mouse.leftButton.isPressed || mouse.rightButton.isPressed))
         {
             SetVisible(false);
             return;

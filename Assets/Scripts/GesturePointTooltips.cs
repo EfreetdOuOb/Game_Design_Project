@@ -6,7 +6,7 @@ using UnityEngine;
 ///   點 5～8 → 目前抽到的技能的詳細說明（自動由技能資產產生）
 ///   點 9    → 轉換點
 /// 如果這個點上有炸彈，會在最後補上炸彈的倒數與傷害。
-/// 掛在點位物件本身（不另外加圖形），手勢偵測才不會被影響；畫手勢（按住滑鼠）時說明會自動隱藏。
+/// 掛在點位物件本身（不另外加圖形），手勢偵測才不會被影響；畫手勢（按住滑鼠）時說明也會顯示，停在點位上 0.35 秒就能看。
 /// 由 <see cref="ModeSwitchImageController"/> 自動掛上。
 /// </summary>
 public class GesturePointTooltips : MonoBehaviour
@@ -37,7 +37,8 @@ public class GesturePointTooltips : MonoBehaviour
                 continue;
 
             int pointId = rule.pointId;
-            TooltipTrigger.Attach(rule.point.gameObject, () => Build(pointId));
+            // 畫手勢時（按住滑鼠）也要能看：例如起手轉換、技能剛重抽，想停在技能點上看說明
+            TooltipTrigger.Attach(rule.point.gameObject, () => Build(pointId), showWhilePressed: true);
         }
     }
 

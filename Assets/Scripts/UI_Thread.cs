@@ -52,6 +52,16 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     public bool IsInputLocked { get; private set; }
     public event Action<bool> OnInputLockChanged;
 
+    private static void DisableRaycast(Component target)
+    {
+        if (target == null)
+            return;
+
+        Graphic[] graphics = target.GetComponentsInChildren<Graphic>(true);
+        for (int i = 0; i < graphics.Length; i++)
+            graphics[i].raycastTarget = false;
+    }
+
     private void Awake()
     {
         if (actionAnimationSequence == null)
@@ -61,6 +71,11 @@ public class ui_thread : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         {
             pointRegistry.Rebuild();
         }
+
+        // 連線與端點圖示只是畫面，不能接收游標射線：否則游標下的線條會取代原本的點位，
+        // 手勢就偵測不到被線蓋住的點（例如一條線剛好經過另一個點）。複製出來的線與端點會沿用這個設定。
+        DisableRaycast(fingerLine);
+        DisableRaycast(jointPrefab);
 
         
     }

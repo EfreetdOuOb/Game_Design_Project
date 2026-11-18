@@ -19,9 +19,10 @@ public class TooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     private Canvas rootCanvas;
     private bool manualHitTest;
     private bool hovering;
+    private bool showWhilePressed;
 
     /// <summary>掛上（或更新）說明；重複呼叫只會換掉內容函式。</summary>
-    public static TooltipTrigger Attach(GameObject target, Func<TooltipContent> provider)
+    public static TooltipTrigger Attach(GameObject target, Func<TooltipContent> provider, bool showWhilePressed = false)
     {
         if (target == null)
             return null;
@@ -31,6 +32,7 @@ public class TooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitH
             trigger = target.AddComponent<TooltipTrigger>();
 
         trigger.provider = provider;
+        trigger.showWhilePressed = showWhilePressed;
         return trigger;
     }
 
@@ -93,7 +95,7 @@ public class TooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitH
             return;
 
         hovering = true;
-        TooltipSystem.Instance.Show(this, provider);
+        TooltipSystem.Instance.Show(this, provider, showWhilePressed);
     }
 
     private void End()
