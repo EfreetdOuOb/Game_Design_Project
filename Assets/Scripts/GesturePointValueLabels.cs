@@ -10,8 +10,6 @@ using UnityEngine.UI;
 /// </summary>
 public class GesturePointValueLabels : MonoBehaviour
 {
-    [SerializeField] private Color _attackColor = new Color(1f, 0.85f, 0.4f, 1f);
-    [SerializeField] private Color _defenseColor = new Color(0.55f, 0.8f, 1f, 1f);
     [Tooltip("數字大小，單位是點位圖示高度的比例")]
     [SerializeField, Range(0.15f, 0.8f)] private float _fontRatio = 0.34f;
 
@@ -47,12 +45,12 @@ public class GesturePointValueLabels : MonoBehaviour
             if (image.sprite != null && image.sprite == controller.attackSprite)
             {
                 labels[i].text = player.EffectiveAttackPower.ToString();
-                labels[i].color = _attackColor;
+                labels[i].color = CombatPalette.Damage;
             }
             else if (image.sprite != null && image.sprite == controller.defenseSprite)
             {
                 labels[i].text = player.EffectiveDefensePower.ToString();
-                labels[i].color = _defenseColor;
+                labels[i].color = CombatPalette.Shield;
             }
             else
             {

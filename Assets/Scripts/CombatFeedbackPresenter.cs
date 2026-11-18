@@ -10,9 +10,9 @@ using UnityEngine;
 public class CombatFeedbackPresenter : MonoBehaviour
 {
     [Header("顏色")]
-    [SerializeField] private Color _damageColor = new Color(1f, 0.35f, 0.3f, 1f);
-    [SerializeField] private Color _shieldColor = new Color(0.55f, 0.82f, 1f, 1f);
-    [SerializeField] private Color _healColor = new Color(0.4f, 1f, 0.5f, 1f);
+    [SerializeField] private Color _damageColor = CombatPalette.Damage;
+    [SerializeField] private Color _shieldColor = CombatPalette.Shield;
+    [SerializeField] private Color _healColor = CombatPalette.Heal;
     [SerializeField] private Color _expireColor = new Color(0.78f, 0.78f, 0.85f, 1f);
     [SerializeField] private Color _debuffColor = new Color(0.82f, 0.62f, 1f, 1f);
     [SerializeField] private Color _poiseColor = new Color(1f, 0.9f, 0.4f, 1f);

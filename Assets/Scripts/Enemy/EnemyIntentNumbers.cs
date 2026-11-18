@@ -25,11 +25,6 @@ public class EnemyIntentNumbers : MonoBehaviour
     [Tooltip("數字放在意圖圖示的哪一側。畫面右邊有法陣（螢幕 UI 會蓋在 3D 世界 UI 上面）時，放左邊最不會被遮到。")]
     [SerializeField] private LabelSide _side = LabelSide.Left;
 
-    [Header("顏色")]
-    [SerializeField] private Color _attackColor = new Color(1f, 0.85f, 0.4f, 1f);
-    [SerializeField] private Color _defenseColor = new Color(0.55f, 0.8f, 1f, 1f);
-    [SerializeField] private Color _healColor = new Color(0.5f, 1f, 0.55f, 1f);
-    [SerializeField] private Color _empowerColor = new Color(1f, 0.6f, 0.3f, 1f);
 
     private EnemyCombatAI ai;
     private readonly Dictionary<EnemyActionStep, Text> labels = new Dictionary<EnemyActionStep, Text>();
@@ -74,10 +69,10 @@ public class EnemyIntentNumbers : MonoBehaviour
     {
         switch (type)
         {
-            case EnemyActionType.Defense: return _defenseColor;
-            case EnemyActionType.Heal: return _healColor;
-            case EnemyActionType.Empower: return _empowerColor;
-            default: return _attackColor;
+            case EnemyActionType.Defense: return CombatPalette.Shield;
+            case EnemyActionType.Heal: return CombatPalette.Heal;
+            case EnemyActionType.Empower: return CombatPalette.Keyword;
+            default: return CombatPalette.Damage;
         }
     }
 

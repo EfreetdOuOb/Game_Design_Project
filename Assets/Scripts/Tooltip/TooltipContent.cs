@@ -53,14 +53,14 @@ public class TooltipContent
 /// <summary>懸浮說明的富文字配色：數字、關鍵字用固定顏色，全遊戲看起來一致。</summary>
 public static class TooltipText
 {
-    public static string Damage(object value) => Colored(value, "FF7A6B");
-    public static string Shield(object value) => Colored(value, "8FD1FF");
-    public static string Heal(object value) => Colored(value, "7CF28A");
-    public static string Keyword(object value) => Colored(value, "FFD966");
-    public static string Dim(object value) => Colored(value, "A8A8B3");
+    public static string Damage(object value) => Colored(value, CombatPalette.Damage);
+    public static string Shield(object value) => Colored(value, CombatPalette.Shield);
+    public static string Heal(object value) => Colored(value, CombatPalette.Heal);
+    public static string Keyword(object value) => Colored(value, CombatPalette.Keyword);
+    public static string Dim(object value) => Colored(value, CombatPalette.Dim);
 
-    private static string Colored(object value, string hex)
+    private static string Colored(object value, Color color)
     {
-        return "<color=#" + hex + "><b>" + value + "</b></color>";
+        return "<color=#" + CombatPalette.Hex(color) + "><b>" + value + "</b></color>";
     }
 }
