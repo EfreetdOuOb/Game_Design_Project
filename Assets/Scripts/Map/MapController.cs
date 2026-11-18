@@ -17,9 +17,9 @@ public class MapController : MonoBehaviour
     [Tooltip("還沒走、也還不能選的連線")]
     [SerializeField] private Color _lineIdleColor = new Color(0f, 0f, 0f, 0.75f);
     [Tooltip("已經走完第一步、現在可以選的連線（下一步的選項）")]
-    [SerializeField] private Color _lineAvailableColor = new Color(1f, 1f, 1f, 0.9f);
+    [SerializeField] private Color _lineAvailableColor = new Color(0.78f, 0.16f, 0.12f, 0.95f);
     [Tooltip("已經走過的路")]
-    [SerializeField] private Color _lineTraveledColor = new Color(1f, 0.82f, 0.3f, 1f);
+    [SerializeField] private Color _lineTraveledColor = new Color(0.62f, 0.38f, 0.08f, 1f);
     [SerializeField, Min(1f)] private float _availableLineThickness = 1.3f;
     [SerializeField, Min(1f)] private float _traveledLineThickness = 1.8f;
 
