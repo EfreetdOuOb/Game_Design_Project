@@ -148,6 +148,12 @@ public bool IsSlotLocked(int slotIndex) => lockedSlots.Contains(slotIndex);
             onTransform?.Invoke();
             UnlockAllSlots();
         }
+        else if (previewResult.transformPointIndex == 0)
+        {
+            // 起手就是轉換點：前面沒有走過任何技能點，沒有要鎖定的槽位，直接全部重抽
+            RerollShownSkills();
+            onTransform?.Invoke();
+        }
     }
 
     private void EnsureShownSkillsInitialized()

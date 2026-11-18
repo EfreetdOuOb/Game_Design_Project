@@ -290,8 +290,10 @@ private Color GetBaseColorForFunction(PointFunction func)
             touchedMiddlePoint = true;
         }
 
-        DispatchTransformActivatedIfNeeded();
-        
+        // 路徑中途碰到轉換點：馬上觸發。起手就是轉換點：先不觸發，等真的開始拖曳才觸發，
+        // 不然單純點一下轉換點（沒有出手）就能無限重抽技能。
+        if (selectedPointCount > 1 || hasDraggedThisGesture)
+            DispatchTransformActivatedIfNeeded();
     }
 
     private void LogGestureSummary(GestureResult result)
@@ -399,6 +401,7 @@ private Color GetBaseColorForFunction(PointFunction func)
             isPress = true;
             hasDraggedThisGesture = true;
             touchPos = eventData.position;
+            DispatchTransformActivatedIfNeeded();
         }
         if (isPress && CanPreviewFingerLine())
         {
@@ -455,13 +458,7 @@ private Color GetBaseColorForFunction(PointFunction func)
         GestureResult result = BuildGestureResult(resolvedFunction);
         LogGestureSummary(result);
 
-        if (result.hasTransform && result.transformPointIndex == 0 &&
-            hasDraggedThisGesture && actionDispatcher != null)
-        {
-            GestureResult transformResult = result;
-            transformResult.resolvedFunction = PointFunction.Transform;
-            actionDispatcher.Dispatch(transformResult);
-        }
+        // 起手就是轉換點的情況，轉換（重抽技能）已經在開始拖曳時觸發過了（見 OnDrag），這裡不再重複派發。
         ResetGestureState();
 
         StartCoroutine(PlayActionAnimationsAndEndTurn(result));
