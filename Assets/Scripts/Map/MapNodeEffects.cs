@@ -6,7 +6,7 @@ using UnityEngine.UI;
 /// <summary>
 /// 地圖節點的互動與進度提示：
 ///   · 可以點的節點：外圍有往外擴散的光圈；滑鼠移上去會放大、光圈變亮；點下去彈一下
-///   · 已完成的節點：蓋上半透明的「探索完成」印章（圓圈加旗子），大小約等於節點，隱隱蓋在圖案上
+///   · 已完成的節點：蓋上半透明的完成印章（圓圈加勾勾），大小約等於節點，隱隱蓋在圖案上
 ///   · 滑鼠移上任何節點：顯示節點類型名稱（<see cref="MapNodeTooltip"/>）
 /// 只讀取 <see cref="MapNode"/> 的狀態，不改任何地圖或流程資料。由 MapNode 自動掛上，圖形都是程式畫的，
 /// 想換成自己的圖，指定 Ring / Badge 的 Sprite 即可。
@@ -28,10 +28,10 @@ public class MapNodeEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     [SerializeField, Min(0f)] private float _clickPunch = 0.2f;
 
     [Header("已完成標記")]
-    [Tooltip("選填：自己的探索完成圖（整張含底）。留空使用程式畫的圓圈加旗子。")]
+    [Tooltip("選填：自己的完成圖（整張含底）。留空使用程式畫的圓圈加勾勾。")]
     [SerializeField] private Sprite _badgeSprite;
     [Tooltip("印章顏色；透明度決定蓋在節點圖案上有多淡")]
-    [SerializeField] private Color _badgeColor = new Color(1f, 1f, 1f, 0.55f);
+    [SerializeField] private Color _badgeColor = new Color(0.85f, 0.85f, 0.85f, 0.4f);
     [Tooltip("印章大小，單位是節點大小的比例（1 = 剛好蓋住整個節點圖案）")]
     [SerializeField, Range(0.3f, 1.6f)] private float _badgeSizeRatio = 1.05f;
 

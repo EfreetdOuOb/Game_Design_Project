@@ -12,6 +12,8 @@ public class MapNode : MonoBehaviour
     public Button _button;
     public bool isUnlocked;
     public bool isCompleted;
+    [Tooltip("已完成節點的圖案顏色（越暗越不搶眼）")]
+    public Color completedColor = new Color(0.4f, 0.4f, 0.4f, 1f);
 
     private void Awake()
     {
@@ -53,7 +55,7 @@ public class MapNode : MonoBehaviour
 
         if (isCompleted)
         {
-            _image.color = Color.gray;
+            _image.color = completedColor;
         }
         else if (isUnlocked)
         {

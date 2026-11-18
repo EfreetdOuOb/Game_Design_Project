@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 地圖特效用的簡單圖形（光圈、探索完成印章），用程式畫好後快取，不需要美術資源。
+/// 地圖特效用的簡單圖形（光圈、完成印章），用程式畫好後快取，不需要美術資源。
 /// 之後想換成自己的圖，直接在 <see cref="MapNodeEffects"/> 的 Sprite 欄位指定就會取代。
 /// </summary>
 public static class MapUiSprites
@@ -25,12 +25,12 @@ public static class MapUiSprites
         return Mathf.Clamp01(Smooth(d, 0.5f)) * Mathf.Clamp01(1f - Smooth(d, 0.4f));
     });
 
-    /// <summary>探索完成的印章：外圈 + 插在中間的旗子（白色，顏色與透明度由 Image 決定）</summary>
+    /// <summary>完成印章：外圈 + 中間的勾勾（白色，顏色與透明度由 Image 決定）</summary>
     public static Sprite Stamp => stamp != null ? stamp : stamp = Build("MapStampRuntime", StampAlpha);
 
     private static float StampAlpha(float x, float y)
     {
-        // 3 x 3 取樣，讓旗子的斜邊也平滑
+        // 3 x 3 取樣，讓勾勾的斜線邊緣平滑
         float total = 0f;
         const float step = 1f / (3f * Size);
         for (int sy = -1; sy <= 1; sy++)
@@ -51,31 +51,18 @@ public static class MapUiSprites
         if (d <= 0.48f && d >= 0.42f)
             return true;   // 外圈
 
-        // 旗桿
-        if (p.x >= 0.355f && p.x <= 0.395f && p.y >= 0.2f && p.y <= 0.8f)
-            return true;
-
-        // 旗面（三角旗）
-        if (InsideTriangle(p, new Vector2(0.395f, 0.8f), new Vector2(0.72f, 0.675f), new Vector2(0.395f, 0.55f)))
-            return true;
-
-        // 底座
-        return p.x >= 0.29f && p.x <= 0.46f && p.y >= 0.2f && p.y <= 0.245f;
+        // 勾勾：兩段粗線，左短右長
+        Vector2 a = new Vector2(0.27f, 0.50f);
+        Vector2 b = new Vector2(0.44f, 0.33f);
+        Vector2 c = new Vector2(0.74f, 0.67f);
+        return Mathf.Min(DistanceToSegment(p, a, b), DistanceToSegment(p, b, c)) <= 0.05f;
     }
 
-    private static bool InsideTriangle(Vector2 p, Vector2 a, Vector2 b, Vector2 c)
+    private static float DistanceToSegment(Vector2 p, Vector2 a, Vector2 b)
     {
-        float d1 = Cross(p, a, b);
-        float d2 = Cross(p, b, c);
-        float d3 = Cross(p, c, a);
-        bool hasNegative = d1 < 0f || d2 < 0f || d3 < 0f;
-        bool hasPositive = d1 > 0f || d2 > 0f || d3 > 0f;
-        return !(hasNegative && hasPositive);
-    }
-
-    private static float Cross(Vector2 p, Vector2 a, Vector2 b)
-    {
-        return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
+        Vector2 ab = b - a;
+        float t = Mathf.Clamp01(Vector2.Dot(p - a, ab) / ab.sqrMagnitude);
+        return Vector2.Distance(p, a + ab * t);
     }
 
     // 回傳 0 ~ 1 的不透明度；x、y 是 0 ~ 1 的座標
