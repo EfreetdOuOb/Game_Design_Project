@@ -11281,6 +11281,7 @@ GameObject:
   - component: {fileID: 1331590303}
   - component: {fileID: 1331590302}
   - component: {fileID: 1331590304}
+  - component: {fileID: 1331590305}
   m_Layer: 5
   m_Name: ShopEncounterPanel
   m_TagString: Untagged
@@ -11305,6 +11306,7 @@ RectTransform:
   - {fileID: 1268560127}
   - {fileID: 1797772829}
   - {fileID: 1648833216}
+  - {fileID: 1397690404}
   m_Father: {fileID: 732069550}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -11371,6 +11373,26 @@ MonoBehaviour:
   _slotPrefab: {fileID: 158822856715886, guid: 9be9823f9be0e264da5f7552f1468f86, type: 3}
   _slotContainer: {fileID: 1648833216}
   _resultText: {fileID: 1268560128}
+--- !u!114 &1331590305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1331590300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a10f4a3c011248d6b6555b87914f26de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GoldHUD
+  _goldText: {fileID: 1397690402}
+  _placeBelow: {fileID: 0}
+  _format: "\u91D1\u5E63\uFF1A{0}"
+  _autoFontSize: 28
+  _normalColor: {r: 1, g: 0.87, b: 0.3, a: 1}
+  _gainColor: {r: 1, g: 1, b: 0.7, a: 1}
+  _spendColor: {r: 1, g: 0.45, b: 0.35, a: 1}
+  _countDuration: 0.4
 --- !u!1 &1336919085
 GameObject:
   m_ObjectHideFlags: 0
@@ -11993,6 +12015,85 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleController
   _turnManager: {fileID: 472452699}
+--- !u!1 &1397690401
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1397690404}
+  - component: {fileID: 1397690403}
+  - component: {fileID: 1397690402}
+  m_Layer: 5
+  m_Name: GoldTxt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1397690402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397690401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 0.87058824, b: 0.29803923, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 30
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 2
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: "\u76EE\u524D\u91D1\u5E63\uFF1A"
+--- !u!222 &1397690403
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397690401}
+  m_CullTransparentMesh: 1
+--- !u!224 &1397690404
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397690401}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1331590301}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 179.99992, y: 175.00003}
+  m_SizeDelta: {x: 284.2727, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1400421635
 GameObject:
   m_ObjectHideFlags: 0
